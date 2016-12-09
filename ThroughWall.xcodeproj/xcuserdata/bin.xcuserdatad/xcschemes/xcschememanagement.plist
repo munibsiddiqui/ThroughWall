@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>SchemeUserState</key>
+	<dict>
+		<key>ShadowsocksLib.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>3</integer>
+		</dict>
+		<key>TWPacketTunnelProvider.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
+		<key>ThroughWall.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>0</integer>
+		</dict>
+		<key>TodayEx.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>2</integer>
+		</dict>
+		<key>TunnelLib.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>4</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>3474EC761DDC926C00EBF3C5</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>3474EC921DDC928400EBF3C5</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>3474ECA41DDC92B900EBF3C5</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>3474ECBA1DDC950000EBF3C5</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>3474ECCC1DDC951100EBF3C5</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+	</dict>
+</dict>
+</plist>

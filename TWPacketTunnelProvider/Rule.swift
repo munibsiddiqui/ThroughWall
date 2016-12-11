@@ -110,7 +110,7 @@ class Rule {
         ipRules = [String: DomainRule]()
         
         for item in items {
-            DDLogVerbose(item)
+//            DDLogVerbose(item)
             let components = item.components(separatedBy: ",")
             if components.count >= 3 {
                 let rule = trasnlateRule(fromString: components[2])
@@ -136,32 +136,32 @@ class Rule {
         
         if let block = defaults?.value(forKey: blockADSetting) as? Bool{
             blockAD = block
-            DDLogVerbose("Block AD \(blockAD)")
+//            DDLogVerbose("Block AD \(blockAD)")
         }
         if let global = defaults?.value(forKey: globalModeSetting) as? Bool {
             globalMode = global
-            DDLogVerbose("Global Mode \(globalMode)")
+//            DDLogVerbose("Global Mode \(globalMode)")
         }
         
-        if let realFullRules = fullRules {
-            DDLogVerbose("fullRule")
-            for fullRule in realFullRules {
-                DDLogVerbose("\(fullRule.key) : \(fullRule.value.description)")
-            }
-        }
-        if let realSuffixRules = suffixRules {
-            DDLogVerbose("suffixRule")
-            for suffixRule in realSuffixRules {
-                DDLogVerbose("\(suffixRule.key) : \(suffixRule.value.description)")
-            }
-        }
-        
-        if let realContainRules = containRules {
-            DDLogVerbose("containRule")
-            for containRule in realContainRules {
-                DDLogVerbose("\(containRule.key) : \(containRule.value.description)")
-            }
-        }
+//        if let realFullRules = fullRules {
+//            DDLogVerbose("fullRule")
+//            for fullRule in realFullRules {
+//                DDLogVerbose("\(fullRule.key) : \(fullRule.value.description)")
+//            }
+//        }
+//        if let realSuffixRules = suffixRules {
+//            DDLogVerbose("suffixRule")
+//            for suffixRule in realSuffixRules {
+//                DDLogVerbose("\(suffixRule.key) : \(suffixRule.value.description)")
+//            }
+//        }
+//        
+//        if let realContainRules = containRules {
+//            DDLogVerbose("containRule")
+//            for containRule in realContainRules {
+//                DDLogVerbose("\(containRule.key) : \(containRule.value.description)")
+//            }
+//        }
     }
     
     private func _ruleForDomain(_ domain: String) -> DomainRule {

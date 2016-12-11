@@ -2935,6 +2935,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = JG7P2QYPN7;
 				INFOPLIST_FILE = ThroughWall/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Bingo.ThroughWall;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2950,13 +2951,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = ThroughWall/ThroughWall.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				DEVELOPMENT_TEAM = JG7P2QYPN7;
 				INFOPLIST_FILE = ThroughWall/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Bingo.ThroughWall;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "267affdb-31e9-42a0-9d5a-0e8f83627602";
-				PROVISIONING_PROFILE_SPECIFIER = Dev.ThroughWall;
+				PROVISIONING_PROFILE = "2db2c172-fa12-4204-b4e5-4fc043860216";
+				PROVISIONING_PROFILE_SPECIFIER = "XC iOS: Bingo.ThroughWall";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
@@ -2987,13 +2990,14 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = TWPacketTunnelProvider/TWPacketTunnelProvider.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				DEVELOPMENT_TEAM = JG7P2QYPN7;
 				INFOPLIST_FILE = TWPacketTunnelProvider/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Bingo.ThroughWall.TWPacketTunnelProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "02a7b6a5-4f23-494c-bf24-faa0667d8006";
-				PROVISIONING_PROFILE_SPECIFIER = Dev.TWPacketTunnelProvider;
+				PROVISIONING_PROFILE = "ac3c2040-5aaa-4f49-a3cf-4c7a63bc31e3";
+				PROVISIONING_PROFILE_SPECIFIER = "XC iOS: Bingo.ThroughWall.TWPacketTunnelProvider";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "TWPacketTunnelProvider/TWPacketTunnelProvider-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
@@ -3022,13 +3026,14 @@
 			baseConfigurationReference = A823D555ABAD2A9D06C0A955 /* Pods-TodayEx.release.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = TodayEx/TodayEx.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				DEVELOPMENT_TEAM = JG7P2QYPN7;
 				INFOPLIST_FILE = TodayEx/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Bingo.ThroughWall.TodayEx;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "a8d9022a-b450-401f-9a00-2fdf6c6ba1b5";
-				PROVISIONING_PROFILE_SPECIFIER = Dev.TWTodayEx;
+				PROVISIONING_PROFILE = "efd55b42-55c5-4515-aa21-f06727dd058f";
+				PROVISIONING_PROFILE_SPECIFIER = "XC iOS: Bingo.ThroughWall.TodayEx";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 3.0;
 			};

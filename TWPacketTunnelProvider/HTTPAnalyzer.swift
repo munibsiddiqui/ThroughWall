@@ -15,9 +15,11 @@ let ConnectionResponse = ConnectionResponseStr.data(using: String.Encoding.utf8)
 
 let TAG_RECOGNIZE = 0
 let TAG_WRITE     = 1
-let TAG_READFROMCLIENT = 2
-let TAG_READFROMSERVER = 3
-let TAG_HTTPRESPONSE = 4
+let TAG_WRITETOSERVER = 2
+let TAG_READFROMCLIENT = 12
+let TAG_READFROMSERVER = 13
+let TAG_HTTPRESPONSE = 14
+
 
 enum ConnectionError: Error {
     case UnReadableData
@@ -26,15 +28,15 @@ enum ConnectionError: Error {
     case URLComponentAnalysisError
 }
 
-protocol HTTPTraficTransmitDelegate {
-    func HTTPTraficTransmitDidDisconnect(httpTraficTransmit transmit: HTTPTraficTransmit)
+protocol HTTPTrafficTransmitDelegate {
+    func HTTPTrafficTransmitDidDisconnect()
     func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16)
     func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int)
 }
 
-class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTraficTransmitDelegate {
+class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate {
     
-    private var outGoing: HTTPTraficTransmit?
+    private var outGoing: HTTPTrafficTransmit?
     private var clientSocket: GCDAsyncSocket?
     private var isConnectRequest = true
     private var repostData: Data? = nil
@@ -60,10 +62,18 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTraficTransmitDelegate 
     }
     
     func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int) {
+        if clientSocket == nil {
+            DDLogError("H\(intTag) Socks has disconnected")
+            return
+        }
         if tag == TAG_RECOGNIZE {
             //get destination and port
             analyzeProxy(analyzeData: data, completionHandle: { (host, port) in
-                outGoing = HTTPTraficTransmit(withDelegate: self)
+                if clientSocket == nil {
+                    DDLogError("H\(intTag) Socks has disconnected")
+                    return
+                }
+                outGoing = HTTPTrafficTransmit(withDelegate: self)
                 var useProxy = false
                 switch Rule.sharedInstance.ruleForDomain(host) {
                 case .Proxy:
@@ -84,9 +94,9 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTraficTransmitDelegate 
                 DDLogError("H\(intTag) \(error)")
             })
         }else if tag == TAG_READFROMCLIENT {
-            DDLogVerbose("H\(intTag) From Client length:\(data.count)")
+            DDLogVerbose("H\(intTag) To Server length:\(data.count)")
             delegate?.didUploadToServer(dataSize: data.count)
-            outGoing?.write(data, withTimeout: -1, tag: TAG_WRITE)
+            outGoing?.write(data, withTimeout: -1, tag: TAG_WRITETOSERVER)
             clientSocket?.readData(withTimeout: -1, tag: TAG_READFROMCLIENT)
         }else if tag == TAG_READFROMSERVER {
             DDLogVerbose("H\(intTag) From Server length:\(data.count)")
@@ -104,6 +114,12 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTraficTransmitDelegate 
             DDLogError("H\(intTag) Unknow Tag: \(tag)")
         }
     }
+    
+//    func socket(_ sock: GCDAsyncSocket, didWriteDataWithTag tag: Int) {
+//        if tag == TAG_WRITETOSERVER {
+
+//        }
+//    }
     
     func extractDetail(from request: String, by name: String) -> String? {
         var result: String? = nil
@@ -275,8 +291,8 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTraficTransmitDelegate 
         }
     }
     
-    func HTTPTraficTransmitDidDisconnect(httpTraficTransmit transmit: HTTPTraficTransmit) {
-        DDLogVerbose("H\(intTag) HTTPTrafic side disconnect")
+    func HTTPTrafficTransmitDidDisconnect() {
+        DDLogVerbose("H\(intTag) HTTPTraffic side disconnect")
         
         outGoing = nil
         if clientSocket == nil {

@@ -23,10 +23,10 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate,HTTPAnalyzerDelegate {
     private var bindToPort = 0
     private var socketServer: GCDAsyncSocket!
     private var clientSocket = [HTTPAnalyzer]()
-    private let analyzerLockQueue = DispatchQueue(label: "httpProxy.analyzer.lockQueue")
-    private let downloadLockQueue = DispatchQueue(label: "httpProxy.download.lockQueue")
-    private let uploadLockQueue = DispatchQueue(label: "httpProxy.upload.lockQueue")
-    private let tagLockQueue = DispatchQueue(label: "httpProxy.tagLockQueue")
+    private let analyzerLock = NSLock()
+    private let downloadLock = NSLock()
+    private let uploadLock = NSLock()
+    private let tagLock = NSLock()
     private var downloadCount = 0
     private var uploadCount = 0
     private var timer: DispatchSourceTimer?
@@ -35,7 +35,7 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate,HTTPAnalyzerDelegate {
     func startProxy(bindToPort toPort: Int, callback: (Int, Error?) -> Void) {
         let localPort = 0
         bindToPort = toPort
-        
+
         socketServer = GCDAsyncSocket(delegate: self, delegateQueue: DispatchQueue.global())
         do {
             try socketServer.accept(onInterface: "127.0.0.1", port: UInt16(localPort))
@@ -53,7 +53,7 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate,HTTPAnalyzerDelegate {
     }
     
     func prepareTimelyUpdate() {
-        timer  = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue(label: "updateQueue") )
+        timer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue(label: "updateQueue") )
         timer?.scheduleRepeating(deadline: .now() + .seconds(1), interval: .seconds(1), leeway: .milliseconds(100))
         timer?.setEventHandler(handler: {
             let (download, upload) = self.readDownloadUploadCount()
@@ -75,53 +75,53 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate,HTTPAnalyzerDelegate {
     }
     
     func HTTPAnalyzerDidDisconnect(httpAnalyzer analyzer: HTTPAnalyzer) {
-        analyzerLockQueue.async {
+        analyzerLock.lock()
             if let index = self.clientSocket.index(of: analyzer) {
                 self.clientSocket.remove(at: index)
                 DDLogVerbose("H\(analyzer.getIntTag()) removed from arrary")
             }
-        }
+        analyzerLock.unlock()
     }
     
     func didDownloadFromServer(dataSize size: Int) {
-        downloadLockQueue.async {
+        downloadLock.lock()
             self.downloadCount = self.downloadCount + size
-        }
+        downloadLock.unlock()
     }
     
     func didUploadToServer(dataSize size: Int) {
-        uploadLockQueue.async {
+        uploadLock.lock()
             self.uploadCount = self.uploadCount + size
-        }
+        uploadLock.unlock()
     }
     
     func readDownloadUploadCount() -> (Int, Int) {
         var download = 0
         var upload = 0
-        downloadLockQueue.sync {
+        downloadLock.lock()
             download = self.downloadCount
             self.downloadCount = 0
-        }
-        uploadLockQueue.sync {
-            upload = self.uploadCount
+        downloadLock.unlock()
+        uploadLock.lock()
+        upload = self.uploadCount
             self.uploadCount = 0
-        }
+        uploadLock.unlock()
         return (download, upload)
     }
     
     func socket(_ sock: GCDAsyncSocket, didAcceptNewSocket newSocket: GCDAsyncSocket) {
         var tag = 0
-        tagLockQueue.sync {
+        tagLock.lock()
             self.tagCount = self.tagCount + 1
             tag = self.tagCount
-        }
+        tagLock.unlock()
         
         let newClient = HTTPAnalyzer(analyzerDelegate: self, intTag: tag)
         newClient.setSocket(newSocket, socksServerPort: bindToPort)
-        analyzerLockQueue.async {
-            self.clientSocket.append(newClient)
-            DDLogVerbose("H\(newClient.getIntTag()) added into arrary")
-        }
+        analyzerLock.lock()
+        self.clientSocket.append(newClient)
+        DDLogVerbose("H\(newClient.getIntTag()) added into arrary")
+        analyzerLock.unlock()
     }
     
 }

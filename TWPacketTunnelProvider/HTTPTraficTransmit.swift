@@ -1,5 +1,5 @@
 //
-//  HTTPTraficTransmit.swift
+//  HTTPTrafficTransmit.swift
 //  ThroughWall
 //
 //  Created by Bin on 01/12/2016.
@@ -23,11 +23,11 @@ private let TIMEOUT_CONNECT = 8.00
 private let TIMEOUT_READ = 5.00
 private let TIMEOUT_TOTAL = 80.00
 
-class HTTPTraficTransmit: NSObject, GCDAsyncSocketDelegate {
+class HTTPTrafficTransmit: NSObject, GCDAsyncSocketDelegate {
     
     private var proxyHost: String?
     private var proxyPort: UInt16?
-    private var delegate: HTTPTraficTransmitDelegate?
+    private var delegate: HTTPTrafficTransmitDelegate?
     private var shouldConnectDirectly = true
     private var remoteHost: String?
     private var remotePort: UInt16?
@@ -39,7 +39,7 @@ class HTTPTraficTransmit: NSObject, GCDAsyncSocketDelegate {
         shouldConnectDirectly = false
     }
     
-    init(withDelegate delegate: HTTPTraficTransmitDelegate) {
+    init(withDelegate delegate: HTTPTrafficTransmitDelegate) {
         self.delegate = delegate
     }
     
@@ -74,7 +74,7 @@ class HTTPTraficTransmit: NSObject, GCDAsyncSocketDelegate {
     
     internal  func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
         socket = nil
-        delegate?.HTTPTraficTransmitDidDisconnect(httpTraficTransmit: self)
+        delegate?.HTTPTrafficTransmitDidDisconnect()
         delegate = nil
     }
     

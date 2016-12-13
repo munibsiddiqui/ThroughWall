@@ -57,7 +57,7 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate,HTTPAnalyzerDelegate {
         timer?.scheduleRepeating(deadline: .now() + .seconds(1), interval: .seconds(1), leeway: .milliseconds(100))
         timer?.setEventHandler(handler: {
             let (download, upload) = self.readDownloadUploadCount()
-//            DDLogVerbose("download:\(download) upload:\(upload)")
+            // DDLogVerbose("download:\(download) upload:\(upload)")
             let defaults = UserDefaults.init(suiteName: groupName)
             
             defaults?.set(download, forKey: downloadCountKey)
@@ -78,7 +78,7 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate,HTTPAnalyzerDelegate {
         analyzerLock.lock()
             if let index = self.clientSocket.index(of: analyzer) {
                 self.clientSocket.remove(at: index)
-                DDLogVerbose("H\(analyzer.getIntTag()) removed from arrary")
+                // DDLogVerbose("H\(analyzer.getIntTag()) removed from arrary")
             }
         analyzerLock.unlock()
     }
@@ -120,7 +120,7 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate,HTTPAnalyzerDelegate {
         newClient.setSocket(newSocket, socksServerPort: bindToPort)
         analyzerLock.lock()
         self.clientSocket.append(newClient)
-        DDLogVerbose("H\(newClient.getIntTag()) added into arrary")
+        // DDLogVerbose("H\(newClient.getIntTag()) added into arrary")
         analyzerLock.unlock()
     }
     

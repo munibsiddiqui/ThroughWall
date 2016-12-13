@@ -209,5 +209,9 @@ class HTTPTrafficTransmit: NSObject, GCDAsyncSocketDelegate {
     func readData(withTimeout timeout: TimeInterval, tag intTag: Int) {
         socket?.readData(withTimeout: timeout, tag: intTag)
     }
+    
+    func socket(_ sock: GCDAsyncSocket, didWriteDataWithTag tag: Int) {
+        delegate?.socket(sock, didWriteDataWithTag: tag)
+    }
 }
 

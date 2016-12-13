@@ -74,7 +74,7 @@ class Socks2HTTPS: NSObject, GCDAsyncSocketDelegate, Socks2HTTPSConverterDelegat
         newClient.socksOpen()
         lockQueue.async {
             self.converts?.append(newClient)
-            DDLogVerbose("S\(newClient.getIntTag()) added into arrary")
+            // DDLogVerbose("S\(newClient.getIntTag()) added into arrary")
             
         }
     }
@@ -83,7 +83,7 @@ class Socks2HTTPS: NSObject, GCDAsyncSocketDelegate, Socks2HTTPSConverterDelegat
         lockQueue.async {
             if let index = self.converts?.index(of: sock) {
                 self.converts?.remove(at: index)
-                DDLogVerbose("S\(sock.getIntTag()) removed from arrary")
+                // DDLogVerbose("S\(sock.getIntTag()) removed from arrary")
             }
         }
     }
@@ -117,17 +117,17 @@ class Socks2HTTPSConverter: NSObject, GCDAsyncSocketDelegate{
     
     internal func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int) {
         if tag == SOCKS_INCOMING_READ {
-            DDLogVerbose("S\(intTag) SOCKS_INCOMING_READ")
+            // DDLogVerbose("S\(intTag) SOCKS_INCOMING_READ")
             outGoing?.write(data, withTimeout: -1, tag: SOCKS_OUTGOING_WRITE)
             socksConnection?.readData(withTimeout: -1, tag: SOCKS_INCOMING_READ)
             outGoing?.readData(withTimeout: -1, tag: SOCKS_OUTGOING_READ)
         }else if tag == SOCKS_OUTGOING_READ {
-            DDLogVerbose("S\(intTag) SOCKS_OUTGOING_READ")
+            // DDLogVerbose("S\(intTag) SOCKS_OUTGOING_READ")
             socksConnection?.write(data, withTimeout: -1, tag: SOCKS_INCOMING_WRITE)
             socksConnection?.readData(withTimeout: -1, tag: SOCKS_INCOMING_READ)
             outGoing?.readData(withTimeout: -1, tag: SOCKS_OUTGOING_READ)
         }else if tag == HTTP_PROXY_REQUEST_RESPONSE {
-            DDLogVerbose("S\(intTag) HTTP_PROXY_REQUEST_RESPONSE")
+            // DDLogVerbose("S\(intTag) HTTP_PROXY_REQUEST_RESPONSE")
             let response = String.init(data: data, encoding: String.Encoding.utf8)
             if response != ConnectionResponseStr {
                 outGoing?.disconnect()
@@ -146,7 +146,7 @@ class Socks2HTTPSConverter: NSObject, GCDAsyncSocketDelegate{
         }else if tag == SOCKS_OPEN {
             let buffer: [UInt8] = [5, 0]
             
-            DDLogVerbose("S\(intTag) SOCKS_OPEN")
+            // DDLogVerbose("S\(intTag) SOCKS_OPEN")
             socksConnection?.write(Data(bytes: buffer), withTimeout: -1, tag: SOCKS_OPEN)
             socksConnection?.readData(toLength: 4, withTimeout: TIMEOUT_READ, tag: SOCKS_CONNECT_INIT)
         }else if tag == SOCKS_CONNECT_INIT{
@@ -164,7 +164,7 @@ class Socks2HTTPSConverter: NSObject, GCDAsyncSocketDelegate{
             // Address Type = 3 (1=IPv4, 3=DomainName 4=IPv6)
             // Address      = P:D (P=LengthOfDomain D=DomainWithoutNullTermination)
             // Port         = 0
-            DDLogVerbose("S\(intTag) SOCKS_CONNECT_INIT")
+            // DDLogVerbose("S\(intTag) SOCKS_CONNECT_INIT")
             //            var buffer = [UInt8].init(repeating: 0, count: data.count)
             //            data.copyBytes(to: &buffer, count: data.count)
             let buffer = [UInt8](data)
@@ -179,7 +179,7 @@ class Socks2HTTPSConverter: NSObject, GCDAsyncSocketDelegate{
                 socksConnection?.readData(toLength: 16, withTimeout: -1, tag: SOCKS_CONNECT_IPv6)
             }
         }else if tag == SOCKS_CONNECT_IPv4 {
-            DDLogVerbose("S\(intTag) SOCKS_CONNECT_IPv4")
+            // DDLogVerbose("S\(intTag) SOCKS_CONNECT_IPv4")
             let buffer = [UInt8](data)
             responseData?.append(contentsOf: buffer)
             
@@ -189,10 +189,10 @@ class Socks2HTTPSConverter: NSObject, GCDAsyncSocketDelegate{
             let address = String(cString: &addressStr)
             addressStr.removeAll()
             host = address
-            DDLogVerbose("S\(intTag) host: \(host)")
+            // DDLogVerbose("S\(intTag) host: \(host)")
             socksConnection?.readData(toLength: 2, withTimeout: -1, tag: SOCKS_CONNECT_PORT)
         }else if tag == SOCKS_CONNECT_IPv6 {
-            DDLogVerbose("S\(intTag) SOCKS_CONNECT_IPv6")
+            // DDLogVerbose("S\(intTag) SOCKS_CONNECT_IPv6")
             let buffer = [UInt8](data)
             responseData?.append(contentsOf: buffer)
             
@@ -202,21 +202,21 @@ class Socks2HTTPSConverter: NSObject, GCDAsyncSocketDelegate{
             let address = String(cString: &addressStr)
             addressStr.removeAll()
             host = address
-            DDLogVerbose("S\(intTag) host6: \(host)")
+            // DDLogVerbose("S\(intTag) host6: \(host)")
             socksConnection?.readData(toLength: 2, withTimeout: -1, tag: SOCKS_CONNECT_PORT)
         }else if tag == SOCKS_CONNECT_DOMAIN_LENGTH {
             DDLogError("S\(intTag) SOCKS_CONNECT_DOMAIN_LENGTH is strange")
         }else if tag == SOCKS_CONNECT_PORT {
-            DDLogVerbose("S\(intTag) SOCKS_CONNECT_PORT")
+            // DDLogVerbose("S\(intTag) SOCKS_CONNECT_PORT")
             let buffer = [UInt8](data)
             responseData?.append(contentsOf: buffer)
             port = UInt16(buffer[0]) * 256 + UInt16(buffer[1])
-            DDLogVerbose("S\(intTag) port: \(port)")
+            // DDLogVerbose("S\(intTag) port: \(port)")
             do{
                 outGoing = GCDAsyncSocket(delegate: self, delegateQueue: DispatchQueue.global())
                 try outGoing?.connect(toHost: "127.0.0.1", onPort: httpPort)
             }catch {
-                DDLogVerbose("S\(intTag) Unable to connect local port \(httpPort)")
+                // DDLogVerbose("S\(intTag) Unable to connect local port \(httpPort)")
                 outGoing = nil
                 socksConnection?.disconnect()
             }
@@ -224,9 +224,9 @@ class Socks2HTTPSConverter: NSObject, GCDAsyncSocketDelegate{
     }
     
     internal func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16) {
-        DDLogVerbose("S\(intTag) HTTPS proxy server connected")
+        // DDLogVerbose("S\(intTag) HTTPS proxy server connected")
         let request = "CONNECT \(self.host!):\(self.port!) HTTP/1.1\r\nHost: \(self.host!)\r\n\r\n"
-        DDLogVerbose("S\(intTag) \(request)")
+        // DDLogVerbose("S\(intTag) \(request)")
         self.host = nil
         outGoing?.write(request.data(using: String.Encoding.utf8)!, withTimeout: -1, tag: HTTP_PROXY_REQUEST)
         outGoing?.readData(withTimeout: TIMEOUT_READ, tag: HTTP_PROXY_REQUEST_RESPONSE)
@@ -235,17 +235,17 @@ class Socks2HTTPSConverter: NSObject, GCDAsyncSocketDelegate{
     internal func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
         
         if sock == outGoing {
-            DDLogVerbose("S\(intTag) HTTP side disconnect")
+            // DDLogVerbose("S\(intTag) HTTP side disconnect")
             outGoing =  nil
             socksConnection?.disconnect()
 //            socksConnection = nil
         }else if sock == socksConnection {
-            DDLogVerbose("S\(intTag) Socks side disconnect")
+            // DDLogVerbose("S\(intTag) Socks side disconnect")
             socksConnection = nil
             outGoing?.disconnect()
 //            outGoing =  nil
         }else{
-            DDLogVerbose("S\(intTag) Unknown side disconnect")
+            // DDLogVerbose("S\(intTag) Unknown side disconnect")
             outGoing?.disconnect()
             outGoing =  nil
             socksConnection?.disconnect()
@@ -257,7 +257,7 @@ class Socks2HTTPSConverter: NSObject, GCDAsyncSocketDelegate{
         }
         
         if responseData != nil {
-            DDLogVerbose("S\(intTag) Unbelieveable~~~")
+            // DDLogVerbose("S\(intTag) Unbelieveable~~~")
         }
         responseData = nil
     }

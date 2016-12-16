@@ -9,6 +9,8 @@
 import UIKit
 import NotificationCenter
 import NetworkExtension
+import Fabric
+import Crashlytics
 
 class TodayViewController: UIViewController, NCWidgetProviding {
         
@@ -81,10 +83,16 @@ class TodayViewController: UIViewController, NCWidgetProviding {
         }
     }
     
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+//        Fabric.with([Crashlytics.self])
+        Crashlytics.start(withAPIKey: "ea6ae7041e03704c8768e183adaa548fa1192da8")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view from its nib.
-        
+
 //        extensionContext?.widgetLargestAvailableDisplayMode = .expanded
         
         observer = UnsafeRawPointer(Unmanaged.passUnretained(self).toOpaque())

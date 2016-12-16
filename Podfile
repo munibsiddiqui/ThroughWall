@@ -14,6 +14,8 @@ target 'ThroughWall' do
   use_frameworks!
   pod 'CocoaLumberjack/Swift'
   pod 'Charts'
+  pod 'Fabric'
+  pod 'Crashlytics'
   # Pods for ThroughWall
 
 end
@@ -22,6 +24,8 @@ target 'TodayEx' do
   # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
   use_frameworks!
   pod 'CocoaLumberjack/Swift'
+  pod 'Fabric'
+  pod 'Crashlytics'
   # Pods for TodayEx
 
 end
@@ -40,6 +44,8 @@ target 'TWPacketTunnelProvider' do
   use_frameworks!
   pod 'CocoaAsyncSocket'
   pod 'CocoaLumberjack/Swift'
+  pod 'Fabric'
+  pod 'Crashlytics'
   # Pods for TWPacketTunnelProvider
 
 end

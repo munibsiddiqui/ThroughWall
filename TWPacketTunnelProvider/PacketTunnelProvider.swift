@@ -10,6 +10,8 @@ import NetworkExtension
 import CocoaLumberjack
 import ShadowsocksLib
 import TunnelLib
+import Fabric
+import Crashlytics
 
 class PacketTunnelProvider: NEPacketTunnelProvider {
     var pendingStartCompletion: ((Error?) -> Void)?
@@ -19,7 +21,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     
     override func startTunnel(options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void) {
         // Add code here to start the process of connecting the tunnel.
-        
+        Fabric.with([Crashlytics.self])
+
         DDLog.add(DDASLLogger.sharedInstance()) // ASL = Apple System Logs
         
         let fileLogger: DDFileLogger = DDFileLogger() // File Logger

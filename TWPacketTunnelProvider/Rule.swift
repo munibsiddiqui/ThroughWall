@@ -164,15 +164,26 @@ class Rule {
 //        }
     }
     
-    private func _ruleForDomain(_ domain: String) -> DomainRule {
-        var isIP = false
-        if let chr = domain.characters.first {
-            if (chr >= "0" && chr <= "9") {
-                isIP = true
-            }
+    private func validateIpAddress(ipToValidate: String) -> Bool {
+        
+        var sin = sockaddr_in()
+        var sin6 = sockaddr_in6()
+        
+        if ipToValidate.withCString({ cstring in inet_pton(AF_INET6, cstring, &sin6.sin6_addr) }) == 1 {
+            // IPv6 peer.
+            return true
+        }
+        else if ipToValidate.withCString({ cstring in inet_pton(AF_INET, cstring, &sin.sin_addr) }) == 1 {
+            // IPv4 peer.
+            return true
         }
         
-        if isIP {
+        return false;
+    }
+    
+    private func _ruleForDomain(_ domain: String) -> DomainRule {
+        
+        if validateIpAddress(ipToValidate: domain) {
             let ipInBinary = translateToBinary(fromIP: domain)
             if let realIPRules = ipRules {
                 for ipRule in realIPRules {

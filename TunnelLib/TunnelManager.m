@@ -87,8 +87,8 @@ static const DDLogLevel ddLogLevel = DDLogLevelDebug;
     [NSThread detachNewThreadSelector:@selector(_startTun2Socks:) toTarget:[TunnelManager sharedInterface] withObject:@(socksServerPort)];
 }
 
-+ (void)stop {
-    //    stop_tun2socks();
+- (void)stop {
+    stop_tun2socks();
 }
 
 - (void)_startTun2Socks: (NSNumber *)socksServerPort {

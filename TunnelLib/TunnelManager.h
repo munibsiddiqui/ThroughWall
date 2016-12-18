@@ -19,6 +19,6 @@
 + (TunnelManager *)sharedInterface;
 - (NSError *)startTunnelWithShadowsocksPort:(NSNumber *)shadowsocksPort PacketTunnelFlow:(NEPacketTunnelFlow *)packetFlow;
 + (void)writePacket: (NSData *)packet;
-+ (void)stop;
+- (void)stop;
 
 @end

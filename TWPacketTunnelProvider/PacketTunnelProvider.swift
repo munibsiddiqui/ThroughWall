@@ -15,14 +15,17 @@ import Crashlytics
 
 class PacketTunnelProvider: NEPacketTunnelProvider {
     var pendingStartCompletion: ((Error?) -> Void)?
+    var pendingStopCompletion: (() -> Void)?
     let ssControler = SSlibevController()
+    var lastPath: NWPath?
+    var httpPort = 0
     
     let filePath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] + "/" + configFileName
     
     override func startTunnel(options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void) {
         // Add code here to start the process of connecting the tunnel.
         Fabric.with([Crashlytics.self])
-
+        
         DDLog.add(DDASLLogger.sharedInstance()) // ASL = Apple System Logs
         
         let fileLogger: DDFileLogger = DDFileLogger() // File Logger
@@ -39,6 +42,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         
         Rule.sharedInstance.analyzeRuleFile()
         
+        addObserver(self, forKeyPath: "defaultPath", options: NSKeyValueObservingOptions.initial, context: nil)
+        
         //Start shadowsocks_libev
         startShodowsocksClient { (ShadowLibSocksPort, error) in
             if error != nil {
@@ -46,6 +51,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 return
             }
             DDLogDebug("shadowsocks port: \(ShadowLibSocksPort)")
+            
+            NotificationCenter.default.addObserver(self, selector: #selector(PacketTunnelProvider.onShadowsocksClientClosed), name: NSNotification.Name(rawValue: Tun2SocksStoppedNotification), object: nil)
             
             //HTTP/HTTPS Proxy Setting
             HTTPProxyManager.shardInstance.startProxy(bindToPort: ShadowLibSocksPort, callback: { (httpProxyPort, error) in
@@ -55,6 +62,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                     return
                 }
                 DDLogDebug("http(s) port: \(httpProxyPort)")
+                self.httpPort = httpProxyPort
                 
                 //socksTohttp
                 Socks2HTTPS.sharedInstance.start(bindToPort: UInt16(httpProxyPort), callback: { (socksPortToHTTP, error) in
@@ -63,6 +71,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                     self.setupTunnelWith(proxyPort: httpProxyPort, completionHandle: { (error) in
                         //Forward IP Packets
                         let error = TunnelManager.sharedInterface().startTunnel(withShadowsocksPort: socksPortToHTTP as NSNumber!, packetTunnelFlow: self.packetFlow)
+                        //                        [weakSelf addObserver:weakSelf forKeyPath:@"defaultPath" options:NSKeyValueObservingOptionInitial context:nil];
                         self.pendingStartCompletion?(error)
                         
                     })
@@ -113,10 +122,39 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
     
+    func onShadowsocksClientClosed() {
+        DDLogDebug("onShadowsocksClientClosed")
+        if pendingStopCompletion != nil {
+            pendingStopCompletion!()
+        }
+        exit(EXIT_SUCCESS);
+    }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == "defaultPath" {
+            DDLogDebug("defaultPath")
+            if defaultPath?.status == NWPathStatus.satisfied && defaultPath != lastPath {
+                if lastPath == nil {
+                    lastPath = defaultPath
+                }else{
+                    DDLogDebug("received network change notifcation")
+                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1, execute: {
+                        self.setupTunnelWith(proxyPort: self.httpPort, completionHandle: { (_) in
+                            
+                        })
+                    })
+                }
+            }else{
+                lastPath = defaultPath
+            }
+        }
+    }
     
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
         // Add code here to start the process of stopping the tunnel.
-        completionHandler()
+        TunnelManager.sharedInterface().stop()
+        pendingStopCompletion = completionHandler
+        DDLogDebug("stopTunnel")
     }
     
     override func handleAppMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)?) {

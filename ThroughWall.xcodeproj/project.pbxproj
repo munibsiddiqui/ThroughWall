@@ -200,7 +200,6 @@
 		34CC5FFA1DDCAA390061AA44 /* ConfigureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34CC5FF71DDCAA390061AA44 /* ConfigureViewController.swift */; };
 		34CC5FFB1DDCAA390061AA44 /* InputTextFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34CC5FF81DDCAA390061AA44 /* InputTextFieldCell.swift */; };
 		34CC5FFC1DDCAA390061AA44 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34CC5FF91DDCAA390061AA44 /* MainViewController.swift */; };
-		34E126051E0B6745001D7464 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 34E126041E0B6745001D7464 /* .gitignore */; };
 		560A5FB41FCB850B8240A0EF /* Pods_TWPacketTunnelProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D54040D7632C1761B2803BD /* Pods_TWPacketTunnelProvider.framework */; };
 		6F35DA3314EA72D537C22254 /* Pods_TunnelLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C49EBEDDB2AF6AB02D6E3DEC /* Pods_TunnelLib.framework */; };
 		8788255218AB66821DB5C29F /* Pods_TodayEx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6776F291F2979F3F8EA43E5 /* Pods_TodayEx.framework */; };
@@ -891,7 +890,6 @@
 		34CC5FF91DDCAA390061AA44 /* MainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		34CC5FFD1DDCAE5F0061AA44 /* ThroughWall.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ThroughWall.entitlements; sourceTree = "<group>"; };
 		34CC5FFE1DDCAEF10061AA44 /* TodayEx.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TodayEx.entitlements; sourceTree = "<group>"; };
-		34E126041E0B6745001D7464 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		3CE3B4B0CF2F4A6FF2DF8953 /* Pods-TunnelLib.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TunnelLib.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TunnelLib/Pods-TunnelLib.debug.xcconfig"; sourceTree = "<group>"; };
 		541B6C2129C7CA6D95A9FB35 /* Pods_ThroughWall.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThroughWall.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A7F08F73CD12752F1495C75 /* Pods-ShadowsocksLib.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ShadowsocksLib.release.xcconfig"; path = "Pods/Target Support Files/Pods-ShadowsocksLib/Pods-ShadowsocksLib.release.xcconfig"; sourceTree = "<group>"; };
@@ -973,7 +971,6 @@
 		3474EC6E1DDC926C00EBF3C5 = {
 			isa = PBXGroup;
 			children = (
-				34E126041E0B6745001D7464 /* .gitignore */,
 				3474EC791DDC926C00EBF3C5 /* ThroughWall */,
 				3474EC941DDC928400EBF3C5 /* TWPacketTunnelProvider */,
 				3474ECA91DDC92B900EBF3C5 /* TodayEx */,
@@ -2374,7 +2371,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				34E126051E0B6745001D7464 /* .gitignore in Resources */,
 				3474EC881DDC926C00EBF3C5 /* LaunchScreen.storyboard in Resources */,
 				3474EC851DDC926C00EBF3C5 /* Assets.xcassets in Resources */,
 				3474EC801DDC926C00EBF3C5 /* Main.storyboard in Resources */,

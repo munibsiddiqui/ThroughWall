@@ -88,7 +88,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
                     break
                 }
                 do {
-                    // DDLogVerbose("H\(intTag) Proxy:\(useProxy) Connect: \(host):\(port)")
+                     DDLogDebug("H\(intTag) Proxy:\(useProxy) Connect: \(host):\(port)")
                     try outGoing?.connnect(toRemoteHost: host, onPort: port)
                 }catch{
                     DDLogError("H\(intTag) \(error)")
@@ -97,23 +97,18 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
                 DDLogError("H\(intTag) \(error)")
             })
         }else if tag == TAG_READFROMCLIENT {
-//             DDLogVerbose("H\(intTag) From Client length:\(data.count)")
+             DDLogDebug("H\(intTag) From Client length:\(data.count)")
             delegate?.didUploadToServer(dataSize: data.count)
             outGoing?.write(data, withTimeout: -1, tag: TAG_WRITETOSERVER)
-//            clientSocket?.readData(withTimeout: -1, tag: TAG_READFROMCLIENT)
         }else if tag == TAG_READFROMSERVER {
-//             DDLogVerbose("H\(intTag) From Server length:\(data.count)")
+             DDLogDebug("H\(intTag) From Server length:\(data.count)")
             delegate?.didDownloadFromServer(dataSize: data.count)
             clientSocket?.write(data, withTimeout: -1, tag: TAG_WRITETOCLIENT)
-//            DDLogVerbose("H\(intTag) From Server length:\(data.count) End")
-//            outGoing?.readData(withTimeout: -1, tag: TAG_READFROMSERVER)
+            DDLogDebug("H\(intTag) From Server length:\(data.count) End")
         }else if tag == TAG_HTTPRESPONSE{
             
             clientSocket?.write(data, withTimeout: -1, tag: TAG_WRITEHTTPRESPONSE)
             parseHttpResponse(data)
-//            clientSocket?.readData(withTimeout: -1, tag: TAG_READFROMCLIENT)
-//            outGoing?.readData(withTimeout: -1, tag: TAG_READFROMSERVER)
-            
         }else{
             DDLogError("H\(intTag) Unknow Tag: \(tag)")
         }
@@ -121,16 +116,16 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
     
     func socket(_ sock: GCDAsyncSocket, didWriteDataWithTag tag: Int) {
         if tag == TAG_WRITETOSERVER {
-//            DDLogVerbose("H\(intTag) TAG_WRITETOSERVER")
+            DDLogDebug("H\(intTag) TAG_WRITETOSERVER")
             clientSocket?.readData(withTimeout: -1, tag: TAG_READFROMCLIENT)
         }else if tag == TAG_WRITETOCLIENT {
-//            DDLogVerbose("H\(intTag) TAG_WRITETOCLIENT")
+            DDLogDebug("H\(intTag) TAG_WRITETOCLIENT")
             outGoing?.readData(withTimeout: -1, tag: TAG_READFROMSERVER)
         }else if tag == TAG_WRITEHTTPRESPONSE {
-//            DDLogVerbose("H\(intTag) TAG_WRITEHTTPRESPONSE")
+            DDLogDebug("H\(intTag) TAG_WRITEHTTPRESPONSE")
             outGoing?.readData(withTimeout: -1, tag: TAG_READFROMSERVER)
         }else if tag == TAG_WRITEHTTPSRESPONSR {
-//            DDLogVerbose("H\(intTag) TAG_WRITEHTTPSRESPONSR")
+            DDLogDebug("H\(intTag) TAG_WRITEHTTPSRESPONSR")
             clientSocket?.readData(withTimeout: -1, tag: TAG_READFROMCLIENT)
             outGoing?.readData(withTimeout: -1, tag: TAG_READFROMSERVER)
         }
@@ -175,7 +170,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
         
         let responseComponents = serverResponse.components(separatedBy: "\r\n\r\n")
         serverResponse = responseComponents[0]
-        // DDLogVerbose("H\(intTag) " + serverResponse)
+         DDLogDebug("H\(intTag) " + serverResponse)
         
 //        var attatch: Data? = nil
 //        
@@ -212,31 +207,17 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
             gotError(error)
             return
         }
-        
-//        let requestComponents = clientRequest.components(separatedBy: "\r\n\r\n")
-//        clientRequest = requestComponents[0]
-//         DDLogVerbose("H\(intTag) head \(headerEndIndex) data \(data.count)")
-//         DDLogVerbose("H\(intTag) " + clientRequest)
-        
-//        var attatch: Data? = nil
-//        
-//        if requestComponents.count > 1 {
-//            let length = clientRequest.utf8.count + 4
-//            attatch = data.subdata(in: length ..< data.count)
-////            // DDLogVerbose("data size:\(data.count) attatch size:\(attatch?.count)")
-//        }
-        
-//        clientRequest = clientRequest + "\r\n"
-        guard let hostDomain = extractDetail(from: clientRequest, by: "Host") else {
-            gotError(ConnectionError.NoHostInRequest)
-            return
-        }
-        let hostItems = hostDomain.components(separatedBy: ":")
+
+        DDLogDebug("H\(intTag) head \(headerEndIndex) data \(data.count)")
+        DDLogDebug("H\(intTag) " + clientRequest)
+
+        let hostDomain = extractDetail(from: clientRequest, by: "Host")
+        let hostItems = hostDomain?.components(separatedBy: ":")
         
         var host = ""
         var port: UInt16 = 0
-        if hostItems.count == 2 {
-            port = UInt16(hostItems[1]) ?? 80
+        if hostItems?.count == 2 {
+            port = UInt16(hostItems?[1] ?? "80")!
         }
         
         var request = clientRequest.components(separatedBy: "\r\n")
@@ -252,6 +233,9 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
             host = urlComponents[0]
             let portString = urlComponents[1]
             port = UInt16(portString) ?? 443
+            
+            //what if ipv6 address
+            
         }else{
             isConnectRequest = false
             var urlComponents = headerComponents[1].components(separatedBy: "/")
@@ -262,9 +246,15 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
             let hostComponents = urlComponents[2].components(separatedBy: ":")
             if hostComponents[0].contains("[") {
                 //ipv6 address
-//                host = hostComponents.last!
-//                host.remove(at: host.index(before: host.endIndex))
-                host = hostItems[0]
+                if hostItems != nil {
+                    host = hostItems![0]
+                }else{
+                    host = hostComponents.last!
+                    host.remove(at: host.index(before: host.endIndex))
+                    
+                    //what about port??
+                }
+                
             }else{
                 host = hostComponents[0]
                 if hostComponents.count > 1 {
@@ -295,7 +285,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
     }
     
     func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
-        // DDLogVerbose("H\(intTag) Socks side disconnect")
+         DDLogDebug("H\(intTag) Socks side disconnect")
         
         clientSocket = nil
         if outGoing == nil {
@@ -307,7 +297,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
     }
     
     func HTTPTrafficTransmitDidDisconnect() {
-        // DDLogVerbose("H\(intTag) HTTPTraffic side disconnect")
+         DDLogDebug("H\(intTag) HTTPTraffic side disconnect")
         
         outGoing = nil
         if clientSocket == nil {
@@ -319,19 +309,16 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
     }
     
     func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16) {
-//         DDLogVerbose("H\(intTag) didConnect \(host):\(port)")
+         DDLogDebug("H\(intTag) didConnect \(host):\(port)")
         
         if isConnectRequest {
-//             DDLogVerbose("H\(intTag) Connection")
+             DDLogDebug("H\(intTag) Connection")
             clientSocket?.write(ConnectionResponse, withTimeout: -1, tag: TAG_WRITEHTTPSRESPONSR)
-//            clientSocket?.readData(withTimeout: -1, tag: TAG_READFROMCLIENT)
-//            outGoing?.readData(withTimeout: -1, tag: TAG_READFROMSERVER)
         }else{
-//             DDLogVerbose("H\(intTag) None Connection")
+             DDLogDebug("H\(intTag) None Connection")
             outGoing?.write(repostData!, withTimeout: -1, tag: TAG_WRITETOSERVER)
             repostData = nil
             outGoing?.readData(withTimeout: -1, tag: TAG_HTTPRESPONSE)
-//            clientSocket?.readData(withTimeout: -1, tag: TAG_READFROMCLIENT)
         }
     }
 }

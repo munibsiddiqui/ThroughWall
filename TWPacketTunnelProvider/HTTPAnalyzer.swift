@@ -46,6 +46,9 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
     private var bindToPort = 0
     private var delegate: HTTPAnalyzerDelegate?
     private var intTag = 0
+    private var proxyType = ""
+    private var dataLengthFromClient = 0
+    
     
     init(analyzerDelegate delegate: HTTPAnalyzerDelegate, intTag tag: Int) {
         self.delegate = delegate
@@ -81,10 +84,13 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
                 switch Rule.sharedInstance.ruleForDomain(host) {
                 case .Proxy:
                     useProxy = true
+                    proxyType = "Proxy"
                     outGoing?.setProxyHost(withHostName: "127.0.0.1", port: UInt16(bindToPort))
                 case .Reject:
+                    proxyType = "Reject"
                     clientSocket?.disconnect()
                 default:
+                    proxyType = "Direct"
                     break
                 }
                 do {
@@ -98,15 +104,16 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
             })
         }else if tag == TAG_READFROMCLIENT {
              DDLogDebug("H\(intTag) From Client length:\(data.count)")
-            delegate?.didUploadToServer(dataSize: data.count)
+//            delegate?.didUploadToServer(dataSize: data.count)
+            dataLengthFromClient = data.count
             outGoing?.write(data, withTimeout: -1, tag: TAG_WRITETOSERVER)
         }else if tag == TAG_READFROMSERVER {
              DDLogDebug("H\(intTag) From Server length:\(data.count)")
-            delegate?.didDownloadFromServer(dataSize: data.count)
+            delegate?.didDownloadFromServer(dataSize: data.count, proxyType: proxyType)
             clientSocket?.write(data, withTimeout: -1, tag: TAG_WRITETOCLIENT)
             DDLogDebug("H\(intTag) From Server length:\(data.count) End")
         }else if tag == TAG_HTTPRESPONSE{
-            
+            delegate?.didDownloadFromServer(dataSize: data.count, proxyType: proxyType)
             clientSocket?.write(data, withTimeout: -1, tag: TAG_WRITEHTTPRESPONSE)
             parseHttpResponse(data)
         }else{
@@ -117,6 +124,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
     func socket(_ sock: GCDAsyncSocket, didWriteDataWithTag tag: Int) {
         if tag == TAG_WRITETOSERVER {
             DDLogDebug("H\(intTag) TAG_WRITETOSERVER")
+            delegate?.didUploadToServer(dataSize: dataLengthFromClient, proxyType: proxyType)
             clientSocket?.readData(withTimeout: -1, tag: TAG_READFROMCLIENT)
         }else if tag == TAG_WRITETOCLIENT {
             DDLogDebug("H\(intTag) TAG_WRITETOCLIENT")
@@ -316,6 +324,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
             clientSocket?.write(ConnectionResponse, withTimeout: -1, tag: TAG_WRITEHTTPSRESPONSR)
         }else{
              DDLogDebug("H\(intTag) None Connection")
+            dataLengthFromClient = repostData!.count
             outGoing?.write(repostData!, withTimeout: -1, tag: TAG_WRITETOSERVER)
             repostData = nil
             outGoing?.readData(withTimeout: -1, tag: TAG_HTTPRESPONSE)

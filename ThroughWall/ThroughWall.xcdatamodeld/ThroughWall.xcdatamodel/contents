@@ -1,4 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="11542" systemVersion="16B2555" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
-    <elements/>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="11759" systemVersion="16C67" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="HistoryTraffic" representedClassName="HistoryTraffic" syncable="YES" codeGenerationType="class">
+        <attribute name="hisType" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="inCount" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="outCount" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="pathType" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="proxyType" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="timestamp" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+    </entity>
+    <entity name="HostTraffic" representedClassName="HostTraffic" syncable="YES" codeGenerationType="class">
+        <attribute name="hostName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="inCount" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="outCount" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="requestBody" optional="YES" attributeType="Binary" syncable="YES"/>
+        <attribute name="requestHead" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="requestTime" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="responseBody" optional="YES" attributeType="Binary" syncable="YES"/>
+        <attribute name="responseHead" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="responseTime" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="HistoryTraffic" positionX="-63" positionY="-18" width="128" height="135"/>
+        <element name="HostTraffic" positionX="-54" positionY="63" width="128" height="180"/>
+    </elements>
 </model>

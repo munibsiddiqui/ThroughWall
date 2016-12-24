@@ -46,6 +46,10 @@ class CoreDataController: NSObject {
         return container
     }()
     
+    func getContext() -> NSManagedObjectContext {
+        return persistentContainer.viewContext
+    }
+    
     // MARK: - Core Data Saving support
     
     func saveContext () {

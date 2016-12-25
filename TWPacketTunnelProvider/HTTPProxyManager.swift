@@ -104,27 +104,28 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate,HTTPAnalyzerDelegate {
         hourTimer?.setEventHandler(handler: {
             self.setNextHourTimer()
             
-            let currentTime = NSDate()
-            let oldTime = NSDate.init(timeInterval: -3600, since: currentTime as Date)
-            
-            let fetchOldData: NSFetchRequest<HistoryTraffic> = HistoryTraffic.fetchRequest()
-            fetchOldData.predicate = NSPredicate(format: "timestamp <= %@", oldTime)
-            let fetchNewData: NSFetchRequest<HistoryTraffic> = HistoryTraffic.fetchRequest()
-            fetchNewData.predicate = NSPredicate(format: "timestamp <= %@", currentTime)
-            
-            do {
-                let oldData = try CoreDataController.sharedInstance.getContext().fetch(fetchOldData)
-                for data in oldData {
-                    CoreDataController.sharedInstance.getContext().delete(data)
-                }
-                CoreDataController.sharedInstance.saveContext()
+            DispatchQueue.main.async {
+                let currentTime = NSDate()
+                let oldTime = NSDate.init(timeInterval: -3600, since: currentTime as Date)
                 
-                var wifiTraffic = downUpTraffic()
-                var cellularTraffic = downUpTraffic()
+                let fetchOldData: NSFetchRequest<HistoryTraffic> = HistoryTraffic.fetchRequest()
+                fetchOldData.predicate = NSPredicate(format: "timestamp <= %@", oldTime)
+                let fetchNewData: NSFetchRequest<HistoryTraffic> = HistoryTraffic.fetchRequest()
+                fetchNewData.predicate = NSPredicate(format: "timestamp <= %@", currentTime)
                 
-                let newData = try CoreDataController.sharedInstance.getContext().fetch(fetchNewData)
-                for data in newData {
-                    switch data.proxyType! {
+                do {
+                    let oldData = try CoreDataController.sharedInstance.getContext().fetch(fetchOldData)
+                    for data in oldData {
+                        CoreDataController.sharedInstance.getContext().delete(data)
+                    }
+                    CoreDataController.sharedInstance.saveContext()
+                    
+                    var wifiTraffic = downUpTraffic()
+                    var cellularTraffic = downUpTraffic()
+                    
+                    let newData = try CoreDataController.sharedInstance.getContext().fetch(fetchNewData)
+                    for data in newData {
+                        switch data.proxyType! {
                         case "Proxy":
                             if data.pathType == "WIFI" {
                                 wifiTraffic.proxyUpload = wifiTraffic.proxyUpload + Int(data.outCount)
@@ -134,51 +135,52 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate,HTTPAnalyzerDelegate {
                                 cellularTraffic.proxyDownload = cellularTraffic.proxyDownload + Int(data.inCount)
                             }
                         case "Direct":
-                        if data.pathType == "WIFI" {
-                            wifiTraffic.directUpload = wifiTraffic.directUpload + Int(data.outCount)
-                            wifiTraffic.directDownload = wifiTraffic.directDownload + Int(data.inCount)
-                        }else if data.pathType == "Cellular" {
-                            cellularTraffic.directUpload = cellularTraffic.directUpload + Int(data.outCount)
-                            cellularTraffic.directDownload = cellularTraffic.directDownload + Int(data.inCount)
+                            if data.pathType == "WIFI" {
+                                wifiTraffic.directUpload = wifiTraffic.directUpload + Int(data.outCount)
+                                wifiTraffic.directDownload = wifiTraffic.directDownload + Int(data.inCount)
+                            }else if data.pathType == "Cellular" {
+                                cellularTraffic.directUpload = cellularTraffic.directUpload + Int(data.outCount)
+                                cellularTraffic.directDownload = cellularTraffic.directDownload + Int(data.inCount)
+                            }
+                        default:
+                            break
                         }
-                    default:
-                        break
                     }
+                    
+                    let timestamp = NSDate()
+                    let wifiProxyHisTraffic = HistoryTraffic(context: CoreDataController.sharedInstance.getContext())
+                    wifiProxyHisTraffic.hisType = "hour"
+                    wifiProxyHisTraffic.proxyType = "Proxy"
+                    wifiProxyHisTraffic.pathType = "WIFI"
+                    wifiProxyHisTraffic.timestamp = timestamp
+                    wifiProxyHisTraffic.inCount = Int64(wifiTraffic.proxyDownload)
+                    wifiProxyHisTraffic.outCount = Int64(wifiTraffic.proxyUpload)
+                    let wifiDirectHisTraffic = HistoryTraffic(context: CoreDataController.sharedInstance.getContext())
+                    wifiDirectHisTraffic.hisType = "hour"
+                    wifiDirectHisTraffic.proxyType = "Direct"
+                    wifiDirectHisTraffic.pathType = "WIFI"
+                    wifiDirectHisTraffic.timestamp = timestamp
+                    wifiDirectHisTraffic.inCount = Int64(wifiTraffic.directDownload)
+                    wifiDirectHisTraffic.outCount = Int64(wifiTraffic.directUpload)
+                    let cellularProxyHisTraffic = HistoryTraffic(context: CoreDataController.sharedInstance.getContext())
+                    cellularProxyHisTraffic.hisType = "hour"
+                    cellularProxyHisTraffic.proxyType = "Proxy"
+                    cellularProxyHisTraffic.pathType = "Cellular"
+                    cellularProxyHisTraffic.timestamp = timestamp
+                    cellularProxyHisTraffic.inCount = Int64(cellularTraffic.proxyDownload)
+                    cellularProxyHisTraffic.outCount = Int64(cellularTraffic.proxyUpload)
+                    let celluarDirectHisTraffic = HistoryTraffic(context: CoreDataController.sharedInstance.getContext())
+                    celluarDirectHisTraffic.hisType = "hour"
+                    celluarDirectHisTraffic.proxyType = "Direct"
+                    celluarDirectHisTraffic.pathType = "Cellular"
+                    celluarDirectHisTraffic.timestamp = timestamp
+                    celluarDirectHisTraffic.inCount = Int64(cellularTraffic.directDownload)
+                    celluarDirectHisTraffic.outCount = Int64(cellularTraffic.directUpload)
+                    
+                    CoreDataController.sharedInstance.saveContext()
+                }catch{
+                    print(error)
                 }
-                
-                let timestamp = NSDate()
-                let wifiProxyHisTraffic = HistoryTraffic(context: CoreDataController.sharedInstance.getContext())
-                wifiProxyHisTraffic.hisType = "hour"
-                wifiProxyHisTraffic.proxyType = "Proxy"
-                wifiProxyHisTraffic.pathType = "WIFI"
-                wifiProxyHisTraffic.timestamp = timestamp
-                wifiProxyHisTraffic.inCount = Int64(wifiTraffic.proxyDownload)
-                wifiProxyHisTraffic.outCount = Int64(wifiTraffic.proxyUpload)
-                let wifiDirectHisTraffic = HistoryTraffic(context: CoreDataController.sharedInstance.getContext())
-                wifiDirectHisTraffic.hisType = "hour"
-                wifiDirectHisTraffic.proxyType = "Direct"
-                wifiDirectHisTraffic.pathType = "WIFI"
-                wifiDirectHisTraffic.timestamp = timestamp
-                wifiDirectHisTraffic.inCount = Int64(wifiTraffic.directDownload)
-                wifiDirectHisTraffic.outCount = Int64(wifiTraffic.directUpload)
-                let cellularProxyHisTraffic = HistoryTraffic(context: CoreDataController.sharedInstance.getContext())
-                cellularProxyHisTraffic.hisType = "hour"
-                cellularProxyHisTraffic.proxyType = "Proxy"
-                cellularProxyHisTraffic.pathType = "Cellular"
-                cellularProxyHisTraffic.timestamp = timestamp
-                cellularProxyHisTraffic.inCount = Int64(cellularTraffic.proxyDownload)
-                cellularProxyHisTraffic.outCount = Int64(cellularTraffic.proxyUpload)
-                let celluarDirectHisTraffic = HistoryTraffic(context: CoreDataController.sharedInstance.getContext())
-                celluarDirectHisTraffic.hisType = "hour"
-                celluarDirectHisTraffic.proxyType = "Direct"
-                celluarDirectHisTraffic.pathType = "Cellular"
-                celluarDirectHisTraffic.timestamp = timestamp
-                celluarDirectHisTraffic.inCount = Int64(cellularTraffic.directDownload)
-                celluarDirectHisTraffic.outCount = Int64(cellularTraffic.directUpload)
-                
-                CoreDataController.sharedInstance.saveContext()
-            }catch{
-                print(error)
             }
             
             
@@ -188,31 +190,33 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate,HTTPAnalyzerDelegate {
     }
     
     func saveTraffic(_ traffic : downUpTraffic) {
-        let context = CoreDataController.sharedInstance.getContext()
-
-        let timestamp = NSDate()
-        
-        if traffic.proxyDownload > 0 || traffic.proxyUpload > 0 {
-            let proxyHisTraffic = HistoryTraffic(context: context)
-            proxyHisTraffic.hisType = "second"
-            proxyHisTraffic.inCount = Int64(traffic.proxyDownload)
-            proxyHisTraffic.outCount = Int64(traffic.proxyUpload)
-            proxyHisTraffic.proxyType = "Proxy"
-            proxyHisTraffic.timestamp = timestamp
-            proxyHisTraffic.pathType = "WIFI"
+        DispatchQueue.main.async {
+            let context = CoreDataController.sharedInstance.getContext()
+            
+            let timestamp = NSDate()
+            
+            if traffic.proxyDownload > 0 || traffic.proxyUpload > 0 {
+                let proxyHisTraffic = HistoryTraffic(context: context)
+                proxyHisTraffic.hisType = "second"
+                proxyHisTraffic.inCount = Int64(traffic.proxyDownload)
+                proxyHisTraffic.outCount = Int64(traffic.proxyUpload)
+                proxyHisTraffic.proxyType = "Proxy"
+                proxyHisTraffic.timestamp = timestamp
+                proxyHisTraffic.pathType = "WIFI"
+            }
+            
+            if traffic.directDownload > 0 || traffic.directUpload > 0 {
+                let directHisTraffic = HistoryTraffic(context: context)
+                directHisTraffic.hisType = "second"
+                directHisTraffic.inCount = Int64(traffic.directDownload)
+                directHisTraffic.outCount = Int64(traffic.directUpload)
+                directHisTraffic.proxyType = "Direct"
+                directHisTraffic.timestamp = timestamp
+                directHisTraffic.pathType = "WIFI"
+            }
+            
+            CoreDataController.sharedInstance.saveContext()
         }
-        
-        if traffic.directDownload > 0 || traffic.directUpload > 0 {
-            let directHisTraffic = HistoryTraffic(context: context)
-            directHisTraffic.hisType = "second"
-            directHisTraffic.inCount = Int64(traffic.directDownload)
-            directHisTraffic.outCount = Int64(traffic.directUpload)
-            directHisTraffic.proxyType = "Direct"
-            directHisTraffic.timestamp = timestamp
-            directHisTraffic.pathType = "WIFI"
-        }
-        
-        CoreDataController.sharedInstance.saveContext()
         
     }
     

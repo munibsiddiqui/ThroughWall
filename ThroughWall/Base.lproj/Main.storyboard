@@ -628,17 +628,27 @@
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="peF-OV-brU" customClass="LineChartView" customModule="Charts">
-                                <rect key="frame" x="16" y="196" width="343" height="343"/>
+                                <rect key="frame" x="16" y="196" width="343" height="171.5"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" secondItem="peF-OV-brU" secondAttribute="height" multiplier="1:1" id="l8p-xy-O7d"/>
+                                    <constraint firstAttribute="width" secondItem="peF-OV-brU" secondAttribute="height" multiplier="2:1" id="l8p-xy-O7d"/>
+                                </constraints>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qbm-IY-Eqa" customClass="LineChartView" customModule="Charts">
+                                <rect key="frame" x="16" y="375" width="343" height="171.5"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="qbm-IY-Eqa" secondAttribute="height" multiplier="2:1" id="Rvs-of-kKc"/>
                                 </constraints>
                             </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="QCL-Po-nGm" firstAttribute="top" secondItem="heo-XI-5YB" secondAttribute="bottom" constant="8" id="2rx-Gu-R12"/>
+                            <constraint firstAttribute="leadingMargin" secondItem="qbm-IY-Eqa" secondAttribute="leading" id="5uw-JP-ZPh"/>
+                            <constraint firstItem="qbm-IY-Eqa" firstAttribute="top" secondItem="peF-OV-brU" secondAttribute="bottom" constant="7.5" id="7Yg-N0-rHF"/>
                             <constraint firstAttribute="leadingMargin" secondItem="peF-OV-brU" secondAttribute="leading" id="APS-YC-io7"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="qbm-IY-Eqa" secondAttribute="trailing" id="KPG-CI-PPR"/>
                             <constraint firstAttribute="leadingMargin" secondItem="QCL-Po-nGm" secondAttribute="leading" id="LtV-VK-ygF"/>
                             <constraint firstItem="ued-q8-Val" firstAttribute="top" secondItem="QCL-Po-nGm" secondAttribute="bottom" constant="8" id="Td3-pD-ao8"/>
                             <constraint firstItem="peF-OV-brU" firstAttribute="top" secondItem="ued-q8-Val" secondAttribute="bottom" constant="8" symbolic="YES" id="drK-zV-sgl"/>
@@ -649,7 +659,8 @@
                     </view>
                     <tabBarItem key="tabBarItem" systemItem="history" id="V1x-Gy-oT7"/>
                     <connections>
-                        <outlet property="chartView" destination="peF-OV-brU" id="Pub-Fi-GWF"/>
+                        <outlet property="downloadChartView" destination="peF-OV-brU" id="Zxo-Sz-Aaw"/>
+                        <outlet property="uploadChartView" destination="qbm-IY-Eqa" id="B5h-bG-e2t"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="nPH-JQ-yIS" userLabel="First Responder" sceneMemberID="firstResponder"/>

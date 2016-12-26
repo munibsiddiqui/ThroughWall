@@ -14,7 +14,7 @@ class HistoryViewController: UIViewController {
     @IBOutlet weak var downloadChartView: LineChartView!
     @IBOutlet weak var uploadChartView: LineChartView!
 
-    var startTime: NSDate?
+//    var startTime: NSDate?
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -32,11 +32,7 @@ class HistoryViewController: UIViewController {
 
     
     override func viewWillAppear(_ animated: Bool) {
-        let fetchSecondData: NSFetchRequest<HistoryTraffic> = HistoryTraffic.fetchRequest()
-        startTime = NSDate.init(timeInterval: -3600, since: Date())
-        fetchSecondData.predicate = NSPredicate(format: "timestamp >= %@ && hisType <= %@ && pathType == %@ && proxyType == %@", startTime!, "second", "WIFI", "Proxy")
-        
-        showDataWith(startTime!, historyType: "second", pathType: "WIFI", proxyType: "Proxy")
+        showRecent()
     }
     
     override func didReceiveMemoryWarning() {
@@ -44,77 +40,100 @@ class HistoryViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    @IBAction func segmentChanged(_ sender: UISegmentedControl) {
+        if sender.selectedSegmentIndex == 0 {
+            showRecent()
+        }else{
+            showHour()
+        }
+    }
     
-    func showDataWith(_ startTime: NSDate, historyType: String, pathType: String, proxyType: String) {
-        let fetchSecondData: NSFetchRequest<HistoryTraffic> = HistoryTraffic.fetchRequest()
-        fetchSecondData.predicate = NSPredicate(format: "timestamp >= %@ && hisType <= %@ && pathType == %@ && proxyType == %@", startTime, historyType, pathType, proxyType)
+    
+    func showRecent() {
+        let pastSeconds = 3600
+        let step = 30
+        let startTime = NSDate.init(timeInterval: TimeInterval(-1 * pastSeconds), since: Date())
+        
+        let fetch: NSFetchRequest<HistoryTraffic> = HistoryTraffic.fetchRequest()
+        fetch.predicate = NSPredicate(format: "timestamp >= %@ && hisType == %@ && proxyType == %@", startTime, "second", "Proxy")
+        let histories = fetchHistory(fetch)
+        drawHistory(histories, startTime: startTime, pastSeconds: pastSeconds, stepSeconds: step)
+    }
+    
+    func showHour() {
+        let pastSeconds = 3600 * 12
+        let step = 3600
+        let startTime = NSDate.init(timeInterval: TimeInterval(-1 * pastSeconds), since: Date())
+        let fetch: NSFetchRequest<HistoryTraffic> = HistoryTraffic.fetchRequest()
+        
+        fetch.predicate = NSPredicate(format: "timestamp >= %@ && hisType == %@ && proxyType == %@", startTime, "second", "Proxy")
+        let histories = fetchHistory(fetch)
+        drawHistory(histories, startTime: startTime, pastSeconds: pastSeconds, stepSeconds: step)
+
+    }
+    
+    
+    func fetchHistory(_ fetch: NSFetchRequest<HistoryTraffic>) -> [HistoryTraffic] {
+        do{
+            let histories = try CoreDataController.sharedInstance.getContext().fetch(fetch)
+            return histories
+        }catch{
+            print(error)
+            return [HistoryTraffic]()
+        }
+    }
+    
+    func autoFitRange(maxValue: Int) -> (Int, String) {
+        var scale = 1
+        var unit = "B"
+        switch maxValue {
+        case 0 ..< 1024:
+            break
+        case 1024 ..< 1024*1024:
+            scale = 1024
+            unit = "KB"
+        case 1024*1024 ..< 1024*1024*1024:
+            scale = 1024*1024
+            unit = "MB"
+        default:
+            scale = 1024*1024*1024
+            unit = "GB"
+        }
+        return (scale, unit)
+    }
+    
+    func drawHistory(_ histories: [HistoryTraffic],startTime: NSDate , pastSeconds: Int, stepSeconds: Int) {
         let localFormatter = DateFormatter()
         localFormatter.locale = Locale.current
         localFormatter.dateFormat = "HH:mm"
-        var historyDic = [[Int]].init(repeating: [0, 0], count: 60)
-        
+        let count = pastSeconds%stepSeconds > 0 ? pastSeconds/stepSeconds + 1 : pastSeconds/stepSeconds
+        var historyDic = [[Int]].init(repeating: [0, 0], count: count)
         var maxInValue = 0
         var maxOutValue = 0
-        do {
-            let histories = try CoreDataController.sharedInstance.getContext().fetch(fetchSecondData)
-            
-            for history in histories {
-                let index = Int((history.timestamp?.timeIntervalSince(startTime as Date))!) / 60
-                historyDic[index][0] = historyDic[index][0] + Int(history.inCount)
-                if maxInValue < historyDic[index][0] {
-                   maxInValue = historyDic[index][0]
-                }
-                historyDic[index][1] = historyDic[index][1] + Int(history.outCount)
-                if maxOutValue < historyDic[index][1] {
-                   maxOutValue = historyDic[index][1]
-                }
+        
+        for history in histories {
+            let index = Int((history.timestamp?.timeIntervalSince(startTime as Date))!) / stepSeconds
+            historyDic[index][0] = historyDic[index][0] + Int(history.inCount)
+            if maxInValue < historyDic[index][0] {
+                maxInValue = historyDic[index][0]
             }
-            
-        }catch{
-            print(error)
+            historyDic[index][1] = historyDic[index][1] + Int(history.outCount)
+            if maxOutValue < historyDic[index][1] {
+                maxOutValue = historyDic[index][1]
+            }
         }
         
         var inValues = [ChartDataEntry]()
         var outValues = [ChartDataEntry]()
-        var inScale = 1
-        var outScale = 1
-        var inUnit = "B"
-        var outUnit = "B"
         
-        switch maxInValue / 60 {
-        case 0 ..< 1024:
-            break
-        case 1024 ..< 1024*1024:
-            inScale = 1024
-            inUnit = "KB"
-        case 1024*1024 ..< 1024*1024*1024:
-            inScale = 1024 * 1024
-            inUnit = "MB"
-        default:
-            inScale = 1024 * 1024 * 1024
-            inUnit = "GB"
-        }
-        
-        switch maxOutValue / 60 {
-        case 0 ..< 1024:
-            break
-        case 1024 ..< 1024*1024:
-            outScale = 1024
-            outUnit = "KB"
-        case 1024*1024 ..< 1024*1024*1024:
-            outScale = 1024 * 1024
-            outUnit = "MB"
-        default:
-            outScale = 1024 * 1024 * 1024
-            outUnit = "GB"
-        }
-        
+        let (inScale, inUnit) = autoFitRange(maxValue: maxInValue/stepSeconds)
+        let (outScale, outUnit) = autoFitRange(maxValue: maxOutValue/stepSeconds)
         
         for index in 0 ..< historyDic.count {
             let values = historyDic[index]
             let x = Double(index)
-            let yIN = Double(values[0])/Double(60 * inScale)
-            let yOUT = Double(values[1])/Double(60 * outScale)
+            let yIN = Double(values[0])/Double(stepSeconds * inScale)
+            let yOUT = Double(values[1])/Double(stepSeconds * outScale)
             inValues.append(ChartDataEntry(x: x, y: yIN))
             outValues.append(ChartDataEntry(x: x, y: yOUT))
         }
@@ -135,13 +154,13 @@ class HistoryViewController: UIViewController {
         
         var xValues = [String]()
         for i in 0 ..< 60 {
-            xValues.append("\(localFormatter.string(from: Date.init(timeInterval: TimeInterval(i * 60) , since: startTime as Date)))")
+            xValues.append("\(localFormatter.string(from: Date.init(timeInterval: TimeInterval(i * stepSeconds) , since: startTime as Date)))")
         }
         
         downloadChartView.xAxis.valueFormatter = IndexAxisValueFormatter(values: xValues)
         uploadChartView.xAxis.valueFormatter = IndexAxisValueFormatter(values: xValues)
+        
     }
-    
 
     /*
     // MARK: - Navigation

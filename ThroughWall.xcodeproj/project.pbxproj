@@ -14,17 +14,11 @@
 		3433528A1DF93FF800CF7281 /* ThroughWall.xcdatamodeld in Resources */ = {isa = PBXBuildFile; fileRef = 3474EC811DDC926C00EBF3C5 /* ThroughWall.xcdatamodeld */; };
 		3433528D1DF943D100CF7281 /* CoreDataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3433528C1DF943D100CF7281 /* CoreDataController.swift */; };
 		3433528E1DF943D500CF7281 /* CoreDataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3433528C1DF943D100CF7281 /* CoreDataController.swift */; };
-		3439FA011DEE5E5C00F8CE59 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3439FA001DEE5E5C00F8CE59 /* Common.swift */; };
-		3439FA021DEE5E5C00F8CE59 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3439FA001DEE5E5C00F8CE59 /* Common.swift */; };
-		3439FA031DEE5E5C00F8CE59 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3439FA001DEE5E5C00F8CE59 /* Common.swift */; };
 		3439FA061DEEB7A000F8CE59 /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3439FA051DEEB7A000F8CE59 /* Rule.swift */; };
-		34435A941DED063C00490DE5 /* RuleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34435A931DED063C00490DE5 /* RuleViewController.swift */; };
-		34435A961DED0E6200490DE5 /* RuleImportMethodTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34435A951DED0E6200490DE5 /* RuleImportMethodTableViewController.swift */; };
 		3444AB861DF164B600FD3B9F /* Socks2HTTPS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3444AB851DF164B600FD3B9F /* Socks2HTTPS.swift */; };
 		345ECB861DF8F48800F70ACC /* rule.config in Resources */ = {isa = PBXBuildFile; fileRef = 345ECB851DF8F48800F70ACC /* rule.config */; };
 		345ECB871DF8F5C100F70ACC /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3439FA051DEEB7A000F8CE59 /* Rule.swift */; };
 		3474EC7B1DDC926C00EBF3C5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3474EC7A1DDC926C00EBF3C5 /* AppDelegate.swift */; };
-		3474EC801DDC926C00EBF3C5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3474EC7E1DDC926C00EBF3C5 /* Main.storyboard */; };
 		3474EC831DDC926C00EBF3C5 /* ThroughWall.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3474EC811DDC926C00EBF3C5 /* ThroughWall.xcdatamodeld */; };
 		3474EC851DDC926C00EBF3C5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3474EC841DDC926C00EBF3C5 /* Assets.xcassets */; };
 		3474EC881DDC926C00EBF3C5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3474EC861DDC926C00EBF3C5 /* LaunchScreen.storyboard */; };
@@ -40,12 +34,22 @@
 		3474ECD11DDC951100EBF3C5 /* TunnelLib.h in Headers */ = {isa = PBXBuildFile; fileRef = 3474ECCF1DDC951100EBF3C5 /* TunnelLib.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3474ECD41DDC951100EBF3C5 /* TunnelLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3474ECCD1DDC951100EBF3C5 /* TunnelLib.framework */; };
 		3474ECD51DDC951100EBF3C5 /* TunnelLib.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3474ECCD1DDC951100EBF3C5 /* TunnelLib.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		349C99411DFA439C0079502B /* HelpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 349C99401DFA439C0079502B /* HelpViewController.swift */; };
+		34765C881E10D8810055C294 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C7E1E10D8810055C294 /* Common.swift */; };
+		34765C891E10D8810055C294 /* ConfigureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C7F1E10D8810055C294 /* ConfigureViewController.swift */; };
+		34765C8A1E10D8810055C294 /* HelpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C801E10D8810055C294 /* HelpViewController.swift */; };
+		34765C8B1E10D8810055C294 /* HistoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C811E10D8810055C294 /* HistoryViewController.swift */; };
+		34765C8C1E10D8810055C294 /* InputTextFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C821E10D8810055C294 /* InputTextFieldCell.swift */; };
+		34765C8D1E10D8810055C294 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C831E10D8810055C294 /* MainViewController.swift */; };
+		34765C8E1E10D8810055C294 /* RuleImportMethodTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C841E10D8810055C294 /* RuleImportMethodTableViewController.swift */; };
+		34765C8F1E10D8810055C294 /* RuleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C851E10D8810055C294 /* RuleViewController.swift */; };
+		34765C901E10D8810055C294 /* SelectInputViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C861E10D8810055C294 /* SelectInputViewController.swift */; };
+		34765C911E10D8810055C294 /* SelectionFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C871E10D8810055C294 /* SelectionFieldCell.swift */; };
+		34765C921E10EB240055C294 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C7E1E10D8810055C294 /* Common.swift */; };
+		34765C931E10EB270055C294 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C7E1E10D8810055C294 /* Common.swift */; };
+		348E850A1E10CCAB00E55F64 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3474EC7E1DDC926C00EBF3C5 /* Main.storyboard */; };
 		349C99421DFA540A0079502B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3474EC841DDC926C00EBF3C5 /* Assets.xcassets */; };
 		34BD966C1DDD392E002442BF /* ShadowsocksLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3474ECBB1DDC950000EBF3C5 /* ShadowsocksLib.framework */; };
 		34BD966D1DDD3932002442BF /* TunnelLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3474ECCD1DDC951100EBF3C5 /* TunnelLib.framework */; };
-		34BD96741DDD4333002442BF /* SelectionFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34BD96731DDD4333002442BF /* SelectionFieldCell.swift */; };
-		34BD96781DDD7A17002442BF /* SelectInputViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34BD96771DDD7A17002442BF /* SelectInputViewController.swift */; };
 		34CC5CDB1DDC9B7A0061AA44 /* BLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 34CC5B221DDC9B790061AA44 /* BLog.m */; };
 		34CC5CDC1DDC9B7A0061AA44 /* BLog_syslog.c in Sources */ = {isa = PBXBuildFile; fileRef = 34CC5B231DDC9B790061AA44 /* BLog_syslog.c */; };
 		34CC5CDF1DDC9B7A0061AA44 /* BPending.c in Sources */ = {isa = PBXBuildFile; fileRef = 34CC5B261DDC9B790061AA44 /* BPending.c */; };
@@ -197,10 +201,6 @@
 		34CC5FF21DDCA6750061AA44 /* HTTPProxyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34CC5FEE1DDCA6750061AA44 /* HTTPProxyManager.swift */; };
 		34CC5FF31DDCA6750061AA44 /* HTTPAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34CC5FEF1DDCA6750061AA44 /* HTTPAnalyzer.swift */; };
 		34CC5FF61DDCA9200061AA44 /* libresolv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 34CC5E7C1DDCA0EA0061AA44 /* libresolv.tbd */; };
-		34CC5FFA1DDCAA390061AA44 /* ConfigureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34CC5FF71DDCAA390061AA44 /* ConfigureViewController.swift */; };
-		34CC5FFB1DDCAA390061AA44 /* InputTextFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34CC5FF81DDCAA390061AA44 /* InputTextFieldCell.swift */; };
-		34CC5FFC1DDCAA390061AA44 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34CC5FF91DDCAA390061AA44 /* MainViewController.swift */; };
-		34D7017B1E0EF6E90045AC9B /* HistoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34D7017A1E0EF6E90045AC9B /* HistoryViewController.swift */; };
 		560A5FB41FCB850B8240A0EF /* Pods_TWPacketTunnelProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D54040D7632C1761B2803BD /* Pods_TWPacketTunnelProvider.framework */; };
 		6F35DA3314EA72D537C22254 /* Pods_TunnelLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C49EBEDDB2AF6AB02D6E3DEC /* Pods_TunnelLib.framework */; };
 		8788255218AB66821DB5C29F /* Pods_TodayEx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6776F291F2979F3F8EA43E5 /* Pods_TodayEx.framework */; };
@@ -269,10 +269,7 @@
 		172477E3A4C2AE264451794D /* Pods-ThroughWall.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThroughWall.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ThroughWall/Pods-ThroughWall.debug.xcconfig"; sourceTree = "<group>"; };
 		3423C7641DF00C60002B5AE8 /* HTTPTraficTransmit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPTraficTransmit.swift; sourceTree = "<group>"; };
 		3433528C1DF943D100CF7281 /* CoreDataController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataController.swift; sourceTree = "<group>"; };
-		3439FA001DEE5E5C00F8CE59 /* Common.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
 		3439FA051DEEB7A000F8CE59 /* Rule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Rule.swift; sourceTree = "<group>"; };
-		34435A931DED063C00490DE5 /* RuleViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleViewController.swift; sourceTree = "<group>"; };
-		34435A951DED0E6200490DE5 /* RuleImportMethodTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleImportMethodTableViewController.swift; sourceTree = "<group>"; };
 		3444AB851DF164B600FD3B9F /* Socks2HTTPS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Socks2HTTPS.swift; sourceTree = "<group>"; };
 		345ECB851DF8F48800F70ACC /* rule.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = rule.config; sourceTree = "<group>"; };
 		3474EC771DDC926C00EBF3C5 /* ThroughWall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ThroughWall.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -297,9 +294,16 @@
 		3474ECCD1DDC951100EBF3C5 /* TunnelLib.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TunnelLib.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3474ECCF1DDC951100EBF3C5 /* TunnelLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TunnelLib.h; sourceTree = "<group>"; };
 		3474ECD01DDC951100EBF3C5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		349C99401DFA439C0079502B /* HelpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelpViewController.swift; sourceTree = "<group>"; };
-		34BD96731DDD4333002442BF /* SelectionFieldCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectionFieldCell.swift; sourceTree = "<group>"; };
-		34BD96771DDD7A17002442BF /* SelectInputViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectInputViewController.swift; sourceTree = "<group>"; };
+		34765C7E1E10D8810055C294 /* Common.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
+		34765C7F1E10D8810055C294 /* ConfigureViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigureViewController.swift; sourceTree = "<group>"; };
+		34765C801E10D8810055C294 /* HelpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelpViewController.swift; sourceTree = "<group>"; };
+		34765C811E10D8810055C294 /* HistoryViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryViewController.swift; sourceTree = "<group>"; };
+		34765C821E10D8810055C294 /* InputTextFieldCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InputTextFieldCell.swift; sourceTree = "<group>"; };
+		34765C831E10D8810055C294 /* MainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
+		34765C841E10D8810055C294 /* RuleImportMethodTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleImportMethodTableViewController.swift; sourceTree = "<group>"; };
+		34765C851E10D8810055C294 /* RuleViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleViewController.swift; sourceTree = "<group>"; };
+		34765C861E10D8810055C294 /* SelectInputViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectInputViewController.swift; sourceTree = "<group>"; };
+		34765C871E10D8810055C294 /* SelectionFieldCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectionFieldCell.swift; sourceTree = "<group>"; };
 		34CC5B211DDC9B790061AA44 /* BLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLog.h; sourceTree = "<group>"; };
 		34CC5B221DDC9B790061AA44 /* BLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BLog.m; sourceTree = "<group>"; };
 		34CC5B231DDC9B790061AA44 /* BLog_syslog.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = BLog_syslog.c; sourceTree = "<group>"; };
@@ -886,12 +890,8 @@
 		34CC5FEC1DDCA65F0061AA44 /* dns.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = dns.m; sourceTree = "<group>"; };
 		34CC5FEE1DDCA6750061AA44 /* HTTPProxyManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPProxyManager.swift; sourceTree = "<group>"; };
 		34CC5FEF1DDCA6750061AA44 /* HTTPAnalyzer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPAnalyzer.swift; sourceTree = "<group>"; };
-		34CC5FF71DDCAA390061AA44 /* ConfigureViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigureViewController.swift; sourceTree = "<group>"; };
-		34CC5FF81DDCAA390061AA44 /* InputTextFieldCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InputTextFieldCell.swift; sourceTree = "<group>"; };
-		34CC5FF91DDCAA390061AA44 /* MainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		34CC5FFD1DDCAE5F0061AA44 /* ThroughWall.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ThroughWall.entitlements; sourceTree = "<group>"; };
 		34CC5FFE1DDCAEF10061AA44 /* TodayEx.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TodayEx.entitlements; sourceTree = "<group>"; };
-		34D7017A1E0EF6E90045AC9B /* HistoryViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryViewController.swift; sourceTree = "<group>"; };
 		3CE3B4B0CF2F4A6FF2DF8953 /* Pods-TunnelLib.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TunnelLib.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TunnelLib/Pods-TunnelLib.debug.xcconfig"; sourceTree = "<group>"; };
 		541B6C2129C7CA6D95A9FB35 /* Pods_ThroughWall.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThroughWall.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A7F08F73CD12752F1495C75 /* Pods-ShadowsocksLib.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ShadowsocksLib.release.xcconfig"; path = "Pods/Target Support Files/Pods-ShadowsocksLib/Pods-ShadowsocksLib.release.xcconfig"; sourceTree = "<group>"; };
@@ -999,17 +999,17 @@
 		3474EC791DDC926C00EBF3C5 /* ThroughWall */ = {
 			isa = PBXGroup;
 			children = (
-				34435A931DED063C00490DE5 /* RuleViewController.swift */,
-				34435A951DED0E6200490DE5 /* RuleImportMethodTableViewController.swift */,
-				34CC5FF71DDCAA390061AA44 /* ConfigureViewController.swift */,
-				34BD96771DDD7A17002442BF /* SelectInputViewController.swift */,
-				34CC5FF81DDCAA390061AA44 /* InputTextFieldCell.swift */,
-				34BD96731DDD4333002442BF /* SelectionFieldCell.swift */,
-				34CC5FF91DDCAA390061AA44 /* MainViewController.swift */,
-				34D7017A1E0EF6E90045AC9B /* HistoryViewController.swift */,
+				34765C7F1E10D8810055C294 /* ConfigureViewController.swift */,
+				34765C801E10D8810055C294 /* HelpViewController.swift */,
+				34765C811E10D8810055C294 /* HistoryViewController.swift */,
+				34765C821E10D8810055C294 /* InputTextFieldCell.swift */,
+				34765C831E10D8810055C294 /* MainViewController.swift */,
+				34765C841E10D8810055C294 /* RuleImportMethodTableViewController.swift */,
+				34765C851E10D8810055C294 /* RuleViewController.swift */,
+				34765C861E10D8810055C294 /* SelectInputViewController.swift */,
+				34765C871E10D8810055C294 /* SelectionFieldCell.swift */,
 				3474EC7E1DDC926C00EBF3C5 /* Main.storyboard */,
-				3439FA001DEE5E5C00F8CE59 /* Common.swift */,
-				349C99401DFA439C0079502B /* HelpViewController.swift */,
+				34765C7E1E10D8810055C294 /* Common.swift */,
 				3433528B1DF943B700CF7281 /* Core Data */,
 				348CFFC91DEBF36400A2720E /* SupportingFiles */,
 			);
@@ -2376,8 +2376,8 @@
 			files = (
 				3474EC881DDC926C00EBF3C5 /* LaunchScreen.storyboard in Resources */,
 				3474EC851DDC926C00EBF3C5 /* Assets.xcassets in Resources */,
-				3474EC801DDC926C00EBF3C5 /* Main.storyboard in Resources */,
 				345ECB861DF8F48800F70ACC /* rule.config in Resources */,
+				348E850A1E10CCAB00E55F64 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2630,20 +2630,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				34435A961DED0E6200490DE5 /* RuleImportMethodTableViewController.swift in Sources */,
-				34BD96781DDD7A17002442BF /* SelectInputViewController.swift in Sources */,
+				34765C8E1E10D8810055C294 /* RuleImportMethodTableViewController.swift in Sources */,
+				34765C901E10D8810055C294 /* SelectInputViewController.swift in Sources */,
+				34765C8A1E10D8810055C294 /* HelpViewController.swift in Sources */,
+				34765C911E10D8810055C294 /* SelectionFieldCell.swift in Sources */,
+				34765C8F1E10D8810055C294 /* RuleViewController.swift in Sources */,
 				3433528D1DF943D100CF7281 /* CoreDataController.swift in Sources */,
-				349C99411DFA439C0079502B /* HelpViewController.swift in Sources */,
-				34CC5FFA1DDCAA390061AA44 /* ConfigureViewController.swift in Sources */,
-				34D7017B1E0EF6E90045AC9B /* HistoryViewController.swift in Sources */,
 				345ECB871DF8F5C100F70ACC /* Rule.swift in Sources */,
-				34435A941DED063C00490DE5 /* RuleViewController.swift in Sources */,
 				3474EC7B1DDC926C00EBF3C5 /* AppDelegate.swift in Sources */,
-				34BD96741DDD4333002442BF /* SelectionFieldCell.swift in Sources */,
-				34CC5FFC1DDCAA390061AA44 /* MainViewController.swift in Sources */,
-				34CC5FFB1DDCAA390061AA44 /* InputTextFieldCell.swift in Sources */,
-				3439FA011DEE5E5C00F8CE59 /* Common.swift in Sources */,
+				34765C8C1E10D8810055C294 /* InputTextFieldCell.swift in Sources */,
+				34765C881E10D8810055C294 /* Common.swift in Sources */,
 				3474EC831DDC926C00EBF3C5 /* ThroughWall.xcdatamodeld in Sources */,
+				34765C891E10D8810055C294 /* ConfigureViewController.swift in Sources */,
+				34765C8B1E10D8810055C294 /* HistoryViewController.swift in Sources */,
+				34765C8D1E10D8810055C294 /* MainViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2655,11 +2655,11 @@
 				34CC5FF21DDCA6750061AA44 /* HTTPProxyManager.swift in Sources */,
 				3433528E1DF943D500CF7281 /* CoreDataController.swift in Sources */,
 				3474EC981DDC928400EBF3C5 /* PacketTunnelProvider.swift in Sources */,
-				3439FA021DEE5E5C00F8CE59 /* Common.swift in Sources */,
 				3444AB861DF164B600FD3B9F /* Socks2HTTPS.swift in Sources */,
 				343352891DF93FAD00CF7281 /* ThroughWall.xcdatamodeld in Sources */,
 				34CC5FED1DDCA65F0061AA44 /* dns.m in Sources */,
 				3423C7651DF00C60002B5AE8 /* HTTPTraficTransmit.swift in Sources */,
+				34765C921E10EB240055C294 /* Common.swift in Sources */,
 				3439FA061DEEB7A000F8CE59 /* Rule.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2668,7 +2668,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3439FA031DEE5E5C00F8CE59 /* Common.swift in Sources */,
+				34765C931E10EB270055C294 /* Common.swift in Sources */,
 				3474ECAB1DDC92B900EBF3C5 /* TodayViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

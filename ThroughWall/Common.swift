@@ -30,6 +30,10 @@ let globalModeSetting = "Bingo.globalModeSetting"
 //let updateWidget = "updataWidget"
 let downloadCountKey = "count.download"
 let uploadCountKey = "count.upload"
+let proxyDownloadCountKey = "count.proxyDownload"
+let proxyUploadCountKey = "count.proxyUpload"
+let recordingDateKey = "Bingo.recordingDate"
+
 
 enum DarwinNotifications: String {
     case updateWidget = "updataWidget"

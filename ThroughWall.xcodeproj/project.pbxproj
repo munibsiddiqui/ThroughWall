@@ -46,6 +46,7 @@
 		34765C911E10D8810055C294 /* SelectionFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C871E10D8810055C294 /* SelectionFieldCell.swift */; };
 		34765C921E10EB240055C294 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C7E1E10D8810055C294 /* Common.swift */; };
 		34765C931E10EB270055C294 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C7E1E10D8810055C294 /* Common.swift */; };
+		34765C951E1116780055C294 /* RequestListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C941E1116780055C294 /* RequestListTableViewController.swift */; };
 		348E850A1E10CCAB00E55F64 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3474EC7E1DDC926C00EBF3C5 /* Main.storyboard */; };
 		349C99421DFA540A0079502B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3474EC841DDC926C00EBF3C5 /* Assets.xcassets */; };
 		34BD966C1DDD392E002442BF /* ShadowsocksLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3474ECBB1DDC950000EBF3C5 /* ShadowsocksLib.framework */; };
@@ -201,6 +202,7 @@
 		34CC5FF21DDCA6750061AA44 /* HTTPProxyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34CC5FEE1DDCA6750061AA44 /* HTTPProxyManager.swift */; };
 		34CC5FF31DDCA6750061AA44 /* HTTPAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34CC5FEF1DDCA6750061AA44 /* HTTPAnalyzer.swift */; };
 		34CC5FF61DDCA9200061AA44 /* libresolv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 34CC5E7C1DDCA0EA0061AA44 /* libresolv.tbd */; };
+		34E3F1FC1E11428600FAD65C /* RequestDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34E3F1FB1E11428600FAD65C /* RequestDetailTableViewController.swift */; };
 		560A5FB41FCB850B8240A0EF /* Pods_TWPacketTunnelProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D54040D7632C1761B2803BD /* Pods_TWPacketTunnelProvider.framework */; };
 		6F35DA3314EA72D537C22254 /* Pods_TunnelLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C49EBEDDB2AF6AB02D6E3DEC /* Pods_TunnelLib.framework */; };
 		8788255218AB66821DB5C29F /* Pods_TodayEx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6776F291F2979F3F8EA43E5 /* Pods_TodayEx.framework */; };
@@ -304,6 +306,7 @@
 		34765C851E10D8810055C294 /* RuleViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleViewController.swift; sourceTree = "<group>"; };
 		34765C861E10D8810055C294 /* SelectInputViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectInputViewController.swift; sourceTree = "<group>"; };
 		34765C871E10D8810055C294 /* SelectionFieldCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectionFieldCell.swift; sourceTree = "<group>"; };
+		34765C941E1116780055C294 /* RequestListTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestListTableViewController.swift; sourceTree = "<group>"; };
 		34CC5B211DDC9B790061AA44 /* BLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLog.h; sourceTree = "<group>"; };
 		34CC5B221DDC9B790061AA44 /* BLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BLog.m; sourceTree = "<group>"; };
 		34CC5B231DDC9B790061AA44 /* BLog_syslog.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = BLog_syslog.c; sourceTree = "<group>"; };
@@ -892,6 +895,7 @@
 		34CC5FEF1DDCA6750061AA44 /* HTTPAnalyzer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPAnalyzer.swift; sourceTree = "<group>"; };
 		34CC5FFD1DDCAE5F0061AA44 /* ThroughWall.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ThroughWall.entitlements; sourceTree = "<group>"; };
 		34CC5FFE1DDCAEF10061AA44 /* TodayEx.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TodayEx.entitlements; sourceTree = "<group>"; };
+		34E3F1FB1E11428600FAD65C /* RequestDetailTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestDetailTableViewController.swift; sourceTree = "<group>"; };
 		3CE3B4B0CF2F4A6FF2DF8953 /* Pods-TunnelLib.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TunnelLib.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TunnelLib/Pods-TunnelLib.debug.xcconfig"; sourceTree = "<group>"; };
 		541B6C2129C7CA6D95A9FB35 /* Pods_ThroughWall.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThroughWall.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A7F08F73CD12752F1495C75 /* Pods-ShadowsocksLib.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ShadowsocksLib.release.xcconfig"; path = "Pods/Target Support Files/Pods-ShadowsocksLib/Pods-ShadowsocksLib.release.xcconfig"; sourceTree = "<group>"; };
@@ -1008,6 +1012,8 @@
 				34765C851E10D8810055C294 /* RuleViewController.swift */,
 				34765C861E10D8810055C294 /* SelectInputViewController.swift */,
 				34765C871E10D8810055C294 /* SelectionFieldCell.swift */,
+				34765C941E1116780055C294 /* RequestListTableViewController.swift */,
+				34E3F1FB1E11428600FAD65C /* RequestDetailTableViewController.swift */,
 				3474EC7E1DDC926C00EBF3C5 /* Main.storyboard */,
 				34765C7E1E10D8810055C294 /* Common.swift */,
 				3433528B1DF943B700CF7281 /* Core Data */,
@@ -2634,6 +2640,7 @@
 				34765C901E10D8810055C294 /* SelectInputViewController.swift in Sources */,
 				34765C8A1E10D8810055C294 /* HelpViewController.swift in Sources */,
 				34765C911E10D8810055C294 /* SelectionFieldCell.swift in Sources */,
+				34E3F1FC1E11428600FAD65C /* RequestDetailTableViewController.swift in Sources */,
 				34765C8F1E10D8810055C294 /* RuleViewController.swift in Sources */,
 				3433528D1DF943D100CF7281 /* CoreDataController.swift in Sources */,
 				345ECB871DF8F5C100F70ACC /* Rule.swift in Sources */,
@@ -2643,6 +2650,7 @@
 				3474EC831DDC926C00EBF3C5 /* ThroughWall.xcdatamodeld in Sources */,
 				34765C891E10D8810055C294 /* ConfigureViewController.swift in Sources */,
 				34765C8B1E10D8810055C294 /* HistoryViewController.swift in Sources */,
+				34765C951E1116780055C294 /* RequestListTableViewController.swift in Sources */,
 				34765C8D1E10D8810055C294 /* MainViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

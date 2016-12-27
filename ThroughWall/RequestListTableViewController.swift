@@ -65,13 +65,9 @@ class RequestListTableViewController: UITableViewController {
             let cell = tableView.dequeueReusableCell(withIdentifier: "requestList", for: indexPath)
             
             // Configure the cell...
-            let localFormatter = DateFormatter()
-            localFormatter.locale = Locale.current
-            localFormatter.dateFormat = "HH:mm:ss:SSS"
-            
             cell.textLabel?.text = hostTraffics[indexPath.row].hostName
             if hostTraffics[indexPath.row].requestTime != nil {
-                cell.detailTextLabel?.text = localFormatter.string(from: hostTraffics[indexPath.row].requestTime as! Date)
+                cell.detailTextLabel?.attributedText = makeAttributeDescription(fromHostTraffic: hostTraffics[indexPath.row])
             }else{
                 cell.detailTextLabel?.text = "Error"
             }
@@ -82,16 +78,71 @@ class RequestListTableViewController: UITableViewController {
         }
     }
     
+    
+    func makeAttributeDescription(fromHostTraffic hostTraffic: HostTraffic) -> NSAttributedString {
+        let localFormatter = DateFormatter()
+        localFormatter.locale = Locale.current
+        localFormatter.dateFormat = "HH:mm:ss:SSS"
+
+        let attributeDescription = NSMutableAttributedString(string: "")
+        
+        if let rule = hostTraffic.rule {
+            switch rule {
+            case "Direct":
+                let attributeRule = NSAttributedString(string: rule, attributes: [NSBackgroundColorAttributeName : UIColor.green])
+                attributeDescription.append(attributeRule)
+                attributeDescription.append(NSAttributedString(string: " "))
+            case "Proxy":
+                let attributeRule = NSAttributedString(string: rule, attributes: [NSBackgroundColorAttributeName : UIColor.orange])
+                attributeDescription.append(attributeRule)
+                attributeDescription.append(NSAttributedString(string: " "))
+            default:
+                let attributeRule = NSAttributedString(string: rule, attributes: [NSBackgroundColorAttributeName : UIColor.red])
+                attributeDescription.append(attributeRule)
+                attributeDescription.append(NSAttributedString(string: " "))
+            }
+        }
+        
+        if let requestHead = hostTraffic.requestHead {
+            let requestType = requestHead.components(separatedBy: " ")[0]
+            
+            let attributeRequestType = NSAttributedString(string: requestType, attributes: [NSForegroundColorAttributeName : UIColor.white, NSBackgroundColorAttributeName: UIColor.green])
+            
+            attributeDescription.append(attributeRequestType)
+            attributeDescription.append(NSAttributedString(string: " "))
+        }
+        
+        if hostTraffic.inProcessing == true {
+            let attributeIsComplete = NSAttributedString(string:  "Incomplete", attributes: [NSBackgroundColorAttributeName : UIColor.orange])
+            attributeDescription.append(attributeIsComplete)
+            attributeDescription.append(NSAttributedString(string: " "))
+        }else {
+            var backColor = UIColor.green
+            if hostTraffic.forceDisconnect == true {
+                backColor = UIColor.gray
+            }
+            let attributeIsComplete = NSAttributedString(string:  "Complete", attributes: [NSBackgroundColorAttributeName : backColor])
+            attributeDescription.append(attributeIsComplete)
+            attributeDescription.append(NSAttributedString(string: " "))
+        }
+
+        attributeDescription.append(NSAttributedString(string: localFormatter.string(from: hostTraffic.requestTime as! Date)))
+        
+        return attributeDescription
+    }
+    
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 0 {
             performSegue(withIdentifier: "showRequestDetail", sender: hostTraffics[indexPath.row])
         }else{
-            let alertController = UIAlertController(title: "Clear All", message: nil, preferredStyle: .alert)
+            let alertController = UIAlertController(title: "Clear Completed Logs", message: nil, preferredStyle: .alert)
             let deleteAction = UIAlertAction(title: "Clear", style: .destructive, handler: { (_) in
                 DispatchQueue.main.async {
                     for hostTraffic in self.hostTraffics {
-                        CoreDataController.sharedInstance.getContext().delete(hostTraffic)
+                        if hostTraffic.inProcessing ==  false {
+                            CoreDataController.sharedInstance.getContext().delete(hostTraffic)
+                        }
                     }
                     CoreDataController.sharedInstance.saveContext()
                     self.requestHostTraffic()

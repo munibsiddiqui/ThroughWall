@@ -10,6 +10,7 @@
     </entity>
     <entity name="HostTraffic" representedClassName="HostTraffic" syncable="YES" codeGenerationType="class">
         <attribute name="disconnectTime" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="forceDisconnect" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="hostName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="inCount" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="inProcessing" optional="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
@@ -20,9 +21,10 @@
         <attribute name="responseBody" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="responseHead" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="responseTime" optional="YES" attributeType="Date" usesScalarValueType="NO" storedInTruthFile="YES" syncable="YES"/>
+        <attribute name="rule" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
         <element name="HistoryTraffic" positionX="-63" positionY="-18" width="128" height="135"/>
-        <element name="HostTraffic" positionX="-54" positionY="63" width="128" height="210"/>
+        <element name="HostTraffic" positionX="-54" positionY="63" width="128" height="240"/>
     </elements>
 </model>

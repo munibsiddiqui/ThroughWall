@@ -27,7 +27,7 @@ class HTTPTrafficTransmit: NSObject, GCDAsyncSocketDelegate {
     
     private var proxyHost: String?
     private var proxyPort: UInt16?
-    private var delegate: HTTPTrafficTransmitDelegate?
+    private weak var delegate: HTTPTrafficTransmitDelegate?
     private var shouldConnectDirectly = true
     private var remoteHost: String?
     private var remotePort: UInt16?

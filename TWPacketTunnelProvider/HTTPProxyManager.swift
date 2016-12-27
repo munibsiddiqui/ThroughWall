@@ -11,7 +11,7 @@ import CocoaAsyncSocket
 import CocoaLumberjack
 import CoreData
 
-protocol HTTPAnalyzerDelegate {
+protocol HTTPAnalyzerDelegate: class {
     func HTTPAnalyzerDidDisconnect(httpAnalyzer analyzer: HTTPAnalyzer)
     func didDownloadFromServer(dataSize size: Int, proxyType proxy: String)
     func didUploadToServer(dataSize size: Int, proxyType proxy: String)
@@ -62,11 +62,25 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate,HTTPAnalyzerDelegate {
     }
     
     func stopProxy() {
+        socketServer.disconnect()
+
+        for client in clientSocket {
+            client.forceDisconnect()
+        }
+        
+        while true {
+            if clientSocket.count  == 0 {
+                break
+            }
+        }
+        
         saveTrafficTimer?.cancel()
         saveTrafficTimer = nil
         repeatDeleteTimer?.cancel()
         repeatDeleteTimer = nil
     }
+    
+    
     
     func prepareTimelyUpdate() {
         repeatlySaveTraffic(withInterval: 1)
@@ -199,7 +213,9 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate,HTTPAnalyzerDelegate {
         analyzerLock.lock()
         if let index = self.clientSocket.index(of: analyzer) {
             self.clientSocket.remove(at: index)
-            // DDLogVerbose("H\(analyzer.getIntTag()) removed from arrary")
+            DDLogVerbose("H\(analyzer.getIntTag()) removed from arrary")
+        }else{
+            DDLogError("H\(analyzer.getIntTag()) cann't find in the array")
         }
         analyzerLock.unlock()
     }
@@ -269,8 +285,12 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate,HTTPAnalyzerDelegate {
         newClient.setSocket(newSocket, socksServerPort: bindToPort)
         analyzerLock.lock()
         self.clientSocket.append(newClient)
-        // DDLogVerbose("H\(newClient.getIntTag()) added into arrary")
+        DDLogVerbose("H\(newClient.getIntTag()) added into arrary")
         analyzerLock.unlock()
+    }
+    
+    func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
+        NSLog("HTTP Server Disconnected \(err?.localizedDescription)")
     }
     
 }

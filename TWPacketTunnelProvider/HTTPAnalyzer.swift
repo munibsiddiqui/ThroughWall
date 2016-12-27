@@ -31,7 +31,7 @@ enum ConnectionError: Error {
     case URLComponentAnalysisError
 }
 
-protocol HTTPTrafficTransmitDelegate {
+protocol HTTPTrafficTransmitDelegate: class {
     func HTTPTrafficTransmitDidDisconnect()
     func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16)
     func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int)
@@ -45,11 +45,12 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
     private var isConnectRequest = true
     private var repostData: Data? = nil
     private var bindToPort = 0
-    private var delegate: HTTPAnalyzerDelegate?
+    private weak var delegate: HTTPAnalyzerDelegate?
     private var intTag = 0
     private var proxyType = ""
     private var dataLengthFromClient = 0
     private var hostTraffic: HostTraffic?
+    private var isForceDisconnect = false
     private var inCount = 0 {
         willSet{
             DispatchQueue.main.async {
@@ -103,28 +104,31 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
                     DDLogError("H\(intTag) Socks has disconnected")
                     return
                 }
-                outGoing = HTTPTrafficTransmit(withDelegate: self)
+                
                 var useProxy = false
                 switch Rule.sharedInstance.ruleForDomain(host) {
                 case .Proxy:
                     useProxy = true
                     proxyType = "Proxy"
+                    outGoing = HTTPTrafficTransmit(withDelegate: self)
                     outGoing?.setProxyHost(withHostName: "127.0.0.1", port: UInt16(bindToPort))
                 case .Reject:
                     proxyType = "Reject"
+                    outGoing = nil
                     clientSocket?.disconnect()
-                    DispatchQueue.main.async {
-                        self.hostTraffic?.responseHead = "Reject"
-                        self.hostTraffic?.responseTime = NSDate()
-                    }
+                    return
                 default:
                     proxyType = "Direct"
+                    outGoing = HTTPTrafficTransmit(withDelegate: self)
                     break
                 }
+                
+                
                 do {
-                    DDLogDebug("H\(intTag) Proxy:\(useProxy) Connect: \(host):\(port)")
+                    DDLogVerbose("H\(intTag) Proxy:\(useProxy) Connect: \(host):\(port)")
                     try outGoing?.connnect(toRemoteHost: host, onPort: port)
                     DispatchQueue.main.async {
+                        self.hostTraffic?.rule = self.proxyType
                         self.hostTraffic?.requestTime = NSDate()
                         CoreDataController.sharedInstance.saveContext()
                     }
@@ -135,16 +139,16 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
                 DDLogError("H\(intTag) \(error)")
             })
         }else if tag == TAG_READFROMCLIENT {
-            DDLogDebug("H\(intTag) From Client length:\(data.count)")
+            DDLogVerbose("H\(intTag) From Client length:\(data.count)")
             //            delegate?.didUploadToServer(dataSize: data.count)
             dataLengthFromClient = data.count
             outGoing?.write(data, withTimeout: -1, tag: TAG_WRITETOSERVER)
         }else if tag == TAG_READFROMSERVER {
-            DDLogDebug("H\(intTag) From Server length:\(data.count)")
+            DDLogVerbose("H\(intTag) From Server length:\(data.count)")
             inCount = inCount + data.count
             delegate?.didDownloadFromServer(dataSize: data.count, proxyType: proxyType)
             clientSocket?.write(data, withTimeout: -1, tag: TAG_WRITETOCLIENT)
-            DDLogDebug("H\(intTag) From Server length:\(data.count) End")
+            DDLogVerbose("H\(intTag) From Server length:\(data.count) End")
         }else if tag == TAG_HTTPRESPONSE{
             inCount = inCount + data.count
             delegate?.didDownloadFromServer(dataSize: data.count, proxyType: proxyType)
@@ -157,18 +161,18 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
     
     func socket(_ sock: GCDAsyncSocket, didWriteDataWithTag tag: Int) {
         if tag == TAG_WRITETOSERVER {
-            DDLogDebug("H\(intTag) TAG_WRITETOSERVER")
+            DDLogVerbose("H\(intTag) TAG_WRITETOSERVER")
             outCount = outCount + dataLengthFromClient
             delegate?.didUploadToServer(dataSize: dataLengthFromClient, proxyType: proxyType)
             clientSocket?.readData(withTimeout: -1, tag: TAG_READFROMCLIENT)
         }else if tag == TAG_WRITETOCLIENT {
-            DDLogDebug("H\(intTag) TAG_WRITETOCLIENT")
+            DDLogVerbose("H\(intTag) TAG_WRITETOCLIENT")
             outGoing?.readData(withTimeout: -1, tag: TAG_READFROMSERVER)
         }else if tag == TAG_WRITEHTTPRESPONSE {
-            DDLogDebug("H\(intTag) TAG_WRITEHTTPRESPONSE")
+            DDLogVerbose("H\(intTag) TAG_WRITEHTTPRESPONSE")
             outGoing?.readData(withTimeout: -1, tag: TAG_READFROMSERVER)
         }else if tag == TAG_WRITEHTTPSRESPONSR {
-            DDLogDebug("H\(intTag) TAG_WRITEHTTPSRESPONSR")
+            DDLogVerbose("H\(intTag) TAG_WRITEHTTPSRESPONSR")
             clientSocket?.readData(withTimeout: -1, tag: TAG_READFROMCLIENT)
             outGoing?.readData(withTimeout: -1, tag: TAG_READFROMSERVER)
         }
@@ -267,8 +271,8 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
             return
         }
         
-        DDLogDebug("H\(intTag) head \(headerEndIndex) data \(data.count)")
-        DDLogDebug("H\(intTag) " + clientRequest)
+        DDLogVerbose("H\(intTag) head \(headerEndIndex) data \(data.count)")
+        DDLogVerbose("H\(intTag) " + clientRequest)
         
         let hostDomain = extractDetail(from: clientRequest, by: "Host")
         let hostItems = hostDomain?.components(separatedBy: ":")
@@ -358,36 +362,46 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
     }
     
     func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
-        DDLogDebug("H\(intTag) Socks side disconnect")
+        DDLogVerbose("H\(intTag) Socks side disconnect")
         
         clientSocket = nil
         if outGoing == nil {
+            DDLogVerbose("H\(intTag) Both side disconnected")
             saveInOutCount()
             delegate?.HTTPAnalyzerDidDisconnect(httpAnalyzer: self)
             delegate = nil
         }else{
+            DDLogVerbose("H\(intTag) Going to disconnect HTTP Side")
             outGoing?.disconnect()
         }
     }
     
     func HTTPTrafficTransmitDidDisconnect() {
-        DDLogDebug("H\(intTag) HTTPTraffic side disconnect")
+        DDLogVerbose("H\(intTag) HTTPTraffic side disconnect")
         
         outGoing = nil
         if clientSocket == nil {
+            DDLogVerbose("H\(intTag) Both side disconnected")
             saveInOutCount()
             delegate?.HTTPAnalyzerDidDisconnect(httpAnalyzer: self)
             delegate = nil
         }else{
+            DDLogVerbose("H\(intTag) Going to disconnect Socks Side")
             clientSocket?.disconnect()
         }
     }
     
+    func forceDisconnect() {
+        isForceDisconnect = true
+        clientSocket?.disconnect()
+        DDLogVerbose("H\(self.intTag) forceDisconnect")
+    }
+    
     func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16) {
-        DDLogDebug("H\(intTag) didConnect \(host):\(port)")
+        DDLogVerbose("H\(intTag) didConnect \(host):\(port)")
         
         if isConnectRequest {
-            DDLogDebug("H\(intTag) Connection")
+            DDLogVerbose("H\(intTag) Connection")
             DispatchQueue.main.async {
                 self.hostTraffic?.responseHead = ConnectionResponseStr
                 self.hostTraffic?.responseTime = NSDate()
@@ -395,7 +409,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
             }
             clientSocket?.write(ConnectionResponse, withTimeout: -1, tag: TAG_WRITEHTTPSRESPONSR)
         }else{
-            DDLogDebug("H\(intTag) None Connection")
+            DDLogVerbose("H\(intTag) None Connection")
             dataLengthFromClient = repostData!.count
             outGoing?.write(repostData!, withTimeout: -1, tag: TAG_WRITETOSERVER)
             repostData = nil
@@ -405,6 +419,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
     
     func saveInOutCount() {
         DispatchQueue.main.sync {
+            DDLogVerbose("H\(self.intTag) saveInOutCount")
             if self.hostTraffic?.requestTime == nil {
                 CoreDataController.sharedInstance.getContext().delete(self.hostTraffic!)
             }else{
@@ -412,6 +427,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
                 self.hostTraffic?.outCount = Int64(self.outCount)
                 self.hostTraffic?.inProcessing = false
                 self.hostTraffic?.disconnectTime = NSDate()
+                self.hostTraffic?.forceDisconnect = self.isForceDisconnect
             }
             
             CoreDataController.sharedInstance.saveContext()

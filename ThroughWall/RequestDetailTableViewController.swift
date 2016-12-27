@@ -33,19 +33,49 @@ class RequestDetailTableViewController: UITableViewController {
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 2
+        return 5
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
+        if section == 0 {
+            return 1
+        }else if section == 1 {
+            return 3
+        }else if section == 2 {
+            return 2
+        }else if section == 3 {
+            return 1
+        }
         return 2
     }
-
+    
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        switch section {
+        case 0:
+            return "Rule"
+        case 1:
+            return "Time"
+        case 2:
+            return "Traffic"
+        case 3:
+            return "Status"
+        default:
+            return "Request & Response"
+        }
+    }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         // Configure the cell...
         switch indexPath.section {
         case 0:
+            let cell = tableView.dequeueReusableCell(withIdentifier: "timeDetail", for: indexPath)
+            
+            cell.textLabel?.text = "Rule"
+            cell.detailTextLabel?.text = hostRequest.rule
+            
+            return cell
+        case 1:
             let localFormatter = DateFormatter()
             localFormatter.locale = Locale.current
             localFormatter.dateFormat = "HH:mm:ss:SSS"
@@ -56,13 +86,41 @@ class RequestDetailTableViewController: UITableViewController {
                 cell.textLabel?.text = "Request Time"
                 if hostRequest.requestTime != nil{
                     cell.detailTextLabel?.text = localFormatter.string(from: hostRequest.requestTime as! Date)
+                }else{
+                    cell.detailTextLabel?.text = ""
                 }
-            }else{
+            }else if indexPath.row == 1{
                 cell.textLabel?.text = "Response Time"
                 if hostRequest.responseTime != nil {
                     cell.detailTextLabel?.text = localFormatter.string(from: hostRequest.responseTime as! Date)
+                }else{
+                    cell.detailTextLabel?.text = ""
+                }
+            }else{
+                cell.textLabel?.text = "Disconnect Time"
+                if hostRequest.disconnectTime != nil {
+                    cell.detailTextLabel?.text = localFormatter.string(from: hostRequest.disconnectTime as! Date)
+                }else{
+                    cell.detailTextLabel?.text = ""
                 }
             }
+            return cell
+        case 2:
+            let cell = tableView.dequeueReusableCell(withIdentifier: "timeDetail", for: indexPath)
+            if indexPath.row == 0 {
+                cell.textLabel?.text = "Upload"
+                cell.detailTextLabel?.text = "\(hostRequest.outCount)B"
+            }else if indexPath.row == 1{
+                cell.textLabel?.text = "Download"
+                cell.detailTextLabel?.text = "\(hostRequest.inCount)B"
+            }
+            return cell
+        case 3:
+            let cell = tableView.dequeueReusableCell(withIdentifier: "timeDetail", for: indexPath)
+            
+            cell.textLabel?.text = "Status"
+            cell.detailTextLabel?.text = hostRequest.inProcessing ? "Incomplete" : "Complete"
+            
             return cell
         default:
             let cell = tableView.dequeueReusableCell(withIdentifier: "trafficHeader", for: indexPath)
@@ -78,7 +136,7 @@ class RequestDetailTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-        if indexPath.section == 0 {
+        if indexPath.section != 4 {
             return 38
         }else{
             let textView = prototypeCell.viewWithTag(103) as! UITextView
@@ -87,7 +145,7 @@ class RequestDetailTableViewController: UITableViewController {
             }else{
                 textView.text = hostRequest.responseHead
             }
-            let contentSize = textView.sizeThatFits(textView.bounds.size)
+            let contentSize = textView.sizeThatFits(self.view.bounds.size)
             return contentSize.height
         }
     }

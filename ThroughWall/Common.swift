@@ -37,6 +37,8 @@ let recordingDateKey = "Bingo.recordingDate"
 
 let saveContextNotification = "Bingo.TWPacketTunnelProvider.saveContext"
 
+let shouldLogTrafficKey = "Bingo.ShouldLogTraffic"
+let logLevelKey = "Bingo.LogLevel"
 
 enum DarwinNotifications: String {
     case updateWidget = "updataWidget"

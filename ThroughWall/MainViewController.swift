@@ -86,6 +86,8 @@ class MainViewController: UITableViewController {
         RuleFileUpdateController().tryUpdateRuleFileFromBundleFile()
         readSettings()
         NotificationCenter.default.addObserver(self, selector: #selector(MainViewController.deleteEditingVPN), name: NSNotification.Name(rawValue: kDeleteEditingVPN), object: nil)
+        
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -100,13 +102,43 @@ class MainViewController: UITableViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name.NEVPNStatusDidChange, object: nil)
-//        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kDeleteEditingVPN), object: nil)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kDeleteEditingVPN), object: nil)
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+    
+    func mergerOldServer() {
+        NETunnelProviderManager.loadAllFromPreferences() { newManagers, error in
+            if error == nil {
+                guard let vpnManagers = newManagers else { return }
+                self.vpnManagers.removeAll()
+                for vpnManager in vpnManagers {
+                    if let providerProtocol = vpnManager.protocolConfiguration as? NETunnelProviderProtocol {
+                        if providerProtocol.providerBundleIdentifier == kTunnelProviderBundle {
+                            if vpnManager.isEnabled {
+                                self.currentVPNManager = vpnManager
+                            }
+                            self.vpnManagers.append(vpnManager)
+                        }
+                    }
+                }
+                self.vpnStatusSwitch.isEnabled = vpnManagers.count > 0
+                self.tableView.reloadData()
+                self.VPNStatusDidChange(nil)
+            }else{
+                print(error!)
+            }
+        }
+        
+    }
+    
     
     func blockADSwitchValueDidChange(_ sender: UISwitch) {
         let defaults = UserDefaults.init(suiteName: groupName)

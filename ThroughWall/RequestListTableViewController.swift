@@ -69,7 +69,7 @@ class RequestListTableViewController: UITableViewController {
             if hostTraffics[indexPath.row].requestTime != nil {
                 cell.detailTextLabel?.attributedText = makeAttributeDescription(fromHostTraffic: hostTraffics[indexPath.row])
             }else{
-                cell.detailTextLabel?.text = "Error"
+                cell.detailTextLabel?.text = "Error \(hostTraffics[indexPath.row].inProcessing) P"
             }
             return cell
         }else{

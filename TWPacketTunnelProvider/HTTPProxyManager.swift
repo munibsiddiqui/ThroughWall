@@ -78,6 +78,10 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate,HTTPAnalyzerDelegate {
         saveTrafficTimer = nil
         repeatDeleteTimer?.cancel()
         repeatDeleteTimer = nil
+        DDLogVerbose("Going to saveContext")
+        DispatchQueue.main.async {
+            CoreDataController.sharedInstance.saveContext()
+        }
     }
     
     
@@ -135,6 +139,9 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate,HTTPAnalyzerDelegate {
             
             CFNotificationCenterPostNotification(notification, CFNotificationName(name as CFString) , nil, nil, true)
             
+            DispatchQueue.main.async {
+                CoreDataController.sharedInstance.saveContext()
+            }
         })
         saveTrafficTimer?.resume()
     }

@@ -18,6 +18,7 @@ let kDeleteEditingVPN = "Bingo.ThroughWall.DeleteEditingVPN"
 
 let groupName = "group.Bingo.ThroughWall"
 let ruleFielName = "rule.conf"
+let PacketTunnelProviderLogFolderName = "PacketTunnelProvider"
 let bundlefileVersion = 0
 let savedFileVersion = "Bingo.SavedFileVersion"
 let currentFileSource = "Bingo.FileSource"
@@ -33,6 +34,8 @@ let uploadCountKey = "count.upload"
 let proxyDownloadCountKey = "count.proxyDownload"
 let proxyUploadCountKey = "count.proxyUpload"
 let recordingDateKey = "Bingo.recordingDate"
+
+let saveContextNotification = "Bingo.TWPacketTunnelProvider.saveContext"
 
 
 enum DarwinNotifications: String {

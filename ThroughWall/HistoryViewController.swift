@@ -23,11 +23,15 @@ class HistoryViewController: UIViewController {
         downloadChartView.xAxis.labelPosition = .bottom
         downloadChartView.rightAxis.enabled = false
         downloadChartView.chartDescription?.text = ""
+        downloadChartView.xAxis.drawGridLinesEnabled = false
+        downloadChartView.xAxis.labelCount = 7
         
         uploadChartView.noDataText = "Not Enough Data"
         uploadChartView.xAxis.labelPosition = .bottom
         uploadChartView.rightAxis.enabled = false
         uploadChartView.chartDescription?.text = ""
+        uploadChartView.xAxis.drawGridLinesEnabled = false
+        uploadChartView.xAxis.labelCount = 7
     }
 
     
@@ -52,7 +56,7 @@ class HistoryViewController: UIViewController {
     
     func showRecent() {
         let pastSeconds = 3600
-        let step = 30
+        let step = 120
         let startTime = NSDate.init(timeInterval: TimeInterval(-1 * pastSeconds), since: Date())
         
         let fetch: NSFetchRequest<HistoryTraffic> = HistoryTraffic.fetchRequest()
@@ -63,7 +67,7 @@ class HistoryViewController: UIViewController {
     
     func showHour() {
         let pastSeconds = 3600 * 12
-        let step = 3600
+        let step = 1200
         let startTime = NSDate.init(timeInterval: TimeInterval(-1 * pastSeconds), since: Date())
         let fetch: NSFetchRequest<HistoryTraffic> = HistoryTraffic.fetchRequest()
         

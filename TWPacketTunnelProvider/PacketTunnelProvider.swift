@@ -28,15 +28,21 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         
         DDLog.add(DDASLLogger.sharedInstance()) // ASL = Apple System Logs
         
-        let fileLogger: DDFileLogger = DDFileLogger() // File Logger
+        let fileManager = FileManager.default
+        var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName)!
+        url.appendPathComponent(PacketTunnelProviderLogFolderName)
+        
+        let logFileManager = DDLogFileManagerDefault(logsDirectory: url.path)
+        let fileLogger: DDFileLogger = DDFileLogger(logFileManager: logFileManager) // File Logger
         fileLogger.rollingFrequency = TimeInterval(60*60*24)  // 24 hours
-        fileLogger.logFileManager.maximumNumberOfLogFiles = 7
+        fileLogger.logFileManager.maximumNumberOfLogFiles = 2
         DDLog.add(fileLogger)
         
-        defaultDebugLevel = DDLogLevel.debug
+        defaultDebugLevel = DDLogLevel.verbose
         
-        DDLogInfo("\(fileLogger.currentLogFileInfo)")
-        DDLogInfo("Going to start VPN")
+        DDLogInfo("------Log Start------")
+        DDLogVerbose("\(fileLogger.currentLogFileInfo)")
+        DDLogVerbose("Going to start VPN")
         
         pendingStartCompletion = completionHandler
         
@@ -50,7 +56,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 self.pendingStartCompletion?(error)
                 return
             }
-            DDLogDebug("shadowsocks port: \(ShadowLibSocksPort)")
+            DDLogVerbose("shadowsocks port: \(ShadowLibSocksPort)")
             
             NotificationCenter.default.addObserver(self, selector: #selector(PacketTunnelProvider.onShadowsocksClientClosed), name: NSNotification.Name(rawValue: Tun2SocksStoppedNotification), object: nil)
             
@@ -61,12 +67,12 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                     self.pendingStartCompletion?(error)
                     return
                 }
-                DDLogDebug("http(s) port: \(httpProxyPort)")
+                DDLogVerbose("http(s) port: \(httpProxyPort)")
                 self.httpPort = httpProxyPort
                 
                 //socksTohttp
                 Socks2HTTPS.sharedInstance.start(bindToPort: UInt16(httpProxyPort), callback: { (socksPortToHTTP, error) in
-                    DDLogDebug("socksToHTTP port: \(socksPortToHTTP)")
+                    DDLogVerbose("socksToHTTP port: \(socksPortToHTTP)")
                     //TunnelSetting
                     self.setupTunnelWith(proxyPort: httpProxyPort, completionHandle: { (error) in
                         //Forward IP Packets

@@ -49,21 +49,28 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
     private var intTag = 0
     private var proxyType = ""
     private var dataLengthFromClient = 0
-    private var hostTraffic: HostTraffic?
+    
+    private lazy var hostTraffic: HostTraffic = {
+        let context = CoreDataController.sharedInstance.getContext()
+        let hostTraffic = HostTraffic(context: context)
+        hostTraffic.inProcessing = true
+        return hostTraffic
+    }()
+    
     private var isForceDisconnect = false
     private var inCount = 0 {
         willSet{
             DispatchQueue.main.async {
-                self.hostTraffic?.inCount = Int64(newValue)
-                CoreDataController.sharedInstance.saveContext()
+                self.hostTraffic.inCount = Int64(newValue)
+//                CoreDataController.sharedInstance.saveContext()
             }
         }
     }
     private var outCount = 0 {
         willSet {
             DispatchQueue.main.async {
-                self.hostTraffic?.outCount = Int64(newValue)
-                CoreDataController.sharedInstance.saveContext()
+                self.hostTraffic.outCount = Int64(newValue)
+//                CoreDataController.sharedInstance.saveContext()
             }
         }
     }
@@ -78,15 +85,30 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
         clientSocket.delegateQueue = DispatchQueue.global()
         self.clientSocket = clientSocket
         bindToPort = port
-        DispatchQueue.main.sync {
-            let context = CoreDataController.sharedInstance.getContext()
-            self.hostTraffic = HostTraffic(context: context)
-            self.hostTraffic?.inProcessing = true
-            CoreDataController.sharedInstance.saveContext()
-        }
+        
+//        NotificationCenter.default.addObserver(self, selector: #selector(HTTPAnalyzer.saveContextPeriodly), name: NSNotification.Name(rawValue: saveContextNotification), object: nil)
+        
+//        DispatchQueue.main.async {
+//            let context = CoreDataController.sharedInstance.getContext()
+//            self.hostTraffic = HostTraffic(context: context)
+//            self.hostTraffic.inProcessing = true
+//            self.hostTraffic.hostName = "H\(self.intTag)"
+////            CoreDataController.sharedInstance.saveContext()
+//        }
         clientSocket.readData(withTimeout: -1, tag: TAG_RECOGNIZE)
         
     }
+    
+//    deinit {
+//        NotificationCenter.default.removeObserver(self)
+//    }
+    
+//    func saveContextPeriodly() {
+//        DispatchQueue.main.async {
+//            DDLogVerbose("H\(self.intTag) saveContext")
+//            CoreDataController.sharedInstance.saveContext()
+//        }
+//    }
     
     func getIntTag() -> Int {
         return intTag
@@ -128,9 +150,10 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
                     DDLogVerbose("H\(intTag) Proxy:\(useProxy) Connect: \(host):\(port)")
                     try outGoing?.connnect(toRemoteHost: host, onPort: port)
                     DispatchQueue.main.async {
-                        self.hostTraffic?.rule = self.proxyType
-                        self.hostTraffic?.requestTime = NSDate()
-                        CoreDataController.sharedInstance.saveContext()
+                        DDLogVerbose("H\(self.intTag) RequestTag")
+                        self.hostTraffic.rule = self.proxyType
+                        self.hostTraffic.requestTime = NSDate()
+//                        CoreDataController.sharedInstance.saveContext()
                     }
                 }catch{
                     DDLogError("H\(intTag) \(error)")
@@ -140,7 +163,6 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
             })
         }else if tag == TAG_READFROMCLIENT {
             DDLogVerbose("H\(intTag) From Client length:\(data.count)")
-            //            delegate?.didUploadToServer(dataSize: data.count)
             dataLengthFromClient = data.count
             outGoing?.write(data, withTimeout: -1, tag: TAG_WRITETOSERVER)
         }else if tag == TAG_READFROMSERVER {
@@ -148,7 +170,6 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
             inCount = inCount + data.count
             delegate?.didDownloadFromServer(dataSize: data.count, proxyType: proxyType)
             clientSocket?.write(data, withTimeout: -1, tag: TAG_WRITETOCLIENT)
-            DDLogVerbose("H\(intTag) From Server length:\(data.count) End")
         }else if tag == TAG_HTTPRESPONSE{
             inCount = inCount + data.count
             delegate?.didDownloadFromServer(dataSize: data.count, proxyType: proxyType)
@@ -218,21 +239,22 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
         }
         
         DispatchQueue.main.async {
-            self.hostTraffic?.responseHead = serverResponseHeader
-            self.hostTraffic?.responseTime = NSDate()
+            self.hostTraffic.responseHead = serverResponseHeader
+            self.hostTraffic.responseTime = NSDate()
+//            CoreDataController.sharedInstance.saveContext()
         }
         
         if headerEndIndex < data.count {
             let requestBody = data.subdata(in: headerEndIndex ..< data.count)
             DispatchQueue.main.async {
-                self.hostTraffic?.responseBody = requestBody as NSData
+                self.hostTraffic.responseBody = requestBody as NSData
+//                CoreDataController.sharedInstance.saveContext()
             }
         }
         
-        
-        DispatchQueue.main.async {
-            CoreDataController.sharedInstance.saveContext()
-        }
+//        DispatchQueue.main.async {
+//            CoreDataController.sharedInstance.saveContext()
+//        }
         
         
         //        var attatch: Data? = nil
@@ -299,7 +321,8 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
             
             //what if ipv6 address
             DispatchQueue.main.async {
-                self.hostTraffic?.requestHead = clientRequest
+                self.hostTraffic.requestHead = clientRequest
+//                CoreDataController.sharedInstance.saveContext()
             }
         }else{
             isConnectRequest = false
@@ -337,13 +360,15 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
             // DDLogVerbose("H\(intTag) Repost: \n\(clientRequest)")
             repostData = clientRequest.data(using: .utf8)
             DispatchQueue.main.async {
-                self.hostTraffic?.requestHead = clientRequest
+                self.hostTraffic.requestHead = clientRequest
+//                CoreDataController.sharedInstance.saveContext()
             }
             if headerEndIndex < data.count {
                 let requestBody = data.subdata(in: headerEndIndex ..< data.count)
                 repostData?.append(requestBody)
                 DispatchQueue.main.async {
-                    self.hostTraffic?.requestBody = requestBody as NSData
+                    self.hostTraffic.requestBody = requestBody as NSData
+//                    CoreDataController.sharedInstance.saveContext()
                 }
             }
         }
@@ -354,8 +379,8 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
         }
         
         DispatchQueue.main.async {
-            self.hostTraffic?.hostName = "\(host):\(port)"
-            CoreDataController.sharedInstance.saveContext()
+            self.hostTraffic.hostName = "\(host):\(port)"
+//            CoreDataController.sharedInstance.saveContext()
         }
 
         completionHandle(host,port)
@@ -403,9 +428,9 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
         if isConnectRequest {
             DDLogVerbose("H\(intTag) Connection")
             DispatchQueue.main.async {
-                self.hostTraffic?.responseHead = ConnectionResponseStr
-                self.hostTraffic?.responseTime = NSDate()
-                CoreDataController.sharedInstance.saveContext()
+                self.hostTraffic.responseHead = ConnectionResponseStr
+                self.hostTraffic.responseTime = NSDate()
+//                CoreDataController.sharedInstance.saveContext()
             }
             clientSocket?.write(ConnectionResponse, withTimeout: -1, tag: TAG_WRITEHTTPSRESPONSR)
         }else{
@@ -419,18 +444,20 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, HTTPTrafficTransmitDelegate
     
     func saveInOutCount() {
         DispatchQueue.main.sync {
-            DDLogVerbose("H\(self.intTag) saveInOutCount")
-            if self.hostTraffic?.requestTime == nil {
-                CoreDataController.sharedInstance.getContext().delete(self.hostTraffic!)
+            
+            if self.hostTraffic.requestTime == nil {
+                DDLogVerbose("H\(self.intTag) DELETE from context")
+                CoreDataController.sharedInstance.getContext().delete(self.hostTraffic)
             }else{
-                self.hostTraffic?.inCount = Int64(self.inCount)
-                self.hostTraffic?.outCount = Int64(self.outCount)
-                self.hostTraffic?.inProcessing = false
-                self.hostTraffic?.disconnectTime = NSDate()
-                self.hostTraffic?.forceDisconnect = self.isForceDisconnect
+                DDLogVerbose("H\(self.intTag) saveInOutCount")
+                self.hostTraffic.inCount = Int64(self.inCount)
+                self.hostTraffic.outCount = Int64(self.outCount)
+                self.hostTraffic.inProcessing = false
+                self.hostTraffic.disconnectTime = NSDate()
+                self.hostTraffic.forceDisconnect = self.isForceDisconnect
             }
             
-            CoreDataController.sharedInstance.saveContext()
+//            CoreDataController.sharedInstance.saveContext()
         }
     }
 }

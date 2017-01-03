@@ -49,6 +49,7 @@
 		34765C951E1116780055C294 /* RequestListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C941E1116780055C294 /* RequestListTableViewController.swift */; };
 		348E850A1E10CCAB00E55F64 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3474EC7E1DDC926C00EBF3C5 /* Main.storyboard */; };
 		349C99421DFA540A0079502B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3474EC841DDC926C00EBF3C5 /* Assets.xcassets */; };
+		34A26A6B1E13447400A8CC93 /* HistoryOptionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A26A6A1E13447400A8CC93 /* HistoryOptionTableViewController.swift */; };
 		34BD966C1DDD392E002442BF /* ShadowsocksLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3474ECBB1DDC950000EBF3C5 /* ShadowsocksLib.framework */; };
 		34BD966D1DDD3932002442BF /* TunnelLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3474ECCD1DDC951100EBF3C5 /* TunnelLib.framework */; };
 		34CC5CDB1DDC9B7A0061AA44 /* BLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 34CC5B221DDC9B790061AA44 /* BLog.m */; };
@@ -307,6 +308,7 @@
 		34765C861E10D8810055C294 /* SelectInputViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectInputViewController.swift; sourceTree = "<group>"; };
 		34765C871E10D8810055C294 /* SelectionFieldCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectionFieldCell.swift; sourceTree = "<group>"; };
 		34765C941E1116780055C294 /* RequestListTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestListTableViewController.swift; sourceTree = "<group>"; };
+		34A26A6A1E13447400A8CC93 /* HistoryOptionTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryOptionTableViewController.swift; sourceTree = "<group>"; };
 		34CC5B211DDC9B790061AA44 /* BLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLog.h; sourceTree = "<group>"; };
 		34CC5B221DDC9B790061AA44 /* BLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BLog.m; sourceTree = "<group>"; };
 		34CC5B231DDC9B790061AA44 /* BLog_syslog.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = BLog_syslog.c; sourceTree = "<group>"; };
@@ -1006,6 +1008,7 @@
 				34765C7F1E10D8810055C294 /* ConfigureViewController.swift */,
 				34765C801E10D8810055C294 /* HelpViewController.swift */,
 				34765C811E10D8810055C294 /* HistoryViewController.swift */,
+				34A26A6A1E13447400A8CC93 /* HistoryOptionTableViewController.swift */,
 				34765C821E10D8810055C294 /* InputTextFieldCell.swift */,
 				34765C831E10D8810055C294 /* MainViewController.swift */,
 				34765C841E10D8810055C294 /* RuleImportMethodTableViewController.swift */,
@@ -2652,6 +2655,7 @@
 				34765C8B1E10D8810055C294 /* HistoryViewController.swift in Sources */,
 				34765C951E1116780055C294 /* RequestListTableViewController.swift in Sources */,
 				34765C8D1E10D8810055C294 /* MainViewController.swift in Sources */,
+				34A26A6B1E13447400A8CC93 /* HistoryOptionTableViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

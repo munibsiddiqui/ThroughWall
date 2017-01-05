@@ -15,9 +15,11 @@ protocol HTTPAnalyzerDelegate: class {
     func HTTPAnalyzerDidDisconnect(httpAnalyzer analyzer: HTTPAnalyzer)
     func didDownloadFromServer(dataSize size: Int, proxyType proxy: String)
     func didUploadToServer(dataSize size: Int, proxyType proxy: String)
+    func retrieveOutGoingInstance(byHostNameAndPort hostAndPort:String) -> OutgoingSide?
+    func saveOutgoingSideIntoKeepAliveArray(withHostNameAndPort hostAndPort: String, outgoing: OutgoingSide)
 }
 
-class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate,HTTPAnalyzerDelegate {
+class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate, HTTPAnalyzerDelegate {
     
     static let shardInstance = HTTPProxyManager()
     
@@ -83,8 +85,6 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate,HTTPAnalyzerDelegate {
             CoreDataController.sharedInstance.saveContext()
         }
     }
-    
-    
     
     func prepareTimelyUpdate() {
         repeatlySaveTraffic(withInterval: 1)
@@ -220,9 +220,9 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate,HTTPAnalyzerDelegate {
         analyzerLock.lock()
         if let index = self.clientSocket.index(of: analyzer) {
             self.clientSocket.remove(at: index)
-            DDLogVerbose("H\(analyzer.getIntTag()) removed from arrary")
+            DDLogVerbose("H\(analyzer.getIntTag())H removed from arrary")
         }else{
-            DDLogError("H\(analyzer.getIntTag()) cann't find in the array")
+            DDLogError("H\(analyzer.getIntTag())H cann't find in the array")
         }
         analyzerLock.unlock()
     }
@@ -289,10 +289,11 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate,HTTPAnalyzerDelegate {
         tagLock.unlock()
         
         let newClient = HTTPAnalyzer(analyzerDelegate: self, intTag: tag)
-        newClient.setSocket(newSocket, socksServerPort: bindToPort)
+        newClient.setSocket(clientSocket: newSocket, socksServerPort: bindToPort)
+        
         analyzerLock.lock()
         self.clientSocket.append(newClient)
-        DDLogVerbose("H\(newClient.getIntTag()) added into arrary")
+        DDLogVerbose("H\(newClient.getIntTag())H added into arrary")
         analyzerLock.unlock()
     }
     
@@ -300,4 +301,13 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate,HTTPAnalyzerDelegate {
         NSLog("HTTP Server Disconnected \(err?.localizedDescription)")
     }
     
+    
+    func retrieveOutGoingInstance(byHostNameAndPort hostAndPort: String) -> OutgoingSide? {
+        return nil
+    }
+    
+    func saveOutgoingSideIntoKeepAliveArray(withHostNameAndPort hostAndPort: String, outgoing: OutgoingSide) {
+        outgoing.setDelegate(nil)
+        outgoing.disconnect()
+    }
 }

@@ -23,11 +23,11 @@ private let TIMEOUT_CONNECT = 8.00
 private let TIMEOUT_READ = 5.00
 private let TIMEOUT_TOTAL = 80.00
 
-class HTTPTrafficTransmit: NSObject, GCDAsyncSocketDelegate {
+class OutgoingSide: NSObject, GCDAsyncSocketDelegate {
     
     private var proxyHost: String?
     private var proxyPort: UInt16?
-    private weak var delegate: HTTPTrafficTransmitDelegate?
+    private weak var delegate: OutgoingTransmitDelegate?
     private var shouldConnectDirectly = true
     private var remoteHost: String?
     private var remotePort: UInt16?
@@ -39,7 +39,11 @@ class HTTPTrafficTransmit: NSObject, GCDAsyncSocketDelegate {
         shouldConnectDirectly = false
     }
     
-    init(withDelegate delegate: HTTPTrafficTransmitDelegate) {
+    init(withDelegate delegate: OutgoingTransmitDelegate) {
+        self.delegate = delegate
+    }
+    
+    func setDelegate(_ delegate: OutgoingTransmitDelegate?) {
         self.delegate = delegate
     }
     
@@ -66,7 +70,7 @@ class HTTPTrafficTransmit: NSObject, GCDAsyncSocketDelegate {
     
     internal func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16) {
         if shouldConnectDirectly {
-            delegate?.socket(sock, didConnectToHost: host, port: port)
+            delegate?.outgoingSocket(didConnectToHost: host, port: port)
         }else{
             openSocks()
         }
@@ -74,7 +78,7 @@ class HTTPTrafficTransmit: NSObject, GCDAsyncSocketDelegate {
     
     internal  func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
         socket = nil
-        delegate?.HTTPTrafficTransmitDidDisconnect()
+        delegate?.outgoingSocketDidDisconnect()
         delegate = nil
     }
     
@@ -143,9 +147,9 @@ class HTTPTrafficTransmit: NSObject, GCDAsyncSocketDelegate {
                 socket?.disconnect()
             }
         }else if tag == SOCKS_CONNECT_REPLY_2 {
-            delegate?.socket(sock, didConnectToHost: remoteHost!, port: remotePort!)
+            delegate?.outgoingSocket(didConnectToHost: remoteHost!, port: remotePort!)
         }else{
-            delegate?.socket(sock, didRead: data, withTag: tag)
+            delegate?.outgoingSocket(didRead: data, withTag: tag)
         }
     }
     
@@ -211,7 +215,7 @@ class HTTPTrafficTransmit: NSObject, GCDAsyncSocketDelegate {
     }
     
     func socket(_ sock: GCDAsyncSocket, didWriteDataWithTag tag: Int) {
-        delegate?.socket(sock, didWriteDataWithTag: tag)
+        delegate?.outgoingSocket(didWriteDataWithTag: tag)
     }
 }
 

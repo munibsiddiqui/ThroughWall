@@ -540,6 +540,14 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         let rule = Rule.sharedInstance.ruleForDomain(host)
         proxyType = rule.description
         DDLogVerbose("H\(intTag)H Proxy:\(proxyType) Connect: \(host):\(port) KeepAlive: \(isKeepAlive)")
+        if shouldParseTraffic {
+            DispatchQueue.main.async {
+                self.hostTraffic.hostName = host
+                self.hostTraffic.port = Int32(port)
+                self.hostTraffic.rule = self.proxyType
+                self.hostTraffic.requestTime = NSDate()
+            }
+        }
         
         switch rule {
         case .Reject:
@@ -554,14 +562,6 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         
         do {
             try outGoing?.connnect(toRemoteHost: host, onPort: port)
-            if shouldParseTraffic {
-                DispatchQueue.main.async {
-                    self.hostTraffic.hostName = host
-                    self.hostTraffic.port = Int32(port)
-                    self.hostTraffic.rule = self.proxyType
-                    self.hostTraffic.requestTime = NSDate()
-                }
-            }
         }catch{
             DDLogError("H\(intTag)H \(error)")
             outGoing = nil

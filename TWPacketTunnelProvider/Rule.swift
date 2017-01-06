@@ -75,7 +75,7 @@ class Rule {
     private func translateToBinary(fromIP ip: String) -> String {
         var ipParts = ip.components(separatedBy: ".")
         for (index, ipPart) in ipParts.enumerated() {
-            ipParts[index] = pad(String(Int(ipPart)!, radix: 2), toSize: 8)
+            ipParts[index] = pad(String(Int(ipPart) ?? 0, radix: 2), toSize: 8)
         }
         return ipParts.joined()
     }
@@ -98,7 +98,6 @@ class Rule {
         }
         return padded
     }
-    
     
     func analyzeRuleFile() {
         
@@ -171,7 +170,7 @@ class Rule {
         
         if ipToValidate.withCString({ cstring in inet_pton(AF_INET6, cstring, &sin6.sin6_addr) }) == 1 {
             // IPv6 peer.
-            return true
+            return false
         }
         else if ipToValidate.withCString({ cstring in inet_pton(AF_INET, cstring, &sin.sin_addr) }) == 1 {
             // IPv4 peer.

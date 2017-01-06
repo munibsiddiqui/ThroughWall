@@ -65,7 +65,7 @@ class RequestListTableViewController: UITableViewController {
             let cell = tableView.dequeueReusableCell(withIdentifier: "requestList", for: indexPath)
             
             // Configure the cell...
-            cell.textLabel?.text = hostTraffics[indexPath.row].hostName
+            cell.textLabel?.text = (hostTraffics[indexPath.row].hostName ?? "") +  ":\(hostTraffics[indexPath.row].port)"
             if hostTraffics[indexPath.row].requestTime != nil {
                 cell.detailTextLabel?.attributedText = makeAttributeDescription(fromHostTraffic: hostTraffics[indexPath.row])
             }else{

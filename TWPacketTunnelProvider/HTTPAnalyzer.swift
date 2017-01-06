@@ -42,8 +42,7 @@ enum ConnectionError: Error {
     case RequestHeaderAnalysisError
     case URLComponentAnalysisError
     case IPV6AnalysisError
-    case IPV4AnalysisError
-    case HostOrPortNilError
+    case HostNilError
 }
 
 protocol OutgoingTransmitDelegate: class {
@@ -66,7 +65,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     private var proxyType = ""
     private var hostAndPort = ""
     private var isConnectRequest = true
-    private var shouldParseTraffic = false
+    private var shouldParseTraffic = true
     private var isForceDisconnect = false
     private var shoudKeepAlive = false
     private var brokenData: Data?
@@ -275,13 +274,13 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     
     func findHeadEndIndex(_ data: Data) -> Int? {
         let buffer = [UInt8](data)
-        var i = buffer.count - 1
-        while i >= 3 {
-            //0x0a: \n 0x0d: \r
-            if buffer[i] == 0x0a && buffer[i - 2] == 0x0a && buffer[i - 1] == 0x0d && buffer[i - 3] == 0x0d {
-                return i + 1
+        var i = 0
+        
+        while i < buffer.count - 3 {
+            if buffer[i] == 0x0d && buffer[i + 2] == 0x0d && buffer[i + 1] == 0x0a && buffer[i + 3] == 0x0a {
+                return i + 4
             }
-            i = i - 1
+            i = i + 1
         }
         return nil
     }
@@ -306,10 +305,10 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
                 host = hostName
             }
             if port == nil {
-                port = portNumber
+                port = portNumber ?? 443
             }
             
-            if host != nil && port != nil {
+            if host != nil {
                 if shouldParseTraffic {
                     DispatchQueue.main.async {
                         self.hostTraffic.requestHead = request
@@ -317,7 +316,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
                 }
                 tryConnect(toHost: host!, port: port!, isKeepAlive: isKeepAlive)
             }else{
-                DDLogError("H\(intTag)H handleHTTPSRequest \(ConnectionError.HostOrPortNilError)")
+                DDLogError("H\(intTag)H handleHTTPSRequest \(ConnectionError.HostNilError)")
                 forceDisconnect()
                 return
             }
@@ -337,19 +336,20 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
             host = hostName
         }
         if port == nil {
-            port = portNumber
+            port = portNumber ?? 80
         }
         
-        if host != nil && port != nil && repostRequest !=  nil {
+        if host != nil && repostRequest !=  nil {
             if shouldParseTraffic {
                 DispatchQueue.main.async {
                     self.hostTraffic.requestHead = repostRequest
                 }
             }
+            DDLogVerbose("H\(intTag)H repost \(repostRequest!)")
             repostData = repostRequest?.data(using: String.Encoding.utf8)
             tryConnect(toHost: host!, port: port!, isKeepAlive: isKeepAlive)
         }else{
-            DDLogError("H\(intTag)H handleHTTPSRequest \(ConnectionError.HostOrPortNilError)")
+            DDLogError("H\(intTag)H handleHTTPSRequest \(ConnectionError.HostNilError)")
             forceDisconnect()
             return
         }
@@ -366,10 +366,10 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
             host = hostName
         }
         if port == nil {
-            port = portNumber
+            port = portNumber ?? 80
         }
         
-        if host != nil && port != nil && repostRequest !=  nil {
+        if host != nil && repostRequest !=  nil {
             if shouldParseTraffic {
                 DispatchQueue.main.async {
                     self.hostTraffic.requestHead = repostRequest
@@ -382,11 +382,11 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
             }else {
                 leftClientContentLength = leftClientContentLength - body.count
             }
-            
+            DDLogVerbose("H\(intTag)H repost \(repostRequest!)")
             repostData = repostRequest!.data(using: String.Encoding.utf8)! + body
             tryConnect(toHost: host!, port: port!, isKeepAlive: isKeepAlive)
         }else{
-            DDLogError("H\(intTag)H handleHTTPSRequest \(ConnectionError.HostOrPortNilError)")
+            DDLogError("H\(intTag)H handleHTTPSRequest \(ConnectionError.HostNilError)")
             forceDisconnect()
             return
         }
@@ -399,8 +399,8 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         var host: String?
         var port: UInt16?
         if hostItems != nil {
-            if hostItems?.count == 2 {
-                host = hostItems![0]
+            host = hostItems![0]
+            if hostItems!.count == 2 {
                 port = UInt16(hostItems![1])
             }
         }
@@ -452,26 +452,28 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         
         if destiReqComponents[1].hasPrefix("[") {
             //ipv6 address
-            let destiComponents = destiReqComponents[1].components(separatedBy: "]:")
+            let destiComponents = destiReqComponents[1].components(separatedBy: "]")
             if destiComponents.count == 2 {
                 var host = destiComponents[0]
                 host.remove(at: host.startIndex)
-                let port = destiComponents[1]
+                var port = destiComponents[1]
+                if port.hasPrefix(":") {
+                    port.remove(at: port.startIndex)
+                }
                 return (host, UInt16(port))
             }else{
                 DDLogError("H\(intTag)H extactHostAndPort: \(ConnectionError.IPV6AnalysisError)")
                 return (nil , nil)
             }
         }else{
-            //ipv4 address
+            //ipv4 address or domain
             let destiComponents = destiReqComponents[1].components(separatedBy: ":")
             if destiComponents.count == 2{
                 let host = destiComponents[0]
                 let port = destiComponents[1]
                 return (host,UInt16(port))
             }else{
-                DDLogError("H\(intTag)H extactHostAndPort: \(ConnectionError.IPV4AnalysisError)")
-                return (nil, nil)
+                return (destiComponents[0], nil)
             }
         }
     }
@@ -482,37 +484,40 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         var host = ""
         var port: UInt16?
         if destiReqComponents.count != 3 {
-            DDLogError("H\(intTag)H extactHostAndPortWithLeftPart: \(ConnectionError.RequestHeaderAnalysisError)")
+            DDLogError("H\(intTag)H extactHostAndPortWithRepost: \(ConnectionError.RequestHeaderAnalysisError)")
             return (nil, nil, nil)
         }
         
         //destiReqComponents[1]: http://***/...
         var destiComponents = destiReqComponents[1].components(separatedBy: "/")
         if destiComponents.count < 3{
-            DDLogError("H\(intTag)H extactHostAndPortWithLeftPart: \(ConnectionError.URLComponentAnalysisError)")
+            DDLogError("H\(intTag)H extactHostAndPortWithRepost: \(ConnectionError.URLComponentAnalysisError)")
             return (nil, nil, nil)
         }
         
         if destiComponents[2].hasPrefix("[") {
             //ipv6 address
-            let hostAndPortComponents = destiComponents[2].components(separatedBy: "]:")
+            let hostAndPortComponents = destiComponents[2].components(separatedBy: "]")
             if hostAndPortComponents.count == 2{
                 host = hostAndPortComponents[0]
                 host.remove(at: host.startIndex)
-                port = UInt16(hostAndPortComponents[1])
+                var _port = hostAndPortComponents[1]
+                if _port.hasPrefix(":") {
+                    _port.remove(at: _port.startIndex)
+                }
+                port = UInt16(_port)
             }else{
-                DDLogError("H\(intTag)H extactHostAndPortWithLeftPart: \(ConnectionError.IPV6AnalysisError)")
+                DDLogError("H\(intTag)H extactHostAndPortWithRepost: \(ConnectionError.IPV6AnalysisError)")
                 return (nil , nil, nil)
             }
         }else{
-            //ipv4 address
+            //ipv4 address or domain
             let hostAndPortComponents = destiComponents[2].components(separatedBy: ":")
             if hostAndPortComponents.count == 2{
                 host = hostAndPortComponents[0]
                 port = UInt16(hostAndPortComponents[1])
             }else{
-                DDLogError("H\(intTag)H extactHostAndPortWithLeftPart: \(ConnectionError.IPV4AnalysisError)")
-                return (nil , nil, nil)
+                host = hostAndPortComponents[0]
             }
         }
         
@@ -524,7 +529,6 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     }
     
     
-    
     func tryConnect(toHost host: String, port: UInt16, isKeepAlive: Bool) {
         if isKeepAlive {
             outGoing = reuseOutGoingInstance(usingHost: host, port: port)
@@ -534,7 +538,8 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         }
         
         let rule = Rule.sharedInstance.ruleForDomain(host)
-        DDLogVerbose("H\(intTag)H Proxy:\(rule.description) Connect: \(host):\(port)")
+        proxyType = rule.description
+        DDLogVerbose("H\(intTag)H Proxy:\(proxyType) Connect: \(host):\(port) KeepAlive: \(isKeepAlive)")
         
         switch rule {
         case .Reject:
@@ -551,7 +556,8 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
             try outGoing?.connnect(toRemoteHost: host, onPort: port)
             if shouldParseTraffic {
                 DispatchQueue.main.async {
-                    DDLogVerbose("H\(self.intTag)H RequestTag")
+                    self.hostTraffic.hostName = host
+                    self.hostTraffic.port = Int32(port)
                     self.hostTraffic.rule = self.proxyType
                     self.hostTraffic.requestTime = NSDate()
                 }
@@ -590,6 +596,8 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         }else if tag == TAG_WRITE_HEAD_AND_BROKEN_BODY_TO_SERVER {
             DDLogVerbose("H\(intTag)H TAG_WRITE_HEAD_AND_BROKEN_BODY_TO_SERVER")
             clientSocket?.readData(withTimeout: -1, tag: TAG_READ_LEFT_BODY_PACKET_FROM_CLIENT)
+        }else{
+            DDLogError("H\(intTag)H Unknown Outgoing didwrite Tag")
         }
     }
     
@@ -613,6 +621,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
             DDLogVerbose("H\(intTag)H TAG_READ_LEFT_BODY_PACKET_FROM_SERVER length:\(data.count)")
             didReadLeftResponseBody(withData: data)
         default:
+            DDLogError("H\(intTag)H Unknown Outgoing didread Tag")
             break
         }
     }
@@ -680,6 +689,21 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         }
     }
     
+    private func printData(_ data: Data) {
+        let buffer = [UInt8](data)
+        var str = "H\(intTag)H "
+        for i in 0 ..< buffer.count {
+            str = str + String.init(format: "%c", buffer[i])
+        }
+         DDLogVerbose(str)
+        str = "H\(intTag)H "
+        for i in 0 ..< buffer.count {
+            str = str + String.init(format: "%02X ", buffer[i])
+        }
+         DDLogVerbose(str)
+        
+    }
+    
     func didReadServerResponse(withData data: Data) {
         var headData = data
         var bodyData: Data?
@@ -688,7 +712,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
             outGoing?.readData(withTimeout: -1, tag: TAG_READ_LEFT_RESPONSE_FROM_SERVER)
             return
         }
-        
+
         if headEndIndex < data.count {
             headData = data.subdata(in: 0 ..< headEndIndex)
             bodyData = data.subdata(in: headEndIndex ..< data.count)

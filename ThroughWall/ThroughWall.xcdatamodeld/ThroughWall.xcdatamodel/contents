@@ -15,6 +15,7 @@
         <attribute name="inCount" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="inProcessing" optional="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="outCount" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="port" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="requestBody" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="requestHead" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="requestTime" optional="YES" attributeType="Date" usesScalarValueType="NO" storedInTruthFile="YES" syncable="YES"/>
@@ -25,6 +26,6 @@
     </entity>
     <elements>
         <element name="HistoryTraffic" positionX="-63" positionY="-18" width="128" height="135"/>
-        <element name="HostTraffic" positionX="-54" positionY="63" width="128" height="240"/>
+        <element name="HostTraffic" positionX="-54" positionY="63" width="128" height="255"/>
     </elements>
 </model>

@@ -73,13 +73,13 @@ static const DDLogLevel ddLogLevel = DDLogLevelDebug;
     [TunnelManager sharedInterface].readFd = fds[0];
     [TunnelManager sharedInterface].writeFd = fds[1];
     
-    DDLogDebug(@"Going to start tun2socks");
+//    DDLogDebug(@"Going to start tun2socks");
     //start tun2socks
     [[TunnelManager sharedInterface]startTun2Socks:shadowsocksPort.intValue];
-    DDLogDebug(@"tun2socks started");
+//    DDLogDebug(@"tun2socks started");
     //
     [[TunnelManager sharedInterface] processPackets];
-    DDLogDebug(@"processpacket");
+//    DDLogDebug(@"processpacket");
     return nil;
 }
 
@@ -135,6 +135,8 @@ static const DDLogLevel ddLogLevel = DDLogLevelDebug;
             }else if (proto == IP_PROTO_TCP) {
                 DDLogVerbose(@"TCP Packet");
                 [[TunnelManager sharedInterface] handleTCPPPacket:packet];
+            }else{
+                DDLogError(@"Unknown Packet");
             }
         }
         [weakSelf processPackets];

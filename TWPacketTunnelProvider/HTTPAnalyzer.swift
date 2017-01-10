@@ -612,7 +612,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
             DDLogVerbose("H\(intTag)H TAG_WRITE_HEAD_AND_BROKEN_BODY_TO_SERVER")
             clientSocket?.readData(withTimeout: -1, tag: TAG_READ_LEFT_BODY_PACKET_FROM_CLIENT)
         }else{
-            DDLogError("H\(intTag)H Unknown Outgoing didwrite Tag")
+            DDLogError("H\(intTag)H Unknown Outgoing didwrite Tag \(tag)")
         }
     }
     

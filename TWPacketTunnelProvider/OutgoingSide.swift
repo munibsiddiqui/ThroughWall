@@ -215,7 +215,9 @@ class OutgoingSide: NSObject, GCDAsyncSocketDelegate {
     }
     
     func socket(_ sock: GCDAsyncSocket, didWriteDataWithTag tag: Int) {
-        delegate?.outgoingSocket(didWriteDataWithTag: tag)
+        if tag != SOCKS_OPEN && tag != SOCKS_CONNECT {
+            delegate?.outgoingSocket(didWriteDataWithTag: tag)
+        }
     }
 }
 

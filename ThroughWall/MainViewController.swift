@@ -216,7 +216,7 @@ class MainViewController: UITableViewController {
         case 0:
             //block ad section
             //global mode section
-            return 3
+            return 2
         case 1:
             //servers status section
             //server list section

@@ -16,16 +16,22 @@
         <attribute name="inProcessing" optional="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="outCount" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="port" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="requestBody" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="requestHead" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="requestTime" optional="YES" attributeType="Date" usesScalarValueType="NO" storedInTruthFile="YES" syncable="YES"/>
-        <attribute name="responseBody" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="responseHead" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="responseTime" optional="YES" attributeType="Date" usesScalarValueType="NO" storedInTruthFile="YES" syncable="YES"/>
         <attribute name="rule" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="bodies" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="PieceData" inverseName="belongToTraffic" inverseEntity="PieceData" syncable="YES"/>
+    </entity>
+    <entity name="PieceData" representedClassName="PieceData" syncable="YES" codeGenerationType="class">
+        <attribute name="rawData" optional="YES" attributeType="Binary" storedInTruthFile="YES" syncable="YES"/>
+        <attribute name="timeStamp" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="belongToTraffic" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="HostTraffic" inverseName="bodies" inverseEntity="HostTraffic" syncable="YES"/>
     </entity>
     <elements>
         <element name="HistoryTraffic" positionX="-63" positionY="-18" width="128" height="135"/>
-        <element name="HostTraffic" positionX="-54" positionY="63" width="128" height="255"/>
+        <element name="HostTraffic" positionX="-54" positionY="63" width="128" height="240"/>
+        <element name="PieceData" positionX="-54" positionY="126" width="128" height="105"/>
     </elements>
 </model>

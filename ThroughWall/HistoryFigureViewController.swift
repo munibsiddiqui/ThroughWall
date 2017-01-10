@@ -10,7 +10,7 @@ import UIKit
 import Charts
 import CoreData
 
-class HistoryViewController: UIViewController {
+class HistoryFigureViewController: UIViewController {
     @IBOutlet weak var downloadChartView: LineChartView!
     @IBOutlet weak var uploadChartView: LineChartView!
 

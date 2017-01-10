@@ -13,25 +13,25 @@ let CustomizeOption = "Custom"
 
 class Config: NSObject{
     
-    private let proxies = ["SHADOWSOCKS", "HTTP", "SOCKS5"]
+    private let proxies = ["CUSTOM", "HTTP", "SOCKS5"]
     
     private let items = [
-        "SHADOWSOCKS": ["proxy", "description", "server", "port", "password", "method", "dns"],
+        "CUSTOM": ["proxy", "description", "server", "port", "password", "method", "dns"],
         "HTTP": ["proxy", "description", "server", "port", "user", "password"],
         "SOCKS5": ["proxy", "description", "server", "port", "user", "password"]
     ]
     
     private let defaults = [
-        "SHADOWSOCKS": ["proxy": "SHADOWSOCKS", "method": "aes-256-cfb", "dns": "System Default"],
+        "CUSTOM": ["proxy": "CUSTOM", "method": "aes-256-cfb", "dns": "System Default"],
         "HTTP": ["proxy": "HTTP"],
         "SOCKS5": ["proxy": "SOCKS5"]
     ]
     
     private let availables = [
-        "SHADOWSOCKS": [
+        "CUSTOM": [
 //            "proxy": [
 //                "preset": [
-//                    "SHADOWSOCKS", "HTTP", "SOCKS5"
+//                    "CUSTOM", "HTTP", "SOCKS5"
 //                ]
 //            ],
             "method": [
@@ -51,14 +51,14 @@ class Config: NSObject{
         "HTTP": [
             "proxy": [
                 "preset": [
-                    "SHADOWSOCKS", "HTTP", "SOCKS5"
+                    "CUSTOM", "HTTP", "SOCKS5"
                 ]
             ]
         ],
         "SOCKS5": [
             "proxy": [
                 "preset": [
-                    "SHADOWSOCKS", "HTTP", "SOCKS5"
+                    "CUSTOM", "HTTP", "SOCKS5"
                 ]
             ]
         ]
@@ -155,7 +155,7 @@ class Config: NSObject{
 class ConfigureViewController: UITableViewController {
     
     var vpnManager: NETunnelProviderManager!
-    var sectionCounts = 1
+    var showDelete = false
     var descriptionCell =  InputTextFieldCell()
     var serverCell =  InputTextFieldCell()
     var portCell =  InputTextFieldCell()
@@ -184,19 +184,28 @@ class ConfigureViewController: UITableViewController {
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
         
-        if let proxy = (vpnManager.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration!["proxy"] as? String {
+        if var proxy = (vpnManager.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration!["proxy"] as? String {
+            if proxy == "SHADOWSOCKS" {
+                proxy = "CUSTOM"
+            }
             proxyConfig.currentProxy = proxy
   
             for item in proxyConfig.containedItems {
-                if let value = (vpnManager.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration![item] as? String {
+                if var value = (vpnManager.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration![item] as? String {
+                    if value == "SHADOWSOCKS" {
+                        value = "CUSTOM"
+                    }
                     proxyConfig.setValue(byItem: item, value: value)
                 }
             }
         }else{
-            proxyConfig.currentProxy = "SHADOWSOCKS"
+            proxyConfig.currentProxy = "CUSTOM"
         }
         tableView.tableFooterView = UIView()
         tableView.backgroundColor = UIColor.groupTableViewBackground
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(ConfigureViewController.didExtractedQRCode(notification:)), name: NSNotification.Name(rawValue: kQRCodeExtracted), object: nil)
+        print("add")
     }
     
     override func didReceiveMemoryWarning() {
@@ -204,11 +213,67 @@ class ConfigureViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kQRCodeExtracted), object: nil)
+        print("remove")
+    }
+    
+    func didExtractedQRCode(notification: Notification) {
+        if var ss = notification.userInfo?["string"] as? String{
+            if let preRange = ss.range(of: "ss://") {
+                ss.removeSubrange(preRange)
+            }
+            if let poundsignIndex = ss.range(of: "#")?.lowerBound {
+                let removeRange = Range(uncheckedBounds: (lower: poundsignIndex, upper: ss.endIndex))
+                ss.removeSubrange(removeRange)
+            }
+            let decodeData = Data.init(base64Encoded: ss)
+            if let decodestring = String.init(data: decodeData ?? Data(), encoding: String.Encoding.utf8) {
+                print("\(decodestring)")
+                let components = decodestring.components(separatedBy: ":")
+                if components.count == 3 {
+                    var method = components[0]
+                    let passwordHost = components[1]
+                    let port = components[2]
+                    
+                    let components2 = passwordHost.components(separatedBy: "@")
+                    if components2.count == 2 {
+                        let password = components2[0]
+                        let host = components2[1]
+                        
+                        if let range = method.range(of: "-auth") {
+                            method.removeSubrange(range)
+                        }
+                        
+                        proxyConfig.currentProxy = "CUSTOM"
+                        proxyConfig.setValue(byItem: "description", value: "\(host):\(port)")
+                        proxyConfig.setValue(byItem: "server", value: host)
+                        proxyConfig.setValue(byItem: "port", value: port)
+                        proxyConfig.setValue(byItem: "password", value: password)
+                        proxyConfig.setValue(byItem: "method", value: method)
+                        
+                        DispatchQueue.main.async {
+                            self.tableView.reloadData()
+                        }
+                        return
+                    }
+                }
+            }
+        }
+        let alertController = UIAlertController(title: "Extract QRCode Failed", message: nil, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+        
+        alertController.addAction(okAction)
+        DispatchQueue.main.async {
+            self.present(alertController, animated: true, completion: nil)
+        }
+    }
+    
     // MARK: - Table view data source
     
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return sectionCounts
+        return 2
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -259,8 +324,14 @@ class ConfigureViewController: UITableViewController {
                 return cell
             }
         }
-        let cell = tableView.dequeueReusableCell(withIdentifier: "deleteType", for: indexPath)
-        return cell
+        if showDelete {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "deleteType", for: indexPath)
+            return cell
+        }else {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "importQRType", for: indexPath)
+            return cell
+        }
+        
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -271,20 +342,24 @@ class ConfigureViewController: UITableViewController {
                 
             }
         }else{
-            let alertController = UIAlertController(title: "Delete Proxy Server", message: nil, preferredStyle: .alert)
-            let deleteAction = UIAlertAction(title: "Delete", style: .destructive, handler: { (_) in
-                NotificationCenter.default.post(name: NSNotification.Name(rawValue: kDeleteEditingVPN), object: nil)
-                DispatchQueue.main.async {
-                    let _ = self.navigationController?.popViewController(animated: true)
-                }                
-            })
-            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-            
-            alertController.addAction(cancelAction)
-            alertController.addAction(deleteAction)
-            
-            self.present(alertController, animated: true, completion: nil)
-            
+            if showDelete {
+                let alertController = UIAlertController(title: "Delete Proxy Server", message: nil, preferredStyle: .alert)
+                let deleteAction = UIAlertAction(title: "Delete", style: .destructive, handler: { (_) in
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: kDeleteEditingVPN), object: nil)
+                    DispatchQueue.main.async {
+                        let _ = self.navigationController?.popViewController(animated: true)
+                    }
+                })
+                let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+                
+                alertController.addAction(cancelAction)
+                alertController.addAction(deleteAction)
+                
+                self.present(alertController, animated: true, completion: nil)
+                
+            }else {
+                performSegue(withIdentifier: "scanQRCode", sender: nil)
+            }
         }
     }
     

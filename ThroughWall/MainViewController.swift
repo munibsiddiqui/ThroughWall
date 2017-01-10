@@ -346,8 +346,8 @@ class MainViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
         if indexPath.row > 0 && indexPath.row <= vpnManagers.count {
             willEditVPNManager = vpnManagers[indexPath.row - 1]
-            let sectionCounts = 2
-            self.performSegue(withIdentifier: "configure", sender: sectionCounts)
+            let showDelete = true
+            self.performSegue(withIdentifier: "configure", sender: showDelete)
         }
     }
     
@@ -393,13 +393,10 @@ class MainViewController: UITableViewController {
             providerProtocol.providerBundleIdentifier = kTunnelProviderBundle
             providerProtocol.providerConfiguration = [String: AnyObject]()
             manager.protocolConfiguration = providerProtocol
-            
-            //            manager.saveToPreferences(){
-            //                print("saveToPreferences \($0)")
+        
             self.willEditVPNManager = manager
-            let sectionCounts = 1
-            self.performSegue(withIdentifier: "configure", sender: sectionCounts)
-            //            }
+            let showDelete = false
+            self.performSegue(withIdentifier: "configure", sender: showDelete)
         }
     }
     
@@ -449,8 +446,8 @@ class MainViewController: UITableViewController {
         if segue.identifier == "configure" {
             let destination = segue.destination as! ConfigureViewController
             destination.vpnManager = willEditVPNManager
-            let sectionCounts = sender as! Int
-            destination.sectionCounts = sectionCounts
+            let showDelete = sender as! Bool
+            destination.showDelete = showDelete
         }
     }
 }

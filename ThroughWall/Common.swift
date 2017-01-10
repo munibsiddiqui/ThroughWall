@@ -11,6 +11,7 @@ import Foundation
 let kChoosenRuleImportMethod = "Bingo.ThroughWall.ChoosenRuleImportMethod"
 let kRuleImportMethodValue = "Bingo.ThroughWall.RuleImportMethodValue"
 let kTapLocationInRuleView = "Bingo.ThroughWall.TapLocationInRuleView"
+let kQRCodeExtracted = "Bingo.ThroughWall.QRCodeExtracted"
 
 let configFileName = "rule.config"
 let kTunnelProviderBundle = "Bingo.ThroughWall.TWPacketTunnelProvider"
@@ -28,11 +29,11 @@ let userImportFileSource = "Bingo.FileSource.UserImport"
 let blockADSetting = "Bingo.blockADSetting"
 let globalModeSetting = "Bingo.globalModeSetting"
 
-//let updateWidget = "updataWidget"
 let downloadCountKey = "count.download"
 let uploadCountKey = "count.upload"
 let proxyDownloadCountKey = "count.proxyDownload"
 let proxyUploadCountKey = "count.proxyUpload"
+let adjustCountKey = "count.adjust"
 let recordingDateKey = "Bingo.recordingDate"
 
 let saveContextNotification = "Bingo.TWPacketTunnelProvider.saveContext"

@@ -58,14 +58,14 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     private weak var delegate: HTTPAnalyzerDelegate?
     private var intTag = 0
     private var dataLengthFromClient = 0
-    private var leftClientContentLength = 0
-    private var leftServerContentLength = 0
+    private var leftContentLength = 0
+    private var pendingSaveContentLength = 0
     private var outGoing: OutgoingSide?
     private var repostData: Data? = nil
     private var proxyType = ""
     private var hostAndPort = ""
     private var isConnectRequest = true
-    private var shouldParseTraffic = true
+    private var shouldParseTraffic = false
     private var isForceDisconnect = false
     private var shoudKeepAlive = false
     private var brokenData: Data?
@@ -95,6 +95,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     
     init(analyzerDelegate delegate: HTTPAnalyzerDelegate, intTag tag: Int) {
         super.init()
+        readStoredKey()
         self.delegate = delegate
         intTag = tag
     }
@@ -235,37 +236,41 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     }
     
     func didReadLeftRequestBody(withData data: Data) {
-        if leftClientContentLength <= data.count {
+        if leftContentLength <= data.count {
             //already have engouth data
-            let _leftClientContentLength = leftClientContentLength
-            leftClientContentLength = 0
+            let _leftContentLength = leftContentLength
+            leftContentLength = 0
             if shouldParseTraffic {
                 DispatchQueue.main.async {
-                    if let existData = self.hostTraffic.requestBody{
-                        let mergedData = NSMutableData()
-                        mergedData.append(existData as Data)
-                        mergedData.append(data.subdata(in: 0 ..< _leftClientContentLength))
-                        self.hostTraffic.requestBody = mergedData
-                    }else{
-                        self.hostTraffic.responseBody = data.subdata(in: 0 ..< _leftClientContentLength) as NSData?
-                    }
+                    let context = CoreDataController.sharedInstance.getContext()
+                    let pieceBody = PieceData(context: context)
+                    pieceBody.timeStamp = NSDate()
+                    pieceBody.type = "request"
+                    pieceBody.rawData = data.subdata(in: 0 ..< _leftContentLength) as NSData?
+                    pieceBody.belongToTraffic = self.hostTraffic
+                    self.hostTraffic.addToBodies(pieceBody)
+                    
+                    CoreDataController.sharedInstance.saveContext()
+                    CoreDataController.sharedInstance.getContext().refresh(pieceBody, mergeChanges: false)
                     
                 }
             }
             outGoing?.write(data, withTimeout: -1, tag: TAG_WRITE_TO_SERVER)
         }else{
             // not enough data to make up a body
-            leftClientContentLength = leftClientContentLength - data.count
+            leftContentLength = leftContentLength - data.count
             if shouldParseTraffic {
                 DispatchQueue.main.async {
-                    if let existData = self.hostTraffic.requestBody{
-                        let mergedData = NSMutableData()
-                        mergedData.append(existData as Data)
-                        mergedData.append(data)
-                        self.hostTraffic.requestBody = mergedData
-                    }else{
-                        self.hostTraffic.requestBody = data as NSData?
-                    }
+                    let context = CoreDataController.sharedInstance.getContext()
+                    let pieceBody = PieceData(context: context)
+                    pieceBody.timeStamp = NSDate()
+                    pieceBody.type = "request"
+                    pieceBody.rawData = data as NSData?
+                    pieceBody.belongToTraffic = self.hostTraffic
+                    self.hostTraffic.addToBodies(pieceBody)
+                    
+                    CoreDataController.sharedInstance.saveContext()
+                    CoreDataController.sharedInstance.getContext().refresh(pieceBody, mergeChanges: false)
                 }
             }
             outGoing?.write(data, withTimeout: -1, tag: TAG_WRITE_BROKEN_BODY_TO_SERVER)
@@ -328,7 +333,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     func handleHTTPRequest(withRequest request: String) {
         var (host, port) = getHostAndPort(fromHostComponentOfRequest: request)
         let isKeepAlive = getKeepAliveInfo(fromRequest: request)
-        leftClientContentLength = getContentLength(fromRequest: request)
+        leftContentLength = getContentLength(fromRequest: request)
         
         let (hostName, portNumber, repostRequest) = extactHostAndPortWithRepost(fromRequest: request)
         
@@ -343,6 +348,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
             if shouldParseTraffic {
                 DispatchQueue.main.async {
                     self.hostTraffic.requestHead = repostRequest
+                    CoreDataController.sharedInstance.saveContext()
                 }
             }
             DDLogVerbose("H\(intTag)H repost \(repostRequest!)")
@@ -358,7 +364,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     func handleHTTPRequest(withRequest request: String, andBody body: Data) {
         var (host, port) = getHostAndPort(fromHostComponentOfRequest: request)
         let isKeepAlive = getKeepAliveInfo(fromRequest: request)
-        leftClientContentLength = getContentLength(fromRequest: request)
+        leftContentLength = getContentLength(fromRequest: request)
         
         let (hostName, portNumber, repostRequest) = extactHostAndPortWithRepost(fromRequest: request)
         
@@ -373,14 +379,23 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
             if shouldParseTraffic {
                 DispatchQueue.main.async {
                     self.hostTraffic.requestHead = repostRequest
-                    self.hostTraffic.requestBody = body as NSData?
+                    let context = CoreDataController.sharedInstance.getContext()
+                    let pieceBody = PieceData(context: context)
+                    pieceBody.timeStamp = NSDate()
+                    pieceBody.type = "request"
+                    pieceBody.rawData = body as NSData?
+                    pieceBody.belongToTraffic = self.hostTraffic
+                    self.hostTraffic.addToBodies(pieceBody)
+                    
+                    CoreDataController.sharedInstance.saveContext()
+                    CoreDataController.sharedInstance.getContext().refresh(pieceBody, mergeChanges: false)
                 }
             }
             
-            if leftClientContentLength <=  body.count {
-                leftClientContentLength = 0
+            if leftContentLength <=  body.count {
+                leftContentLength = 0
             }else {
-                leftClientContentLength = leftClientContentLength - body.count
+                leftContentLength = leftContentLength - body.count
             }
             DDLogVerbose("H\(intTag)H repost \(repostRequest!)")
             repostData = repostRequest!.data(using: String.Encoding.utf8)! + body
@@ -638,7 +653,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
             }
             clientSocket?.write(ConnectionResponse, withTimeout: -1, tag: TAG_WRITE_HTTPS_RESPONSE)
         }else{
-            if leftClientContentLength > 0 {
+            if leftContentLength > 0 {
                 outGoing?.write(repostData!, withTimeout: -1, tag: TAG_WRITE_HEAD_AND_BROKEN_BODY_TO_SERVER)
             }else{
                 outGoing?.write(repostData!, withTimeout: -1, tag: TAG_WRITE_TO_SERVER)
@@ -684,6 +699,8 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
                     self.hostTraffic.inProcessing = false
                     self.hostTraffic.disconnectTime = NSDate()
                     self.hostTraffic.forceDisconnect = self.isForceDisconnect
+                    CoreDataController.sharedInstance.saveContext()
+                    CoreDataController.sharedInstance.getContext().refresh(self.hostTraffic, mergeChanges: false)
                 }
             }
         }
@@ -724,7 +741,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
             return
         }
         
-        leftServerContentLength = getContentLength(fromResponse: serverResponseString)
+        leftContentLength = getContentLength(fromResponse: serverResponseString)
         if shouldParseTraffic {
             DispatchQueue.main.async {
                 self.hostTraffic.responseHead = serverResponseString
@@ -732,27 +749,41 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
             }
         }
         if let _bodyData = bodyData {
-            if _bodyData.count >= leftServerContentLength {
+            if _bodyData.count >= leftContentLength {
                 if shouldParseTraffic {
                     DispatchQueue.main.async {
-                        if _bodyData.count > self.leftServerContentLength {
-                            self.hostTraffic.responseBody = _bodyData.subdata(in: 0 ..< self.leftServerContentLength) as NSData?
-                        }else{
-                            self.hostTraffic.responseBody = _bodyData as NSData?
-                        }
+                        let context = CoreDataController.sharedInstance.getContext()
+                        let pieceBody = PieceData(context: context)
+                        pieceBody.timeStamp = NSDate()
+                        pieceBody.type = "response"
+                        pieceBody.rawData = _bodyData.subdata(in: 0 ..< self.leftContentLength) as NSData?
+                        pieceBody.belongToTraffic = self.hostTraffic
+                        self.hostTraffic.addToBodies(pieceBody)
+                        
+                        CoreDataController.sharedInstance.saveContext()
+                        CoreDataController.sharedInstance.getContext().refresh(pieceBody, mergeChanges: false)
                     }
                 }
                 clientSocket?.write(data, withTimeout: -1, tag: TAG_WRITE_TO_CLIENT)
             }else{
                 if shouldParseTraffic {
                     DispatchQueue.main.async {
-                        self.hostTraffic.responseBody = _bodyData as NSData?
+                        let context = CoreDataController.sharedInstance.getContext()
+                        let pieceBody = PieceData(context: context)
+                        pieceBody.timeStamp = NSDate()
+                        pieceBody.type = "response"
+                        pieceBody.rawData = _bodyData as NSData?
+                        pieceBody.belongToTraffic = self.hostTraffic
+                        self.hostTraffic.addToBodies(pieceBody)
+                        
+                        CoreDataController.sharedInstance.saveContext()
+                        CoreDataController.sharedInstance.getContext().refresh(pieceBody, mergeChanges: false)
                     }
                 }
                 clientSocket?.write(data, withTimeout: -1, tag: TAG_WRITE_HEAD_AND_BROKEN_BODY_TO_CLIENT)
             }
         }else{
-            if leftServerContentLength > 0 {
+            if leftContentLength > 0 {
                 clientSocket?.write(data, withTimeout: -1, tag: TAG_WRITE_HEAD_AND_BROKEN_BODY_TO_CLIENT)
             }else{
                 clientSocket?.write(data, withTimeout: -1, tag: TAG_WRITE_TO_CLIENT)
@@ -770,36 +801,42 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     
     func didReadLeftResponseBody(withData data: Data) {
         
-        if leftServerContentLength <= data.count {
+        if leftContentLength <= data.count {
             //already have engouth data
-            let _leftServerContentLength = leftServerContentLength
-            leftServerContentLength = 0
+            let _leftContentLength = leftContentLength
+            leftContentLength = 0
             if shouldParseTraffic {
                 DispatchQueue.main.async {
-                    if let existData = self.hostTraffic.responseBody{
-                        let mergedData = NSMutableData()
-                        mergedData.append(existData as Data)
-                        mergedData.append(data.subdata(in: 0 ..< _leftServerContentLength))
-                        self.hostTraffic.responseBody = mergedData
-                    }else{
-                        self.hostTraffic.responseBody = data.subdata(in: 0 ..< _leftServerContentLength) as NSData?
-                    }
+                    let context = CoreDataController.sharedInstance.getContext()
+                    let pieceBody = PieceData(context: context)
+                    pieceBody.timeStamp = NSDate()
+                    pieceBody.type = "response"
+                    pieceBody.rawData = data.subdata(in: 0 ..< _leftContentLength) as NSData?
+                    pieceBody.belongToTraffic = self.hostTraffic
+                    self.hostTraffic.addToBodies(pieceBody)
+                    
+                    CoreDataController.sharedInstance.saveContext()
+                    CoreDataController.sharedInstance.getContext().refresh(pieceBody, mergeChanges: false)
+
                 }
             }
             clientSocket?.write(data, withTimeout: -1, tag: TAG_WRITE_TO_CLIENT)
         }else{
             // not enough data to make up a body
-            leftServerContentLength = leftServerContentLength - data.count
+            leftContentLength = leftContentLength - data.count
             if shouldParseTraffic {
                 DispatchQueue.main.async {
-                    if let existData = self.hostTraffic.responseBody{
-                        let mergedData = NSMutableData()
-                        mergedData.append(existData as Data)
-                        mergedData.append(data)
-                        self.hostTraffic.responseBody = mergedData
-                    }else{
-                        self.hostTraffic.responseBody = data as NSData?
-                    }
+                    let context = CoreDataController.sharedInstance.getContext()
+                    let pieceBody = PieceData(context: context)
+                    pieceBody.timeStamp = NSDate()
+                    pieceBody.type = "response"
+                    pieceBody.rawData = data as NSData?
+                    pieceBody.belongToTraffic = self.hostTraffic
+                    self.hostTraffic.addToBodies(pieceBody)
+                    
+                    CoreDataController.sharedInstance.saveContext()
+                    CoreDataController.sharedInstance.getContext().refresh(pieceBody, mergeChanges: false)
+
                 }
             }
             clientSocket?.write(data, withTimeout: -1, tag: TAG_WRITE_BROKEN_BODY_TO_CLIENT)

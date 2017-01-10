@@ -81,7 +81,7 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate, HTTPAnalyzerDelegate {
         repeatDeleteTimer?.cancel()
         repeatDeleteTimer = nil
         DDLogVerbose("Going to saveContext")
-        DispatchQueue.main.async {
+        DispatchQueue.main.sync {
             CoreDataController.sharedInstance.saveContext()
         }
     }
@@ -139,9 +139,6 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate, HTTPAnalyzerDelegate {
             
             CFNotificationCenterPostNotification(notification, CFNotificationName(name as CFString) , nil, nil, true)
             
-            DispatchQueue.main.async {
-                CoreDataController.sharedInstance.saveContext()
-            }
         })
         saveTrafficTimer?.resume()
     }
@@ -200,6 +197,9 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate, HTTPAnalyzerDelegate {
                 proxyHisTraffic.proxyType = "Proxy"
                 proxyHisTraffic.timestamp = timestamp
                 proxyHisTraffic.pathType = "WIFI"
+                
+                CoreDataController.sharedInstance.saveContext()
+                CoreDataController.sharedInstance.getContext().refresh(proxyHisTraffic, mergeChanges: false)
             }
             
             if traffic.directDownload > 0 || traffic.directUpload > 0 {
@@ -210,9 +210,11 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate, HTTPAnalyzerDelegate {
                 directHisTraffic.proxyType = "Direct"
                 directHisTraffic.timestamp = timestamp
                 directHisTraffic.pathType = "WIFI"
+                
+                CoreDataController.sharedInstance.saveContext()
+                CoreDataController.sharedInstance.getContext().refresh(directHisTraffic, mergeChanges: false)
             }
-            
-            CoreDataController.sharedInstance.saveContext()
+
         }
     }
     

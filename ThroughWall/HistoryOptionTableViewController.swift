@@ -13,6 +13,7 @@ class HistoryOptionTableViewController: UITableViewController {
     let notificaiton = CFNotificationCenterGetDarwinNotifyCenter()
     var observer: UnsafeRawPointer!
     var totalCount = 0
+    var date = ""
     let logRequestSwitch = UISwitch()
     
     override func viewDidLoad() {
@@ -74,6 +75,9 @@ class HistoryOptionTableViewController: UITableViewController {
                 totalCount = downloadCount + uploadCount
             }
         }
+        if let recordingDate = defaults?.value(forKey: recordingDateKey) as? String {
+            date = recordingDate
+        }
     }
     
     func updateCell() {
@@ -101,7 +105,7 @@ class HistoryOptionTableViewController: UITableViewController {
         // #warning Incomplete implementation, return the number of rows
         switch section {
         case 0:
-            fallthrough
+            return 3
         case 1:
             return 2
         case 2:
@@ -117,6 +121,8 @@ class HistoryOptionTableViewController: UITableViewController {
         case 0:
             if indexPath.row == 1 {
                 performSegue(withIdentifier: "showHistoryFigure", sender: nil)
+            }else if indexPath.row == 2 {
+                performSegue(withIdentifier: "showArchivedHistory", sender: nil)
             }
         case 1:
             if indexPath.row == 1 {
@@ -138,14 +144,18 @@ class HistoryOptionTableViewController: UITableViewController {
         var newUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
         newUrl.appendPathComponent(PacketTunnelProviderLogFolderName)
         
-        
         do {
             if fileManager.fileExists(atPath: newUrl.path){
                 try fileManager.removeItem(at: newUrl)
             }
             try fileManager.copyItem(at: logUrl, to: newUrl)
+            
+            newUrl.appendPathComponent(databaseFolderName)
+
             let databaseUrl = CoreDataController.sharedInstance.getDatabaseUrl()
-            try fileManager.copyItem(at: databaseUrl, to: newUrl.appendingPathComponent(CoreDataController.sharedInstance.getDatabaseName()))
+            
+            try fileManager.copyItem(at: databaseUrl, to: newUrl)
+//            CoreDataController.sharedInstance.backupDatabase(toURL: newUrl)
         }catch{
             print(error)
         }
@@ -175,9 +185,17 @@ class HistoryOptionTableViewController: UITableViewController {
         case 0:
             if indexPath.row == 0 {
                 let (scale,unit) = autoFitRange(maxValue: totalCount)
-                cell.textLabel?.text = "\(totalCount/scale)\(unit) this month"
-            }else{
+                if date == "" {
+                    cell.textLabel?.text = "No traffic record now"
+                }else{
+                    cell.textLabel?.text = "\(date):  \(totalCount/scale)\(unit)"
+                }
+                
+            }else if indexPath.row == 1{
                 cell.textLabel?.text = "Traffic Figure"
+                cell.accessoryType = .disclosureIndicator
+            }else {
+                cell.textLabel?.text = "Archive"
                 cell.accessoryType = .disclosureIndicator
             }
         case 1:

@@ -17,6 +17,9 @@ let configFileName = "rule.config"
 let kTunnelProviderBundle = "Bingo.ThroughWall.TWPacketTunnelProvider"
 let kDeleteEditingVPN = "Bingo.ThroughWall.DeleteEditingVPN"
 
+let databaseFolderName = "DataBase"
+let databaseFileName = "Record.sqlite"
+
 let groupName = "group.Bingo.ThroughWall"
 let ruleFielName = "rule.conf"
 let PacketTunnelProviderLogFolderName = "PacketTunnelProvider"

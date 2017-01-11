@@ -68,7 +68,6 @@ class ScanQRCodeViewController: UIViewController, AVCaptureMetadataOutputObjects
         super.viewWillDisappear(animated)
         let notifcation = Notification(name: Notification.Name(rawValue: kQRCodeExtracted), object: nil, userInfo: ["string" : result])
         NotificationCenter.default.post(notifcation)
-        print("post")
     }
 
     override func didReceiveMemoryWarning() {

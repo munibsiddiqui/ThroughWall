@@ -205,7 +205,6 @@ class ConfigureViewController: UITableViewController {
         tableView.backgroundColor = UIColor.groupTableViewBackground
         
         NotificationCenter.default.addObserver(self, selector: #selector(ConfigureViewController.didExtractedQRCode(notification:)), name: NSNotification.Name(rawValue: kQRCodeExtracted), object: nil)
-        print("add")
     }
     
     override func didReceiveMemoryWarning() {
@@ -215,7 +214,6 @@ class ConfigureViewController: UITableViewController {
     
     deinit {
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kQRCodeExtracted), object: nil)
-        print("remove")
     }
     
     func didExtractedQRCode(notification: Notification) {
@@ -229,7 +227,6 @@ class ConfigureViewController: UITableViewController {
             }
             let decodeData = Data.init(base64Encoded: ss)
             if let decodestring = String.init(data: decodeData ?? Data(), encoding: String.Encoding.utf8) {
-                print("\(decodestring)")
                 let components = decodestring.components(separatedBy: ":")
                 if components.count == 3 {
                     var method = components[0]

@@ -83,6 +83,7 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate, HTTPAnalyzerDelegate {
         DDLogVerbose("Going to saveContext")
         DispatchQueue.main.sync {
             CoreDataController.sharedInstance.saveContext()
+            CoreDataController.sharedInstance.getContext().reset()
         }
     }
     
@@ -104,7 +105,7 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate, HTTPAnalyzerDelegate {
             
             let localFormatter = DateFormatter()
             localFormatter.locale = Locale.current
-            localFormatter.dateFormat = "yyyy-MMMM"
+            localFormatter.dateFormat = "yyyy-MM"
             let currentDate = localFormatter.string(from: Date())
             if let recordingDate = defaults?.value(forKey: recordingDateKey) as? String {
                 if currentDate == recordingDate {

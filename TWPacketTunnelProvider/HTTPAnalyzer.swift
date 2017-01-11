@@ -756,7 +756,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
                         let pieceBody = PieceData(context: context)
                         pieceBody.timeStamp = NSDate()
                         pieceBody.type = "response"
-                        pieceBody.rawData = _bodyData.subdata(in: 0 ..< self.leftContentLength) as NSData?
+                        pieceBody.rawData = _bodyData.subdata(in: 0 ..< _bodyData.count) as NSData?
                         pieceBody.belongToTraffic = self.hostTraffic
                         self.hostTraffic.addToBodies(pieceBody)
                         

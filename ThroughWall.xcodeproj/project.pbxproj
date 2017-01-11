@@ -11,7 +11,6 @@
 		1A278AF59DA185F024B942D2 /* Pods_ThroughWall.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 541B6C2129C7CA6D95A9FB35 /* Pods_ThroughWall.framework */; };
 		3423C7651DF00C60002B5AE8 /* OutgoingSide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3423C7641DF00C60002B5AE8 /* OutgoingSide.swift */; };
 		343352891DF93FAD00CF7281 /* ThroughWall.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3474EC811DDC926C00EBF3C5 /* ThroughWall.xcdatamodeld */; };
-		3433528A1DF93FF800CF7281 /* ThroughWall.xcdatamodeld in Resources */ = {isa = PBXBuildFile; fileRef = 3474EC811DDC926C00EBF3C5 /* ThroughWall.xcdatamodeld */; };
 		3433528D1DF943D100CF7281 /* CoreDataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3433528C1DF943D100CF7281 /* CoreDataController.swift */; };
 		3433528E1DF943D500CF7281 /* CoreDataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3433528C1DF943D100CF7281 /* CoreDataController.swift */; };
 		3439FA061DEEB7A000F8CE59 /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3439FA051DEEB7A000F8CE59 /* Rule.swift */; };
@@ -52,6 +51,7 @@
 		34A26A6B1E13447400A8CC93 /* HistoryOptionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A26A6A1E13447400A8CC93 /* HistoryOptionTableViewController.swift */; };
 		34BD966C1DDD392E002442BF /* ShadowsocksLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3474ECBB1DDC950000EBF3C5 /* ShadowsocksLib.framework */; };
 		34BD966D1DDD3932002442BF /* TunnelLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3474ECCD1DDC951100EBF3C5 /* TunnelLib.framework */; };
+		34C7D5731E25C9300052CE78 /* ArchivedTrafficCountTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34C7D5721E25C9300052CE78 /* ArchivedTrafficCountTableViewController.swift */; };
 		34CC5CDB1DDC9B7A0061AA44 /* BLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 34CC5B221DDC9B790061AA44 /* BLog.m */; };
 		34CC5CDC1DDC9B7A0061AA44 /* BLog_syslog.c in Sources */ = {isa = PBXBuildFile; fileRef = 34CC5B231DDC9B790061AA44 /* BLog_syslog.c */; };
 		34CC5CDF1DDC9B7A0061AA44 /* BPending.c in Sources */ = {isa = PBXBuildFile; fileRef = 34CC5B261DDC9B790061AA44 /* BPending.c */; };
@@ -310,6 +310,7 @@
 		34765C871E10D8810055C294 /* SelectionFieldCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectionFieldCell.swift; sourceTree = "<group>"; };
 		34765C941E1116780055C294 /* RequestListTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestListTableViewController.swift; sourceTree = "<group>"; };
 		34A26A6A1E13447400A8CC93 /* HistoryOptionTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryOptionTableViewController.swift; sourceTree = "<group>"; };
+		34C7D5721E25C9300052CE78 /* ArchivedTrafficCountTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArchivedTrafficCountTableViewController.swift; sourceTree = "<group>"; };
 		34CC5B211DDC9B790061AA44 /* BLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLog.h; sourceTree = "<group>"; };
 		34CC5B221DDC9B790061AA44 /* BLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BLog.m; sourceTree = "<group>"; };
 		34CC5B231DDC9B790061AA44 /* BLog_syslog.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = BLog_syslog.c; sourceTree = "<group>"; };
@@ -1012,6 +1013,7 @@
 				34765C801E10D8810055C294 /* HelpViewController.swift */,
 				34765C811E10D8810055C294 /* HistoryFigureViewController.swift */,
 				34A26A6A1E13447400A8CC93 /* HistoryOptionTableViewController.swift */,
+				34C7D5721E25C9300052CE78 /* ArchivedTrafficCountTableViewController.swift */,
 				34765C821E10D8810055C294 /* InputTextFieldCell.swift */,
 				34765C831E10D8810055C294 /* MainViewController.swift */,
 				34765C841E10D8810055C294 /* RuleImportMethodTableViewController.swift */,
@@ -2397,7 +2399,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3433528A1DF93FF800CF7281 /* ThroughWall.xcdatamodeld in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2658,6 +2659,7 @@
 				34765C8B1E10D8810055C294 /* HistoryFigureViewController.swift in Sources */,
 				34765C951E1116780055C294 /* RequestListTableViewController.swift in Sources */,
 				34765C8D1E10D8810055C294 /* MainViewController.swift in Sources */,
+				34C7D5731E25C9300052CE78 /* ArchivedTrafficCountTableViewController.swift in Sources */,
 				34A26A6B1E13447400A8CC93 /* HistoryOptionTableViewController.swift in Sources */,
 				34D154611E24AC7F00546B57 /* ScanQRCodeViewController.swift in Sources */,
 			);

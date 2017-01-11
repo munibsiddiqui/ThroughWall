@@ -35,6 +35,8 @@ class RequestListTableViewController: UITableViewController {
     
     func requestHostTraffic() {
         let fetch: NSFetchRequest<HostTraffic> = HostTraffic.fetchRequest()
+        fetch.sortDescriptors = [NSSortDescriptor.init(key: "requestTime", ascending: true)]
+        
         do{
             hostTraffics = try CoreDataController.sharedInstance.getContext().fetch(fetch)
         }catch{

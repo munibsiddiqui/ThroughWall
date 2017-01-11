@@ -24,8 +24,10 @@ class CoreDataController: NSObject {
          error conditions that could cause the creation of the store to fail.
          */
         let container = NSPersistentContainer(name: "ThroughWall")
-        let url = CoreDataController.sharedInstance.getDatabaseUrl()
+        var url = CoreDataController.sharedInstance.getDatabaseUrl()
+        url.appendPathComponent(databaseFileName)
         container.persistentStoreDescriptions = [NSPersistentStoreDescription.init(url: url)]
+        
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
                 // Replace this implementation with code to handle the error appropriately.
@@ -52,13 +54,10 @@ class CoreDataController: NSObject {
         return managedObjectContext
     }()
     
-    func getDatabaseName() -> String {
-        return "Record.sqlite"
-    }
     
     func getDatabaseUrl() -> URL {
         var url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: groupName)!
-        url.appendPathComponent(getDatabaseName())
+        url.appendPathComponent(databaseFolderName)
         return url
     }
     
@@ -69,12 +68,20 @@ class CoreDataController: NSObject {
     func getPrivateContext() -> NSManagedObjectContext {
         return privateContext
     }
-    
-//    func backupDatabase(toURL url: URL) {
-//        let migrationPSC = NSPersistentStoreCoordinator(managedObjectModel: persistentContainer.managedObjectModel)
-//        migrationPSC.store
-//        migrationPSC.migratePersistentStore(<#T##store: NSPersistentStore##NSPersistentStore#>, to: <#T##URL#>, options: <#T##[AnyHashable : Any]?#>, withType: <#T##String#>)
-//    }
+
+    func backupDatabase(toURL url: URL) {
+            
+        let psc = NSPersistentStoreCoordinator(managedObjectModel: persistentContainer.managedObjectModel)
+        let oldURL = getDatabaseUrl()
+        print(oldURL)
+        print(url)
+        do {
+            let oldStore = try psc.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: oldURL, options: nil)
+            try psc.migratePersistentStore(oldStore, to: url, options: nil, withType: NSSQLiteStoreType)
+        }catch {
+            print(error)
+        }
+    }
     
     // MARK: - Core Data Saving support
     

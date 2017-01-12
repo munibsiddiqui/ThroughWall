@@ -32,6 +32,8 @@ class OutgoingSide: NSObject, GCDAsyncSocketDelegate {
     private var remoteHost: String?
     private var remotePort: UInt16?
     private var socket: GCDAsyncSocket?
+    private var hostAndPort: String?
+    private var storeTime: Date?
     
     func setProxyHost(withHostName host: String, port: UInt16) {
         proxyHost = host
@@ -62,10 +64,30 @@ class OutgoingSide: NSObject, GCDAsyncSocketDelegate {
         }
     }
     
+    func setHostAndPort(_ value: String) {
+        hostAndPort = value
+    }
+    
+    func getHostAndPort() -> String {
+        if hostAndPort == nil{
+            return ""
+        }
+        return "\(hostAndPort!)"
+    }
+    
+    func setStoreTime() {
+        storeTime = Date()
+    }
+    
+    func getStoreTime() -> Date? {
+        return storeTime
+    }
+    
+    
     func disconnect() {
         socket?.disconnect()
-//        socket = nil
-//        delegate = nil
+        //        socket = nil
+        //        delegate = nil
     }
     
     internal func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16) {
@@ -78,7 +100,7 @@ class OutgoingSide: NSObject, GCDAsyncSocketDelegate {
     
     internal  func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
         socket = nil
-        delegate?.outgoingSocketDidDisconnect()
+        delegate?.outgoingSocketDidDisconnect(self)
         delegate = nil
     }
     
@@ -212,6 +234,10 @@ class OutgoingSide: NSObject, GCDAsyncSocketDelegate {
     
     func readData(withTimeout timeout: TimeInterval, tag intTag: Int) {
         socket?.readData(withTimeout: timeout, tag: intTag)
+    }
+    
+    func readData(to data: Data, withTimeout timeout: TimeInterval, tag intTag: Int) {
+        socket?.readData(to: data, withTimeout: timeout, tag: intTag)
     }
     
     func socket(_ sock: GCDAsyncSocket, didWriteDataWithTag tag: Int) {

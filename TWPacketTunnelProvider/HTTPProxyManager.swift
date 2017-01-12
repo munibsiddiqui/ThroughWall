@@ -19,7 +19,7 @@ protocol HTTPAnalyzerDelegate: class {
     func saveOutgoingSideIntoKeepAliveArray(withHostNameAndPort hostAndPort: String, outgoing: OutgoingSide)
 }
 
-class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate, HTTPAnalyzerDelegate {
+class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate, HTTPAnalyzerDelegate, OutgoingTransmitDelegate {
     
     static let shardInstance = HTTPProxyManager()
     
@@ -30,6 +30,7 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate, HTTPAnalyzerDelegate {
     private let downloadLock = NSLock()
     private let uploadLock = NSLock()
     private let tagLock = NSLock()
+    private let outgoingStoreLock = NSLock()
     private var downloadCount = 0
     private var proxyDownloadCount = 0
     private var directDownloadCount = 0
@@ -38,8 +39,9 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate, HTTPAnalyzerDelegate {
     private var directUploadCount = 0
     private var saveTrafficTimer: DispatchSourceTimer?
     private var repeatDeleteTimer: DispatchSourceTimer?
+    private var repeatDisconnectTimer: DispatchSourceTimer?
     private var tagCount = 0
-    
+    private var outgoingStorage = [String:[OutgoingSide]]()
     struct downUpTraffic {
         var proxyDownload = 0
         var directDownload = 0
@@ -80,6 +82,8 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate, HTTPAnalyzerDelegate {
         saveTrafficTimer = nil
         repeatDeleteTimer?.cancel()
         repeatDeleteTimer = nil
+        repeatDisconnectTimer?.cancel()
+        repeatDisconnectTimer = nil
         DDLogVerbose("Going to saveContext")
         DispatchQueue.main.sync {
             CoreDataController.sharedInstance.saveContext()
@@ -90,6 +94,7 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate, HTTPAnalyzerDelegate {
     func prepareTimelyUpdate() {
         repeatlySaveTraffic(withInterval: 1)
         repeatlyDeleteOldHistory(before: 12 * 3600, withRepeatPeriod: 100)
+        repeatlyDisconnectOutgoing(withMaxKeepAliveTime: 6 * 60, checkPeriod: 60)
     }
     
     func repeatlySaveTraffic(withInterval interval: Int)  {
@@ -159,7 +164,6 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate, HTTPAnalyzerDelegate {
         }
     }
     
-    
     func repeatlyDeleteOldHistory(before beforeSeconds: Int, withRepeatPeriod repeatPeriod: Int){
         repeatDeleteTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue(label: "deleteQueue") )
         repeatDeleteTimer?.scheduleRepeating(deadline: .now() + .seconds(repeatPeriod), interval: .seconds(repeatPeriod), leeway: .milliseconds(100))
@@ -218,6 +222,39 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate, HTTPAnalyzerDelegate {
 
         }
     }
+    
+    func repeatlyDisconnectOutgoing(withMaxKeepAliveTime maxAliveTime: Int, checkPeriod: Int) {
+        repeatDisconnectTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue(label: "disconnectQueue") )
+        repeatDisconnectTimer?.scheduleRepeating(deadline: .now() + .seconds(checkPeriod), interval: .seconds(checkPeriod), leeway: .milliseconds(100))
+        
+        repeatDisconnectTimer?.setEventHandler(handler: {
+            let currentDate = Date()
+            
+            self.outgoingStoreLock.lock()
+            let siteOutgoings = self.outgoingStorage.values
+            
+            for outgoings in siteOutgoings {
+                for outgoing in outgoings {
+                    if let storeDate = outgoing.getStoreTime() {
+                        if Int(storeDate.timeIntervalSince(currentDate)) > maxAliveTime {
+                            //disconnect
+                            DDLogVerbose("KAK Timeout \(outgoing.getHostAndPort())")
+                            outgoing.disconnect()
+                        }
+                    }
+                }
+            }
+            
+            for key in self.outgoingStorage.keys {
+                print("KAK \(key): \(self.outgoingStorage[key]?.count)")
+            }
+            
+            self.outgoingStoreLock.unlock()
+        })
+        
+        repeatDisconnectTimer?.resume()
+    }
+    
     
     func HTTPAnalyzerDidDisconnect(httpAnalyzer analyzer: HTTPAnalyzer) {
         analyzerLock.lock()
@@ -305,12 +342,70 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate, HTTPAnalyzerDelegate {
     }
     
     
+    func outgoingSocket(didRead data: Data, withTag tag: Int) {
+    }
+    func outgoingSocket(didWriteDataWithTag tag: Int) {
+    }
+    func outgoingSocket(didConnectToHost host: String, port: UInt16) {
+    }
+    
+    func outgoingSocketDidDisconnect(_ outgoing: OutgoingSide) {
+        let hostAndPort = outgoing.getHostAndPort()
+        DDLogVerbose("KAK diddisconnect \(hostAndPort)")
+        outgoingStoreLock.lock()
+        if var store = outgoingStorage[hostAndPort] {
+            if store.count > 1 {
+                if let index = store.index(of: outgoing) {
+                    DDLogVerbose("KAK removed \(hostAndPort)")
+                    store.remove(at: index)
+                    outgoingStorage[hostAndPort] = store
+                }
+            }else{
+                DDLogVerbose("KAK empty \(hostAndPort)")
+                outgoingStorage.removeValue(forKey: hostAndPort)
+            }
+        }
+        outgoingStoreLock.unlock()
+    }
+    
     func retrieveOutGoingInstance(byHostNameAndPort hostAndPort: String) -> OutgoingSide? {
-        return nil
+        var outgoing: OutgoingSide? = nil
+        DDLogVerbose("KAK retrieve \(hostAndPort)")
+        outgoingStoreLock.lock()
+        if var store = outgoingStorage[hostAndPort] {
+            outgoing = store.removeFirst()
+            if store.count > 0 {
+                outgoingStorage[hostAndPort] = store
+            }else{
+                outgoingStorage.removeValue(forKey: hostAndPort)
+            }
+        }
+        outgoingStoreLock.unlock()
+        
+        if outgoing == nil{
+            DDLogVerbose("KAK retrieved nil")
+        }
+        return outgoing
     }
     
     func saveOutgoingSideIntoKeepAliveArray(withHostNameAndPort hostAndPort: String, outgoing: OutgoingSide) {
-        outgoing.setDelegate(nil)
-        outgoing.disconnect()
+        if hostAndPort == "" {
+            outgoing.setDelegate(nil)
+            outgoing.disconnect()
+            return
+        }
+        
+        outgoingStoreLock.lock()
+        outgoing.setDelegate(self)
+        outgoing.setStoreTime()
+        outgoing.setHostAndPort(hostAndPort)
+        DDLogVerbose("KAK save \(hostAndPort)")
+        if var store = outgoingStorage[hostAndPort] {
+            store.append(outgoing)
+            outgoingStorage[hostAndPort] = store
+        }else{
+            outgoingStorage[hostAndPort] = [outgoing]
+        }
+        outgoingStoreLock.unlock()
     }
 }

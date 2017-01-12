@@ -14,27 +14,26 @@ import CoreData
 
 let ConnectionResponseStr = "HTTP/1.1 200 Connection established\r\n\r\n"
 let ConnectionResponse = ConnectionResponseStr.data(using: String.Encoding.utf8)!
+let crlfData = Data.init(bytes: [0x0d, 0x0a, 0x0d, 0x0a])
 
-let TAG_READ_REQUEST_FROM_CLIENT = 10
-let TAG_READ_LEFT_QEQUEST_FROM_CLIENT = 11
-let TAG_READ_LEFT_BODY_PACKET_FROM_CLIENT = 12
+let TAG_READ_REQUEST_HEAD_FROM_CLIENT = 10
+let TAG_READ_REQUEST_BODY_FROM_CLIENT = 12
 let TAG_READ_FROM_CLIENT = 13
 
-let TAG_READ_HTTP_RESPONSE_FROM_SERVER = 20
-let TAG_READ_LEFT_RESPONSE_FROM_SERVER = 21
-let TAG_READ_LEFT_BODY_PACKET_FROM_SERVER = 22
+let TAG_READ_RESPONSE_FROM_SERVER = 20
 let TAG_READ_FROM_SERVER = 23
 
 let TAG_WRITE_HTTPS_RESPONSE = 30
-let TAG_WRITE_HEAD_AND_BROKEN_BODY_TO_CLIENT = 31
-let TAG_WRITE_BROKEN_BODY_TO_CLIENT = TAG_WRITE_HEAD_AND_BROKEN_BODY_TO_CLIENT
+let TAG_WRITE_RESPONSE_TO_CLIENT = 31
 let TAG_WRITE_TO_CLIENT = 32
 
-
 let TAG_WRITE_TO_SERVER = 40
-let TAG_WRITE_HEAD_AND_BROKEN_BODY_TO_SERVER = 41
-let TAG_WRITE_BROKEN_BODY_TO_SERVER = TAG_WRITE_HEAD_AND_BROKEN_BODY_TO_SERVER
+let TAG_WRITE_REQUEST_TO_SERVER = 41
 
+
+let ST_READ_RESPONSE_HEAD_FROM_SERVER = 1
+let ST_READ_LEFT_RESPONSE_HEAD_FROM_SERVER = 2
+let ST_READ_RESPONSE_BODY_FROM_SERVER = 3
 
 enum ConnectionError: Error {
     case UnReadableData
@@ -46,7 +45,7 @@ enum ConnectionError: Error {
 }
 
 protocol OutgoingTransmitDelegate: class {
-    func outgoingSocketDidDisconnect()
+    func outgoingSocketDidDisconnect(_ outgoing: OutgoingSide)
     func outgoingSocket(didConnectToHost host: String, port: UInt16)
     func outgoingSocket(didRead data: Data, withTag tag: Int)
     func outgoingSocket(didWriteDataWithTag tag: Int)
@@ -58,8 +57,6 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     private weak var delegate: HTTPAnalyzerDelegate?
     private var intTag = 0
     private var dataLengthFromClient = 0
-    private var leftContentLength = 0
-    private var pendingSaveContentLength = 0
     private var outGoing: OutgoingSide?
     private var repostData: Data? = nil
     private var proxyType = ""
@@ -67,8 +64,9 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     private var isConnectRequest = true
     private var shouldParseTraffic = false
     private var isForceDisconnect = false
-    private var shoudKeepAlive = false
+    private var shouldKeepAlive = false
     private var brokenData: Data?
+    private var responseFromServerstate: Int?
     private lazy var hostTraffic: HostTraffic = {
         let context = CoreDataController.sharedInstance.getContext()
         let hostTraffic = HostTraffic(context: context)
@@ -105,8 +103,8 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         socket.delegateQueue = DispatchQueue.global()
         clientSocket = socket
         bindToPort = port
-        
-        clientSocket?.readData(withTimeout: -1, tag: TAG_READ_REQUEST_FROM_CLIENT)
+
+        clientSocket?.readData(to: crlfData, withTimeout: TimeInterval(10), tag: TAG_READ_REQUEST_HEAD_FROM_CLIENT)
     }
     
     
@@ -132,9 +130,9 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
             DDLogVerbose("H\(intTag)H TAG_WRITE_HTTPS_RESPONSE")
             clientSocket?.readData(withTimeout: -1, tag: TAG_READ_FROM_CLIENT)
             outGoing?.readData(withTimeout: -1, tag: TAG_READ_FROM_SERVER)
-        }else if tag == TAG_WRITE_HEAD_AND_BROKEN_BODY_TO_CLIENT {
-            DDLogVerbose("H\(intTag)H TAG_WRITE_HEAD_AND_BROKEN_BODY_TO_CLIENT")
-            outGoing?.readData(withTimeout: -1, tag: TAG_READ_LEFT_BODY_PACKET_FROM_SERVER)
+        }else if tag == TAG_WRITE_RESPONSE_TO_CLIENT {
+            DDLogVerbose("H\(intTag)H TAG_WRITE_RESPONSE_TO_CLIENT")
+            outGoing?.readData(withTimeout: -1, tag: TAG_READ_RESPONSE_FROM_SERVER)
         }
     }
     
@@ -144,15 +142,12 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
             return
         }
         switch tag {
-        case TAG_READ_REQUEST_FROM_CLIENT:
-            DDLogVerbose("H\(intTag)H TAG_READ_REQUEST_FROM_CLIENT length:\(data.count)")
-            didReadClientRequest(withData: data)
-        case TAG_READ_LEFT_QEQUEST_FROM_CLIENT:
-            DDLogVerbose("H\(intTag)H TAG_READ_LEFT_QEQUEST_FROM_CLIENT length:\(data.count)")
-            didReadLeftClientRequest(withData: data)
-        case TAG_READ_LEFT_BODY_PACKET_FROM_CLIENT:
-            DDLogVerbose("H\(intTag)H TAG_READ_LEFT_BODY_PACKET_FROM_CLIENT length:\(data.count)")
-            didReadLeftRequestBody(withData: data)
+        case TAG_READ_REQUEST_HEAD_FROM_CLIENT:
+            DDLogVerbose("H\(intTag)H TAG_READ_REQUEST_HEAD_FROM_CLIENT length:\(data.count)")
+            didReadClientRequestHead(withData: data)
+        case TAG_READ_REQUEST_BODY_FROM_CLIENT:
+            DDLogVerbose("H\(intTag)H TAG_READ_REQUEST_BODY_FROM_CLIENT length:\(data.count)")
+            didReadClientRequestBody(withData: data)
         case TAG_READ_FROM_CLIENT:
             DDLogVerbose("H\(intTag)H TAG_READ_FROM_CLIENT length:\(data.count)")
             dataLengthFromClient = data.count
@@ -173,10 +168,12 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
             delegate?.HTTPAnalyzerDidDisconnect(httpAnalyzer: self)
             delegate = nil
         }else{
-            if shoudKeepAlive && !isForceDisconnect{
+            if shouldKeepAlive && !isForceDisconnect{
                 DDLogVerbose("H\(intTag)H Going to save Outgoing instance")
                 delegate?.saveOutgoingSideIntoKeepAliveArray(withHostNameAndPort: hostAndPort, outgoing: outGoing!)
                 outGoing = nil
+                saveInOutCount()
+                delegate?.HTTPAnalyzerDidDisconnect(httpAnalyzer: self)
                 delegate = nil
             }else{
                 DDLogVerbose("H\(intTag)H Going to disconnect Outgoing Side")
@@ -185,31 +182,24 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         }
     }
     
-    
+    func socket(_ sock: GCDAsyncSocket, shouldTimeoutReadWithTag tag: Int, elapsed: TimeInterval, bytesDone length: UInt) -> TimeInterval {
+        DispatchQueue.global().async {
+            self.forceDisconnect()
+        }
+        return 0
+    }
     
     // MARK: - Process Data from client
     
-    func didReadClientRequest(withData data: Data) {
-        var headData = data
-        var bodyData: Data?
-        guard let headEndIndex = findHeadEndIndex(data) else{
-            brokenData = data
-            clientSocket?.readData(withTimeout: -1, tag: TAG_READ_LEFT_QEQUEST_FROM_CLIENT)
-            return
-        }
-        
-        if headEndIndex < data.count {
-            headData = data.subdata(in: 0 ..< headEndIndex)
-            bodyData = data.subdata(in: headEndIndex ..< data.count)
-        }
-        
-        guard let clientRequestString = String(data: headData, encoding: String.Encoding.utf8) else {
+    func didReadClientRequestHead(withData data: Data) {
+
+        guard let clientRequestString = String(data: data, encoding: String.Encoding.utf8) else {
             let error = ConnectionError.UnReadableData
             DDLogError("H\(intTag)H didReadClientRequest: \(error)")
             return
         }
         
-        DDLogVerbose("H\(intTag)H head \(headData.count) data \(data.count)")
+        DDLogVerbose("H\(intTag)H head \(data.count)")
         DDLogVerbose("H\(intTag)H " + clientRequestString)
         
         if isCONNECTRequest(clientRequestString) {
@@ -217,77 +207,13 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
             handleHTTPSRequest(withRequest: clientRequestString)
         }else{
             isConnectRequest = false
-            if let _bodyData = bodyData {
-                handleHTTPRequest(withRequest: clientRequestString, andBody: _bodyData)
-            }else{
-                // This method has no body. But it doesn't mean the request has no body.
-                // Maybe the next packet has a body. The code should check Content-Length
-                handleHTTPRequest(withRequest: clientRequestString)
-            }
+            handleHTTPRequestHead(withRequest: clientRequestString)
         }
     }
     
-    func didReadLeftClientRequest(withData data:Data) {
-        let maybeCompleteData = brokenData! + data
-        //
-        // what if there's a bug, and the data keeps growing ?????
-        //
-        didReadClientRequest(withData: maybeCompleteData)
-    }
-    
-    func didReadLeftRequestBody(withData data: Data) {
-        if leftContentLength <= data.count {
-            //already have engouth data
-            let _leftContentLength = leftContentLength
-            leftContentLength = 0
-            if shouldParseTraffic {
-                DispatchQueue.main.async {
-                    let context = CoreDataController.sharedInstance.getContext()
-                    let pieceBody = PieceData(context: context)
-                    pieceBody.timeStamp = NSDate()
-                    pieceBody.type = "request"
-                    pieceBody.rawData = data.subdata(in: 0 ..< _leftContentLength) as NSData?
-                    pieceBody.belongToTraffic = self.hostTraffic
-                    self.hostTraffic.addToBodies(pieceBody)
-                    
-                    CoreDataController.sharedInstance.saveContext()
-                    CoreDataController.sharedInstance.getContext().refresh(pieceBody, mergeChanges: false)
-                    
-                }
-            }
-            outGoing?.write(data, withTimeout: -1, tag: TAG_WRITE_TO_SERVER)
-        }else{
-            // not enough data to make up a body
-            leftContentLength = leftContentLength - data.count
-            if shouldParseTraffic {
-                DispatchQueue.main.async {
-                    let context = CoreDataController.sharedInstance.getContext()
-                    let pieceBody = PieceData(context: context)
-                    pieceBody.timeStamp = NSDate()
-                    pieceBody.type = "request"
-                    pieceBody.rawData = data as NSData?
-                    pieceBody.belongToTraffic = self.hostTraffic
-                    self.hostTraffic.addToBodies(pieceBody)
-                    
-                    CoreDataController.sharedInstance.saveContext()
-                    CoreDataController.sharedInstance.getContext().refresh(pieceBody, mergeChanges: false)
-                }
-            }
-            outGoing?.write(data, withTimeout: -1, tag: TAG_WRITE_BROKEN_BODY_TO_SERVER)
-        }
-    }
-    
-    func findHeadEndIndex(_ data: Data) -> Int? {
-        let buffer = [UInt8](data)
-        var i = 0
-        
-        while i < buffer.count - 3 {
-            if buffer[i] == 0x0d && buffer[i + 2] == 0x0d && buffer[i + 1] == 0x0a && buffer[i + 3] == 0x0a {
-                return i + 4
-            }
-            i = i + 1
-        }
-        return nil
+    func didReadClientRequestBody(withData data: Data) {
+        recordBody(withData: data, type: "request")
+        outGoing?.write(data, withTimeout: -1, tag: TAG_WRITE_REQUEST_TO_SERVER)
     }
     
     func isCONNECTRequest(_ request: String) -> Bool {
@@ -299,8 +225,6 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     
     func handleHTTPSRequest(withRequest request: String) {
         var (host, port) = getHostAndPort(fromHostComponentOfRequest: request)
-        let isKeepAlive = getKeepAliveInfo(fromRequest: request)
-        
         if host == nil || port == nil {
             var requestComponents = request.components(separatedBy: "\r\n")
             
@@ -319,23 +243,20 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
                         self.hostTraffic.requestHead = request
                     }
                 }
-                tryConnect(toHost: host!, port: port!, isKeepAlive: isKeepAlive)
+                tryConnect(toHost: host!, port: port!)
             }else{
                 DDLogError("H\(intTag)H handleHTTPSRequest \(ConnectionError.HostNilError)")
                 forceDisconnect()
                 return
             }
         }else{
-            tryConnect(toHost: host!, port: port!, isKeepAlive: isKeepAlive)
+            tryConnect(toHost: host!, port: port!)
         }
     }
     
-    func handleHTTPRequest(withRequest request: String) {
+    func handleHTTPRequestHead(withRequest request: String) {
         var (host, port) = getHostAndPort(fromHostComponentOfRequest: request)
-        let isKeepAlive = getKeepAliveInfo(fromRequest: request)
-        leftContentLength = getContentLength(fromRequest: request)
-        
-        let (hostName, portNumber, repostRequest) = extactHostAndPortWithRepost(fromRequest: request)
+        let (hostName, portNumber, repostRequest) = extractHostAndPortWithRepost(fromRequest: request)
         
         if host == nil {
             host = hostName
@@ -353,53 +274,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
             }
             DDLogVerbose("H\(intTag)H repost \(repostRequest!)")
             repostData = repostRequest?.data(using: String.Encoding.utf8)
-            tryConnect(toHost: host!, port: port!, isKeepAlive: isKeepAlive)
-        }else{
-            DDLogError("H\(intTag)H handleHTTPSRequest \(ConnectionError.HostNilError)")
-            forceDisconnect()
-            return
-        }
-    }
-    
-    func handleHTTPRequest(withRequest request: String, andBody body: Data) {
-        var (host, port) = getHostAndPort(fromHostComponentOfRequest: request)
-        let isKeepAlive = getKeepAliveInfo(fromRequest: request)
-        leftContentLength = getContentLength(fromRequest: request)
-        
-        let (hostName, portNumber, repostRequest) = extactHostAndPortWithRepost(fromRequest: request)
-        
-        if host == nil {
-            host = hostName
-        }
-        if port == nil {
-            port = portNumber ?? 80
-        }
-        
-        if host != nil && repostRequest !=  nil {
-            if shouldParseTraffic {
-                DispatchQueue.main.async {
-                    self.hostTraffic.requestHead = repostRequest
-                    let context = CoreDataController.sharedInstance.getContext()
-                    let pieceBody = PieceData(context: context)
-                    pieceBody.timeStamp = NSDate()
-                    pieceBody.type = "request"
-                    pieceBody.rawData = body as NSData?
-                    pieceBody.belongToTraffic = self.hostTraffic
-                    self.hostTraffic.addToBodies(pieceBody)
-                    
-                    CoreDataController.sharedInstance.saveContext()
-                    CoreDataController.sharedInstance.getContext().refresh(pieceBody, mergeChanges: false)
-                }
-            }
-            
-            if leftContentLength <=  body.count {
-                leftContentLength = 0
-            }else {
-                leftContentLength = leftContentLength - body.count
-            }
-            DDLogVerbose("H\(intTag)H repost \(repostRequest!)")
-            repostData = repostRequest!.data(using: String.Encoding.utf8)! + body
-            tryConnect(toHost: host!, port: port!, isKeepAlive: isKeepAlive)
+            tryConnect(toHost: host!, port: port!)
         }else{
             DDLogError("H\(intTag)H handleHTTPSRequest \(ConnectionError.HostNilError)")
             forceDisconnect()
@@ -424,24 +299,11 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     
     func getKeepAliveInfo(fromRequest request: String) -> Bool {
         if let connetionType = extractDetail(from: request, by: "Connection") {
-            if connetionType.lowercased() == "keep-alive" {
-                return true
+            if connetionType.lowercased() != "keep-alive" {
+                return false
             }
         }
-        return false
-    }
-    
-    func getContentLength(fromRequest request: String) -> Int {
-        if let contentLength = extractDetail(from: request, by: "Content-Length") {
-            if let length = Int(contentLength) {
-                return length
-            }
-        }
-        return 0
-    }
-    
-    func getContentLength(fromResponse response: String) -> Int {
-        return getContentLength(fromRequest: response)
+        return true
     }
     
     func extractDetail(from request: String, by name: String) -> String? {
@@ -493,20 +355,20 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         }
     }
     
-    func extactHostAndPortWithRepost(fromRequest request: String) -> (String?, UInt16?, String?) {
+    func extractHostAndPortWithRepost(fromRequest request: String) -> (String?, UInt16?, String?) {
         var requestComponents = request.components(separatedBy: "\r\n")
         var destiReqComponents = requestComponents[0].components(separatedBy: " ")
         var host = ""
         var port: UInt16?
         if destiReqComponents.count != 3 {
-            DDLogError("H\(intTag)H extactHostAndPortWithRepost: \(ConnectionError.RequestHeaderAnalysisError)")
+            DDLogError("H\(intTag)H extractHostAndPortWithRepost: \(ConnectionError.RequestHeaderAnalysisError)")
             return (nil, nil, nil)
         }
         
         //destiReqComponents[1]: http://***/...
         var destiComponents = destiReqComponents[1].components(separatedBy: "/")
         if destiComponents.count < 3{
-            DDLogError("H\(intTag)H extactHostAndPortWithRepost: \(ConnectionError.URLComponentAnalysisError)")
+            DDLogError("H\(intTag)H extractHostAndPortWithRepost: \(ConnectionError.URLComponentAnalysisError)")
             return (nil, nil, nil)
         }
         
@@ -522,7 +384,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
                 }
                 port = UInt16(_port)
             }else{
-                DDLogError("H\(intTag)H extactHostAndPortWithRepost: \(ConnectionError.IPV6AnalysisError)")
+                DDLogError("H\(intTag)H extractHostAndPortWithRepost: \(ConnectionError.IPV6AnalysisError)")
                 return (nil , nil, nil)
             }
         }else{
@@ -544,17 +406,10 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     }
     
     
-    func tryConnect(toHost host: String, port: UInt16, isKeepAlive: Bool) {
-        if isKeepAlive {
-            outGoing = reuseOutGoingInstance(usingHost: host, port: port)
-        }
-        if outGoing == nil {
-            outGoing = OutgoingSide(withDelegate: self)
-        }
-        
+    func tryConnect(toHost host: String, port: UInt16) {
         let rule = Rule.sharedInstance.ruleForDomain(host)
         proxyType = rule.description
-        DDLogVerbose("H\(intTag)H Proxy:\(proxyType) Connect: \(host):\(port) KeepAlive: \(isKeepAlive)")
+        DDLogVerbose("H\(intTag)H Proxy:\(proxyType) Connect: \(host):\(port)")
         if shouldParseTraffic {
             DispatchQueue.main.async {
                 self.hostTraffic.hostName = host
@@ -562,6 +417,14 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
                 self.hostTraffic.rule = self.proxyType
                 self.hostTraffic.requestTime = NSDate()
             }
+        }
+        
+        outGoing = reuseOutGoingInstance(usingHost: host, port: port)
+        if outGoing == nil {
+            outGoing = OutgoingSide(withDelegate: self)
+        }else{
+            outgoingSocket(didConnectToHost: host, port: port)
+            return
         }
         
         switch rule {
@@ -608,9 +471,9 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         if tag == TAG_WRITE_TO_SERVER {
             DDLogVerbose("H\(intTag)H TAG_WRITE_TO_SERVER")
             clientSocket?.readData(withTimeout: -1, tag: TAG_READ_FROM_CLIENT)
-        }else if tag == TAG_WRITE_HEAD_AND_BROKEN_BODY_TO_SERVER {
-            DDLogVerbose("H\(intTag)H TAG_WRITE_HEAD_AND_BROKEN_BODY_TO_SERVER")
-            clientSocket?.readData(withTimeout: -1, tag: TAG_READ_LEFT_BODY_PACKET_FROM_CLIENT)
+        }else if tag == TAG_WRITE_REQUEST_TO_SERVER {
+            DDLogVerbose("H\(intTag)H TAG_WRITE_REQUEST_TO_SERVER")
+            clientSocket?.readData(withTimeout: -1, tag: TAG_READ_REQUEST_BODY_FROM_CLIENT)
         }else{
             DDLogError("H\(intTag)H Unknown Outgoing didwrite Tag \(tag)")
         }
@@ -626,15 +489,9 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         case TAG_READ_FROM_SERVER:
             DDLogVerbose("H\(intTag)H TAG_READ_FROM_SERVER length:\(data.count)")
             clientSocket?.write(data, withTimeout: -1, tag: TAG_WRITE_TO_CLIENT)
-        case TAG_READ_HTTP_RESPONSE_FROM_SERVER:
-            DDLogVerbose("H\(intTag)H TAG_READ_HTTP_RESPONSE_FROM_SERVER length:\(data.count)")
+        case TAG_READ_RESPONSE_FROM_SERVER:
+            DDLogVerbose("H\(intTag)H TAG_READ_RESPONSE_FROM_SERVER length:\(data.count)")
             didReadServerResponse(withData: data)
-        case TAG_READ_LEFT_RESPONSE_FROM_SERVER:
-            DDLogVerbose("H\(intTag)H TAG_READ_LEFT_RESPONSE_FROM_SERVER length:\(data.count)")
-            didReadLeftServerResponse(withData: data)
-        case TAG_READ_LEFT_BODY_PACKET_FROM_SERVER:
-            DDLogVerbose("H\(intTag)H TAG_READ_LEFT_BODY_PACKET_FROM_SERVER length:\(data.count)")
-            didReadLeftResponseBody(withData: data)
         default:
             DDLogError("H\(intTag)H Unknown Outgoing didread Tag")
             break
@@ -653,18 +510,16 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
             }
             clientSocket?.write(ConnectionResponse, withTimeout: -1, tag: TAG_WRITE_HTTPS_RESPONSE)
         }else{
-            if leftContentLength > 0 {
-                outGoing?.write(repostData!, withTimeout: -1, tag: TAG_WRITE_HEAD_AND_BROKEN_BODY_TO_SERVER)
-            }else{
-                outGoing?.write(repostData!, withTimeout: -1, tag: TAG_WRITE_TO_SERVER)
-            }
+            outGoing?.write(repostData!, withTimeout: -1, tag: TAG_WRITE_REQUEST_TO_SERVER)
             dataLengthFromClient = repostData!.count
             repostData = nil
-            outGoing?.readData(withTimeout: -1, tag: TAG_READ_HTTP_RESPONSE_FROM_SERVER)
+            responseFromServerstate = ST_READ_RESPONSE_HEAD_FROM_SERVER
+            
+            outGoing?.readData(withTimeout: -1, tag: TAG_READ_RESPONSE_FROM_SERVER)
         }
     }
     
-    internal func outgoingSocketDidDisconnect() {
+    internal func outgoingSocketDidDisconnect(_ outgoing: OutgoingSide) {
         DDLogVerbose("H\(intTag)H Outgoing side disconnect")
         outGoing = nil
         if clientSocket == nil {
@@ -712,24 +567,56 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         for i in 0 ..< buffer.count {
             str = str + String.init(format: "%c", buffer[i])
         }
-         DDLogVerbose(str)
+        DDLogVerbose(str)
         str = "H\(intTag)H "
         for i in 0 ..< buffer.count {
             str = str + String.init(format: "%02X ", buffer[i])
         }
-         DDLogVerbose(str)
+        DDLogVerbose(str)
         
     }
     
     func didReadServerResponse(withData data: Data) {
+        guard let state = responseFromServerstate  else{
+            return
+        }
+        
+        switch state {
+        case ST_READ_RESPONSE_HEAD_FROM_SERVER:
+            didReadServerResponseHead(withData: data)
+        case ST_READ_LEFT_RESPONSE_HEAD_FROM_SERVER:
+            didReadLeftServerResponse(withData: data)
+        case ST_READ_RESPONSE_BODY_FROM_SERVER:
+            didReadLeftResponseBody(withData: data)
+        default:
+            break
+        }
+    
+    }
+    
+    func findHeadEndIndex(_ data: Data) -> Int? {
+        let buffer = [UInt8](data)
+        var i = 0
+        
+        while i < buffer.count - 3 {
+            if buffer[i] == 0x0d && buffer[i + 2] == 0x0d && buffer[i + 1] == 0x0a && buffer[i + 3] == 0x0a {
+                return i + 4
+            }
+            i = i + 1
+        }
+        return nil
+    }
+    
+    func didReadServerResponseHead(withData data: Data) {
         var headData = data
         var bodyData: Data?
         guard let headEndIndex = findHeadEndIndex(data) else{
             brokenData = data
-            outGoing?.readData(withTimeout: -1, tag: TAG_READ_LEFT_RESPONSE_FROM_SERVER)
+            responseFromServerstate = ST_READ_LEFT_RESPONSE_HEAD_FROM_SERVER
+            outGoing?.readData(withTimeout: -1, tag: TAG_READ_RESPONSE_FROM_SERVER)
             return
         }
-
+        
         if headEndIndex < data.count {
             headData = data.subdata(in: 0 ..< headEndIndex)
             bodyData = data.subdata(in: headEndIndex ..< data.count)
@@ -741,54 +628,23 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
             return
         }
         
-        leftContentLength = getContentLength(fromResponse: serverResponseString)
         if shouldParseTraffic {
             DispatchQueue.main.async {
                 self.hostTraffic.responseHead = serverResponseString
                 self.hostTraffic.responseTime = NSDate()
             }
         }
+        
+        shouldKeepAlive = getKeepAliveInfo(fromRequest: serverResponseString)
+        
+        DDLogVerbose("H\(intTag)H KeepAlive: \(shouldKeepAlive)")
+        DDLogVerbose("H\(intTag)H " + serverResponseString)
+
         if let _bodyData = bodyData {
-            if _bodyData.count >= leftContentLength {
-                if shouldParseTraffic {
-                    DispatchQueue.main.async {
-                        let context = CoreDataController.sharedInstance.getContext()
-                        let pieceBody = PieceData(context: context)
-                        pieceBody.timeStamp = NSDate()
-                        pieceBody.type = "response"
-                        pieceBody.rawData = _bodyData.subdata(in: 0 ..< _bodyData.count) as NSData?
-                        pieceBody.belongToTraffic = self.hostTraffic
-                        self.hostTraffic.addToBodies(pieceBody)
-                        
-                        CoreDataController.sharedInstance.saveContext()
-                        CoreDataController.sharedInstance.getContext().refresh(pieceBody, mergeChanges: false)
-                    }
-                }
-                clientSocket?.write(data, withTimeout: -1, tag: TAG_WRITE_TO_CLIENT)
-            }else{
-                if shouldParseTraffic {
-                    DispatchQueue.main.async {
-                        let context = CoreDataController.sharedInstance.getContext()
-                        let pieceBody = PieceData(context: context)
-                        pieceBody.timeStamp = NSDate()
-                        pieceBody.type = "response"
-                        pieceBody.rawData = _bodyData as NSData?
-                        pieceBody.belongToTraffic = self.hostTraffic
-                        self.hostTraffic.addToBodies(pieceBody)
-                        
-                        CoreDataController.sharedInstance.saveContext()
-                        CoreDataController.sharedInstance.getContext().refresh(pieceBody, mergeChanges: false)
-                    }
-                }
-                clientSocket?.write(data, withTimeout: -1, tag: TAG_WRITE_HEAD_AND_BROKEN_BODY_TO_CLIENT)
-            }
-        }else{
-            if leftContentLength > 0 {
-                clientSocket?.write(data, withTimeout: -1, tag: TAG_WRITE_HEAD_AND_BROKEN_BODY_TO_CLIENT)
-            }else{
-                clientSocket?.write(data, withTimeout: -1, tag: TAG_WRITE_TO_CLIENT)
-            }
+            recordBody(withData: _bodyData, type: "respnose")
         }
+        responseFromServerstate = ST_READ_RESPONSE_BODY_FROM_SERVER
+        clientSocket?.write(data, withTimeout: -1, tag: TAG_WRITE_RESPONSE_TO_CLIENT)
     }
     
     func didReadLeftServerResponse(withData data: Data) {
@@ -796,50 +652,29 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         //
         // what if there's a bug, and the data keeps growing ?????
         //
-        didReadServerResponse(withData: maybeCompleteData)
+        didReadServerResponseHead(withData: maybeCompleteData)
     }
     
     func didReadLeftResponseBody(withData data: Data) {
-        
-        if leftContentLength <= data.count {
-            //already have engouth data
-            let _leftContentLength = leftContentLength
-            leftContentLength = 0
-            if shouldParseTraffic {
-                DispatchQueue.main.async {
-                    let context = CoreDataController.sharedInstance.getContext()
-                    let pieceBody = PieceData(context: context)
-                    pieceBody.timeStamp = NSDate()
-                    pieceBody.type = "response"
-                    pieceBody.rawData = data.subdata(in: 0 ..< _leftContentLength) as NSData?
-                    pieceBody.belongToTraffic = self.hostTraffic
-                    self.hostTraffic.addToBodies(pieceBody)
-                    
-                    CoreDataController.sharedInstance.saveContext()
-                    CoreDataController.sharedInstance.getContext().refresh(pieceBody, mergeChanges: false)
-
-                }
+        recordBody(withData: data, type: "respnose")
+        clientSocket?.write(data, withTimeout: -1, tag: TAG_WRITE_RESPONSE_TO_CLIENT)
+    }
+    
+    func recordBody(withData data: Data, type: String) {
+        if shouldParseTraffic {
+            DispatchQueue.main.async {
+                let context = CoreDataController.sharedInstance.getContext()
+                let pieceBody = PieceData(context: context)
+                pieceBody.timeStamp = NSDate()
+                pieceBody.type = type
+                pieceBody.rawData = data as NSData?
+                pieceBody.belongToTraffic = self.hostTraffic
+                self.hostTraffic.addToBodies(pieceBody)
+                
+                CoreDataController.sharedInstance.saveContext()
+                CoreDataController.sharedInstance.getContext().refresh(pieceBody, mergeChanges: false)
+                
             }
-            clientSocket?.write(data, withTimeout: -1, tag: TAG_WRITE_TO_CLIENT)
-        }else{
-            // not enough data to make up a body
-            leftContentLength = leftContentLength - data.count
-            if shouldParseTraffic {
-                DispatchQueue.main.async {
-                    let context = CoreDataController.sharedInstance.getContext()
-                    let pieceBody = PieceData(context: context)
-                    pieceBody.timeStamp = NSDate()
-                    pieceBody.type = "response"
-                    pieceBody.rawData = data as NSData?
-                    pieceBody.belongToTraffic = self.hostTraffic
-                    self.hostTraffic.addToBodies(pieceBody)
-                    
-                    CoreDataController.sharedInstance.saveContext()
-                    CoreDataController.sharedInstance.getContext().refresh(pieceBody, mergeChanges: false)
-
-                }
-            }
-            clientSocket?.write(data, withTimeout: -1, tag: TAG_WRITE_BROKEN_BODY_TO_CLIENT)
         }
     }
 }

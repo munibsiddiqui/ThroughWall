@@ -60,7 +60,6 @@ class RequestListTableViewController: UITableViewController {
             return 1
         }
     }
-
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == 0 {

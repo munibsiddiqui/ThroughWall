@@ -83,6 +83,90 @@ class CoreDataController: NSObject {
         }
     }
     
+    func mergerPieceBody(atURL url: URL) {
+        DispatchQueue.main.async {
+            self._mergerPieceBody(atURL: url)
+        }
+    }
+    
+    func _mergerPieceBody(atURL url: URL) {
+        let container = NSPersistentContainer(name: "ThroughWall")
+        container.persistentStoreDescriptions = [NSPersistentStoreDescription.init(url: url)]
+        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+            if let error = error as NSError? {
+                fatalError("Unresolved error \(error), \(error.userInfo)")
+            }
+        })
+        let context = container.viewContext
+        
+        let fetch: NSFetchRequest<HostTraffic> = HostTraffic.fetchRequest()
+        fetch.includesPropertyValues = false
+        fetch.includesSubentities = false
+        
+        do {
+            let results = try context.fetch(fetch)
+            for result in results {
+                
+                if let bodies = result.bodies {
+                    var responseBody = Data()
+                    var requestBody = Data()
+                    if var _bodies = bodies.allObjects as? [PieceData] {
+                        _bodies.sort() {
+                            if $0.timeStamp!.timeIntervalSince1970 < $1.timeStamp!.timeIntervalSince1970 {
+                                return true
+                            }else{
+                                return false
+                            }
+                        }
+                        for body in _bodies{
+                            if body.type == "respnose" {
+                                responseBody.append((body.rawData as? Data) ?? Data())
+                            }else if body.type == "request" {
+                                requestBody.append((body.rawData as? Data) ?? Data())
+                            }
+                            context.delete(body)
+                        }
+                        saveContext(context)
+                        if responseBody.count > 0 {
+                            let response = PieceData(context: context)
+                            response.rawData = responseBody as NSData?
+                            response.timeStamp = Date() as NSDate?
+                            response.type = "respnose"
+                            //                        response.belongToTraffic = result
+                            result.addToBodies(response)
+                        }
+                        if requestBody.count > 0 {
+                            let request = PieceData(context: context)
+                            request.rawData = requestBody as NSData?
+                            request.timeStamp = Date() as NSDate?
+                            request.type = "request"
+                            //                        request.belongToTraffic = result
+                            result.addToBodies(request)
+                        }
+                        saveContext(context)
+                        //                    context.refresh(result, mergeChanges: false)
+                    }
+                    
+                }else{
+                    context.refresh(result, mergeChanges: false)
+                }
+            }
+        }catch {
+            print(error)
+        }
+    }
+    
+    func saveContext(_ context: NSManagedObjectContext) {
+        if context.hasChanges {
+            do {
+                try context.save()
+            }catch {
+                print(error)
+            }
+        }
+    }
+    
+    
     // MARK: - Core Data Saving support
     
     func saveContext () {

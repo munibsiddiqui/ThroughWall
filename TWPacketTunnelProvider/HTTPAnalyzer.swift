@@ -42,6 +42,7 @@ enum ConnectionError: Error {
     case URLComponentAnalysisError
     case IPV6AnalysisError
     case HostNilError
+    case StateError
 }
 
 protocol OutgoingTransmitDelegate: class {
@@ -519,6 +520,26 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         }
     }
     
+    func retrievedOutgoingSocket(host: String, port: UInt16) {
+        DDLogVerbose("H\(intTag)H retrievedOutgoingSocket \(host):\(port)")
+        
+        if isConnectRequest {
+            if shouldParseTraffic {
+                DispatchQueue.main.async {
+                    self.hostTraffic.responseHead = ConnectionResponseStr
+                    self.hostTraffic.responseTime = NSDate()
+                }
+            }
+            clientSocket?.write(ConnectionResponse, withTimeout: -1, tag: TAG_WRITE_HTTPS_RESPONSE)
+        }else{
+            outGoing?.write(repostData!, withTimeout: -1, tag: TAG_WRITE_REQUEST_TO_SERVER)
+            dataLengthFromClient = repostData!.count
+            repostData = nil
+            responseFromServerstate = ST_READ_RESPONSE_HEAD_FROM_SERVER
+            //alread read at last period.
+        }
+    }
+    
     internal func outgoingSocketDidDisconnect(_ outgoing: OutgoingSide) {
         DDLogVerbose("H\(intTag)H Outgoing side disconnect")
         outGoing = nil
@@ -583,12 +604,16 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         
         switch state {
         case ST_READ_RESPONSE_HEAD_FROM_SERVER:
+            DDLogVerbose("H\(intTag)H ST_READ_RESPONSE_HEAD_FROM_SERVER")
             didReadServerResponseHead(withData: data)
         case ST_READ_LEFT_RESPONSE_HEAD_FROM_SERVER:
+            DDLogVerbose("H\(intTag)H ST_READ_LEFT_RESPONSE_HEAD_FROM_SERVER")
             didReadLeftServerResponse(withData: data)
         case ST_READ_RESPONSE_BODY_FROM_SERVER:
+            DDLogVerbose("H\(intTag)H ST_READ_RESPONSE_BODY_FROM_SERVER")
             didReadLeftResponseBody(withData: data)
         default:
+            DDLogError("H\(intTag)H \(ConnectionError.StateError)")
             break
         }
     
@@ -663,6 +688,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     func recordBody(withData data: Data, type: String) {
         if shouldParseTraffic {
             DispatchQueue.main.async {
+                DDLogVerbose("H\(self.intTag)H Record: \(data.count)")
                 let context = CoreDataController.sharedInstance.getContext()
                 let pieceBody = PieceData(context: context)
                 pieceBody.timeStamp = NSDate()

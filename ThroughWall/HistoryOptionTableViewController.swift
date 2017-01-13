@@ -131,6 +131,9 @@ class HistoryOptionTableViewController: UITableViewController {
         case 2:
             if indexPath.row == 0 {
                 copyPacketTunnelProviderLogToDocument()
+            }else if indexPath.row == 1 {
+                copyPacketTunnelProviderLogToDocument()
+                mergePieceBody()
             }
         default:
             break
@@ -159,7 +162,15 @@ class HistoryOptionTableViewController: UITableViewController {
         }catch{
             print(error)
         }
+    }
     
+    func mergePieceBody() {
+        let fileManager = FileManager.default
+        var newUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
+        newUrl.appendPathComponent(PacketTunnelProviderLogFolderName)
+        newUrl.appendPathComponent(databaseFolderName)
+        newUrl.appendPathComponent(databaseFileName)
+        CoreDataController.sharedInstance.mergerPieceBody(atURL: newUrl)
     }
     
     
@@ -210,7 +221,7 @@ class HistoryOptionTableViewController: UITableViewController {
             if indexPath.row == 0 {
                 cell.textLabel?.text = "Copy to Document"
             }else if indexPath.row == 1 {
-                cell.textLabel?.text = "Email"
+                cell.textLabel?.text = "Merge to Document"
             }else if indexPath.row   == 2 {
                 cell.textLabel?.text = "AirDrop"
             }

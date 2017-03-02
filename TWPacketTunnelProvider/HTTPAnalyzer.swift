@@ -304,7 +304,8 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
                 return false
             }
         }
-        return true
+//        return true
+        return false
     }
     
     func extractDetail(from request: String, by name: String) -> String? {

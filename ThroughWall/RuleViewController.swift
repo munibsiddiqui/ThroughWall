@@ -31,7 +31,7 @@ class RuleFileUpdateController: NSObject {
     }
     
     private func getCurrentFileSource() -> String {
-        let defaults = UserDefaults.init(suiteName: groupName)
+        let defaults = UserDefaults(suiteName: groupName)
         var source = ""
         
         if let fileSource = defaults?.value(forKey: currentFileSource) as? String {

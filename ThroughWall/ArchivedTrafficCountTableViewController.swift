@@ -29,7 +29,7 @@ class ArchivedTrafficCountTableViewController: UITableViewController {
         
         let localFormatter = DateFormatter()
         localFormatter.locale = Locale.current
-        localFormatter.dateFormat = "yyyy-MMMM"
+        localFormatter.dateFormat = "yyyy-MM"
         
         do {
             let data = try CoreDataController.sharedInstance.getContext().fetch(fetchData)
@@ -68,7 +68,7 @@ class ArchivedTrafficCountTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == 0 {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "basiccell", for: indexPath)
+            let cell = tableView.dequeueReusableCell(withIdentifier: "basicCell", for: indexPath)
             
             // Configure the cell...
             let (date, count) = archived[indexPath.row]

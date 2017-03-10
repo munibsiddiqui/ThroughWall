@@ -109,7 +109,7 @@ class RuleFileUpdateController: NSObject {
                     guard var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName) else {
                         return
                     }
-                    url.appendPathComponent(ruleFielName)
+                    url.appendPathComponent(ruleFileName)
                     
                     fileManager.createFile(atPath: url.path, contents: nil, attributes: nil)
                     

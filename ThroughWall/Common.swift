@@ -16,12 +16,15 @@ let kQRCodeExtracted = "Bingo.ThroughWall.QRCodeExtracted"
 let configFileName = "rule.config"
 let kTunnelProviderBundle = "Bingo.ThroughWall.TWPacketTunnelProvider"
 let kDeleteEditingVPN = "Bingo.ThroughWall.DeleteEditingVPN"
+let kConfigureVersion = "Bingo.TW.ConfigureVersion"
+let currentConfigureVersion = 1
 
 let databaseFolderName = "DataBase"
 let databaseFileName = "Record.sqlite"
 
 let groupName = "group.Bingo.ThroughWall"
-let ruleFielName = "rule.conf"
+let ruleFileName = "rule.conf"
+let siteFileName = "site.conf"
 let PacketTunnelProviderLogFolderName = "PacketTunnelProvider"
 let bundlefileVersion = 0
 let savedFileVersion = "Bingo.SavedFileVersion"

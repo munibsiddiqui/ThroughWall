@@ -72,7 +72,7 @@ class Config: NSObject{
         "user": "User",
         "password": "Password",
         "method": "Method",
-        "dns": "DNS"
+//        "dns": "DNS"
     ]
     
     private var _currentProxy = ""

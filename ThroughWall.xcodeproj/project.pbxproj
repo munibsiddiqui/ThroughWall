@@ -15,6 +15,7 @@
 		3433528E1DF943D500CF7281 /* CoreDataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3433528C1DF943D100CF7281 /* CoreDataController.swift */; };
 		3439FA061DEEB7A000F8CE59 /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3439FA051DEEB7A000F8CE59 /* Rule.swift */; };
 		3444AB861DF164B600FD3B9F /* Socks2HTTPS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3444AB851DF164B600FD3B9F /* Socks2HTTPS.swift */; };
+		3452C3481E763D80008CCC4E /* Tool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3452C3471E763D80008CCC4E /* Tool.swift */; };
 		345ECB861DF8F48800F70ACC /* rule.config in Resources */ = {isa = PBXBuildFile; fileRef = 345ECB851DF8F48800F70ACC /* rule.config */; };
 		345ECB871DF8F5C100F70ACC /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3439FA051DEEB7A000F8CE59 /* Rule.swift */; };
 		3474EC7B1DDC926C00EBF3C5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3474EC7A1DDC926C00EBF3C5 /* AppDelegate.swift */; };
@@ -275,6 +276,7 @@
 		3433528C1DF943D100CF7281 /* CoreDataController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataController.swift; sourceTree = "<group>"; };
 		3439FA051DEEB7A000F8CE59 /* Rule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Rule.swift; sourceTree = "<group>"; };
 		3444AB851DF164B600FD3B9F /* Socks2HTTPS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Socks2HTTPS.swift; sourceTree = "<group>"; };
+		3452C3471E763D80008CCC4E /* Tool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tool.swift; sourceTree = "<group>"; };
 		345ECB851DF8F48800F70ACC /* rule.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = rule.config; sourceTree = "<group>"; };
 		3474EC771DDC926C00EBF3C5 /* ThroughWall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ThroughWall.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3474EC7A1DDC926C00EBF3C5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -979,6 +981,15 @@
 			name = "Core Data";
 			sourceTree = "<group>";
 		};
+		3452C3461E763D27008CCC4E /* MainView */ = {
+			isa = PBXGroup;
+			children = (
+				34765C831E10D8810055C294 /* MainViewController.swift */,
+				3452C3471E763D80008CCC4E /* Tool.swift */,
+			);
+			name = MainView;
+			sourceTree = "<group>";
+		};
 		3474EC6E1DDC926C00EBF3C5 = {
 			isa = PBXGroup;
 			children = (
@@ -1008,6 +1019,7 @@
 		3474EC791DDC926C00EBF3C5 /* ThroughWall */ = {
 			isa = PBXGroup;
 			children = (
+				3452C3461E763D27008CCC4E /* MainView */,
 				34765C7F1E10D8810055C294 /* ConfigureViewController.swift */,
 				34D154601E24AC7F00546B57 /* ScanQRCodeViewController.swift */,
 				34765C801E10D8810055C294 /* HelpViewController.swift */,
@@ -1015,7 +1027,6 @@
 				34A26A6A1E13447400A8CC93 /* HistoryOptionTableViewController.swift */,
 				34C7D5721E25C9300052CE78 /* ArchivedTrafficCountTableViewController.swift */,
 				34765C821E10D8810055C294 /* InputTextFieldCell.swift */,
-				34765C831E10D8810055C294 /* MainViewController.swift */,
 				34765C841E10D8810055C294 /* RuleImportMethodTableViewController.swift */,
 				34765C851E10D8810055C294 /* RuleViewController.swift */,
 				34765C861E10D8810055C294 /* SelectInputViewController.swift */,
@@ -2646,6 +2657,7 @@
 				34765C8E1E10D8810055C294 /* RuleImportMethodTableViewController.swift in Sources */,
 				34765C901E10D8810055C294 /* SelectInputViewController.swift in Sources */,
 				34765C8A1E10D8810055C294 /* HelpViewController.swift in Sources */,
+				3452C3481E763D80008CCC4E /* Tool.swift in Sources */,
 				34765C911E10D8810055C294 /* SelectionFieldCell.swift in Sources */,
 				34E3F1FC1E11428600FAD65C /* RequestDetailTableViewController.swift in Sources */,
 				34765C8F1E10D8810055C294 /* RuleViewController.swift in Sources */,

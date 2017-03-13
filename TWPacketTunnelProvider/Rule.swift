@@ -57,7 +57,7 @@ class Rule {
         guard var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName) else {
             return []
         }
-        url.appendPathComponent(ruleFielName)
+        url.appendPathComponent(ruleFileName)
         
         var fileString = ""
         do {

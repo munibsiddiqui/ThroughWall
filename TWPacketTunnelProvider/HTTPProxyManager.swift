@@ -246,7 +246,7 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate, HTTPAnalyzerDelegate, 
             }
             
             for key in self.outgoingStorage.keys {
-                print("KAK \(key): \(self.outgoingStorage[key]?.count)")
+                print("KAK \(key): \(self.outgoingStorage[key]?.count ?? 0)")
             }
             
             self.outgoingStoreLock.unlock()
@@ -338,7 +338,7 @@ class HTTPProxyManager: NSObject, GCDAsyncSocketDelegate, HTTPAnalyzerDelegate, 
     }
     
     func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
-        NSLog("HTTP Server Disconnected \(err?.localizedDescription)")
+        NSLog("HTTP Server Disconnected \(err?.localizedDescription ?? "")")
     }
     
     

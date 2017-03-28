@@ -8,129 +8,6 @@
 
 import UIKit
 
-class RuleFileUpdateController: NSObject {
-    
-    func tryUpdateRuleFileFromBundleFile() {
-        if getCurrentFileSource() == defaultFileSource {
-            if isBundleRuleFileNewer() {
-                updateRuleFileFromBundleFile()
-            }
-        }
-    }
-    
-    func forceUpdateRuleFileFromBundleFile() {
-        updateRuleFileFromBundleFile()
-    }
-    
-    
-    func updateRuleFileFromImportedFile(_ path: String) {
-        saveToRuleFile(fromURLString: path)
-        let defaults = UserDefaults.init(suiteName: groupName)
-        defaults?.set(userImportFileSource, forKey: currentFileSource)
-        defaults?.synchronize()
-    }
-    
-    private func getCurrentFileSource() -> String {
-        let defaults = UserDefaults(suiteName: groupName)
-        var source = ""
-        
-        if let fileSource = defaults?.value(forKey: currentFileSource) as? String {
-            source = fileSource
-        }else {
-            source = defaultFileSource
-            defaults?.set(defaultFileSource, forKey: currentFileSource)
-            defaults?.synchronize()
-        }
-        return source
-    }
-    
-    private func isBundleRuleFileNewer() -> Bool {
-        let defaults = UserDefaults.init(suiteName: groupName)
-        var bundleRuleFileNewer = false
-        
-        if let savedRuleFileVersion = defaults?.value(forKey: savedFileVersion) as? Int {
-            if bundlefileVersion > savedRuleFileVersion {
-                bundleRuleFileNewer = true
-            }
-        }else {
-            bundleRuleFileNewer = true
-        }
-        return bundleRuleFileNewer
-    }
-    
-    private func updateRuleFileFromBundleFile() {
-        if let path = Bundle.main.path(forResource: "rule", ofType: "config") {
-            saveToRuleFile(fromURLString: path)
-            let defaults = UserDefaults.init(suiteName: groupName)
-            defaults?.set(bundlefileVersion, forKey: savedFileVersion)
-            defaults?.synchronize()
-        }
-    }
-    
-    private func saveToRuleFile(fromURLString urlString: String) {
-        let fileManager = FileManager.default
-        var fileString = ""
-        
-        do{
-            fileString = try String(contentsOfFile: urlString, encoding: String.Encoding.utf8)
-        }catch {
-            return
-        }
-        
-        let classifications = fileString.components(separatedBy: "[")
-        
-        for classification in classifications {
-            
-            let components = classification.components(separatedBy: "]" )
-            
-            if components.count == 2 {
-                let name = components[0]
-                let value = components[1]
-                
-                var returnKey = "\r\n"
-                
-                if !value.contains(returnKey) {
-                    returnKey = "\n"
-                    if !value.contains(returnKey) {
-                        returnKey = ""
-                    }
-                }
-                
-                var items = value.components(separatedBy: returnKey)
-                
-                for (index, item) in items.enumerated().reversed() {
-                    if item.hasPrefix("#") || item == "" {
-                        items.remove(at: index)
-                    }
-                }
-                
-                if name == "Rule" {
-                    //store rule into file
-                    guard var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName) else {
-                        return
-                    }
-                    url.appendPathComponent(ruleFileName)
-                    
-                    fileManager.createFile(atPath: url.path, contents: nil, attributes: nil)
-                    
-                    do {
-                        let filehandle = try FileHandle(forWritingTo: url)
-                        for item in items {
-                            filehandle.seekToEndOfFile()
-                            filehandle.write("\(item)\n".data(using: String.Encoding.utf8)!)
-                        }
-                        filehandle.synchronizeFile()
-                        
-                    }catch {
-                        print(error)
-                        return
-                    }
-                }
-            }
-        }
-    }
-}
-
 class RuleViewController: UIViewController, UIPopoverPresentationControllerDelegate, URLSessionDownloadDelegate, UITableViewDelegate, UITableViewDataSource {
     @IBOutlet weak var downloadIndicator: UIActivityIndicatorView!
     @IBOutlet weak var downloadProgress: UILabel!
@@ -148,7 +25,7 @@ class RuleViewController: UIViewController, UIPopoverPresentationControllerDeleg
         NotificationCenter.default.addObserver(self, selector: #selector(RuleViewController.ruleImportMethodChoosen(notification:)), name: NSNotification.Name(rawValue: kChoosenRuleImportMethod), object: nil)
         
         Rule.sharedInstance.analyzeRuleFile()
-        ruleItems = Rule.sharedInstance.itemsInRuleFile()
+//        ruleItems = Rule.sharedInstance.itemsInRuleFile()
         
         tableView.tableFooterView = UIView()
     }
@@ -304,7 +181,7 @@ class RuleViewController: UIViewController, UIPopoverPresentationControllerDeleg
         for (index, ruleFileName) in ruleFileNames.enumerated() {
             let fileItem = UIAlertAction(title: ruleFileName, style: .default, handler: { (_) in
                 RuleFileUpdateController().updateRuleFileFromImportedFile(fileURLs[index].path)
-                self.ruleItems = Rule.sharedInstance.itemsInRuleFile()
+//                self.ruleItems = Rule.sharedInstance.itemsInRuleFile()
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
                 }
@@ -344,7 +221,7 @@ class RuleViewController: UIViewController, UIPopoverPresentationControllerDeleg
     
     func useDefaultRule() {
         RuleFileUpdateController().forceUpdateRuleFileFromBundleFile()
-        ruleItems = Rule.sharedInstance.itemsInRuleFile()
+//        ruleItems = Rule.sharedInstance.itemsInRuleFile()
         DispatchQueue.main.async {
             self.tableView.reloadData()
         }

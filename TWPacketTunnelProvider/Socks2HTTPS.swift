@@ -132,7 +132,7 @@ class Socks2HTTPSConverter: NSObject, GCDAsyncSocketDelegate{
             if response != ConnectionResponseStr {
                 outGoing?.disconnect()
                 socksConnection?.disconnect()
-                DDLogError("S\(intTag) HTTP_PROXY_REQUEST_RESPONSE Error \(response)")
+                DDLogError("S\(intTag) HTTP_PROXY_REQUEST_RESPONSE Error \(response ?? "")")
                 return
             }
             var buffer: [UInt8] = [5, 0, 0]

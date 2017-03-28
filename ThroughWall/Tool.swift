@@ -14,7 +14,7 @@ class ProxyConfig: NSObject {
     private let proxies = ["CUSTOM", "HTTP", "SOCKS5"]
 
     private let items = [
-        "CUSTOM": ["proxy", "description", "server", "port", "password", "method", "dns"],
+        "CUSTOM": ["proxy", "description", "server", "port", "password", "method"],
         "HTTP": ["proxy", "description", "server", "port", "user", "password"],
         "SOCKS5": ["proxy", "description", "server", "port", "user", "password"]
     ]
@@ -27,11 +27,11 @@ class ProxyConfig: NSObject {
 
     private let availables = [
         "CUSTOM": [
-            //            "proxy": [
-            //                "preset": [
-            //                    "CUSTOM", "HTTP", "SOCKS5"
-            //                ]
-            //            ],
+            "proxy": [
+                "preset": [
+                    "CUSTOM"//, "HTTP", "SOCKS5"
+                ]
+            ],
             "method": [
                 "preset": [
                     "table", "aes-128-ctr", "aes-192-ctr", "aes-256-ctr", "aes-128-cfb", "aes-192-cfb", "aes-256-cfb", "bf-cfb", "camellia-128-cfb", "camellia-192-cfb", "camellia-256-cfb", "cast5-cfb", "chacha20", "chacha20-ietf", "des-cfb", "idea-cfb", "rc2-cfb", "rc4", "rc4-md5", "salsa20", "seed-cfb"
@@ -178,6 +178,11 @@ class SiteConfigController {
                     return
                 }
 
+                if vpnManagers.count < 1 {
+                    completion(ServerVersionStatus.EMPTY, [NETunnelProviderManager]())
+                    return
+                }
+
                 if self.isContainConvertedVPN(amongManagers: vpnManagers) {
                     completion(ServerVersionStatus.CONVERTED, vpnManagers)
                 } else {
@@ -221,18 +226,24 @@ class SiteConfigController {
         for item in items {
             configuration[item] = config.getValue(byItem: item) as AnyObject?
         }
+        configuration[kConfigureVersion] = currentConfigureVersion as AnyObject?
         (manager.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration = configuration
     }
 
 
     private func saveConfigFile(fromOldVPNManagers managers: [NETunnelProviderManager]) {
         var proxyConfigs = [ProxyConfig]()
+        var index = 0
         for manager in managers {
             if let providerProtocol = manager.protocolConfiguration as? NETunnelProviderProtocol {
                 if let _ = providerProtocol.providerConfiguration?[kConfigureVersion] {
                 } else {
                     if let conf = self.getConfig(fromManager: manager) {
+                        if manager.isEnabled {
+                            setSelectedServerIndex(withValue: index)
+                        }
                         proxyConfigs.append(conf)
+                        index = index + 1
                     }
                 }
             }
@@ -244,18 +255,20 @@ class SiteConfigController {
 
     }
 
-    private func deleteOldServer(fromVPNManagers managers: [NETunnelProviderManager]) {
+    private func deleteOldServer(fromVPNManagers managers: [NETunnelProviderManager]) -> NETunnelProviderManager? {
+        var newVersionManager: NETunnelProviderManager? = nil
         for manager in managers {
             if let providerProtocol = manager.protocolConfiguration as? NETunnelProviderProtocol {
                 if let _ = providerProtocol.providerConfiguration?[kConfigureVersion] {
+                    newVersionManager = manager
                 } else {
                     //delete old
                     manager.removeFromPreferences(completionHandler: nil)
                     print("delete old")
                 }
             }
-
         }
+        return newVersionManager
     }
 
     private func createNewTypeServer(withCompeletionHandler completionHandler: @escaping (NETunnelProviderManager?) -> Void) {
@@ -264,7 +277,7 @@ class SiteConfigController {
         manager.loadFromPreferences { error in
 
             if error != nil {
-                print("loadFromPreferences \(error)")
+                print("loadFromPreferences \(error!)")
                 completionHandler(nil)
                 return
             }
@@ -277,7 +290,7 @@ class SiteConfigController {
             manager.localizedDescription = "Chisel"
             manager.saveToPreferences() { error in
                 if error != nil {
-                    print("save new manager \(error)")
+                    print("save new manager \(error!)")
                     completionHandler(nil)
                 } else {
                     print("saved new manger")
@@ -287,7 +300,7 @@ class SiteConfigController {
         }
     }
 
-    private func writeIntoSiteConfigFile(withConfigs configs: [ProxyConfig]) {
+    func writeIntoSiteConfigFile(withConfigs configs: [ProxyConfig]) {
         let fileManager = FileManager.default
 
         guard var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName) else {
@@ -309,11 +322,11 @@ class SiteConfigController {
                 let items = config.containedItems
                 //the first item should be proxy !!!
                 for item in items {
-                    let value = config.getValue(byItem: item)
-                    filehandle.write("\(item):\(value)\n".data(using: String.Encoding.utf8)!)
+                    if let value = config.getValue(byItem: item) {
+                        filehandle.write("\(item):\(value)\n".data(using: String.Encoding.utf8)!)
+                    }
                 }
                 filehandle.write("#\n".data(using: String.Encoding.utf8)!)
-
             }
 
             filehandle.synchronizeFile()
@@ -324,73 +337,77 @@ class SiteConfigController {
         }
     }
 
-
-    private func getNewTypeServer(createOneIfEmpty creatIfEmpty: Bool, withCompletionHandler completion: @escaping (NETunnelProviderManager?) -> Void) {
-        checkServerStatus { (currentStatus, managers) in
-            switch currentStatus {
-            case .ERROR:
-                print("Unknown")
-                completion(nil)
-            case .EMPTY:
-                if creatIfEmpty {
-                    self.createNewTypeServer(withCompeletionHandler: { (newManager) in
-                        completion(newManager)
-                    })
-                } else {
-                    completion(nil)
-                }
-            case .CONVERTED:
-                completion(managers[0])
-            case .NOTCONVERTED:
-                self.saveConfigFile(fromOldVPNManagers: managers)
-                self.createNewTypeServer { newManager in
-                    self.deleteOldServer(fromVPNManagers: managers)
-                    completion(newManager)
-                }
-            }
-        }
-    }
-
-
-    func convertOldServer(withCompletionHandler completion: @escaping (Void) -> Void) {
+    func convertOldServer(withCompletionHandler completion: @escaping (NETunnelProviderManager?) -> Void) {
         checkServerStatus { (currentStatus, vpnManagers) in
             switch currentStatus {
             case .ERROR:
                 print("Unknow")
+                completion(nil)
             case .EMPTY:
                 print("empty")
-                completion()
+                completion(nil)
             case .CONVERTED:
                 print("converted")
-                self.deleteOldServer(fromVPNManagers: vpnManagers)
-                completion()
+                let newVersionManager = self.deleteOldServer(fromVPNManagers: vpnManagers)
+                completion(newVersionManager)
             case .NOTCONVERTED:
                 print("not converted")
                 self.saveConfigFile(fromOldVPNManagers: vpnManagers)
-                self.createNewTypeServer { newManager in
-                    self.deleteOldServer(fromVPNManagers: vpnManagers)
-                    completion()
+                self.createNewTypeServer { _newManager in
+                    let _ = self.deleteOldServer(fromVPNManagers: vpnManagers)
+                    let proxyConfigs = self.readSiteConfigsFromConfigFile()
+                    if let newManager = _newManager {
+                        if let selectedIndex = self.getSelectedServerIndex() {
+                            self.save(withConfig: proxyConfigs[selectedIndex], intoManager: newManager, completionHander: {
+                                completion(newManager)
+                            })
+                        } else {
+                            self.save(withConfig: proxyConfigs[0], intoManager: newManager, completionHander: {
+                                completion(newManager)
+                            })
+                        }
+                    }
+
                 }
             }
         }
     }
 
+    func save(withConfig config: ProxyConfig, intoManager manager: NETunnelProviderManager, completionHander completion: @escaping (Void) -> Void) {
+        self.setConfig(fromProxyConfig: config, toManager: manager)
 
-    func loadConfigToManager(withConfigure config: ProxyConfig, createIfEmpty creat: Bool, completionHander completion: @escaping () -> Void) {
-        getNewTypeServer(createOneIfEmpty: creat) { (_manager) in
-            guard let manager = _manager else {
-                completion()
-                return
-            }
-            self.setConfig(fromProxyConfig: config, toManager: manager)
-
-            manager.saveToPreferences(completionHandler: { (error) in
-                completion()
-            })
-        }
+        manager.isEnabled = true
+        manager.saveToPreferences(completionHandler: { (error) in
+            completion()
+        })
     }
 
-
+    func forceSaveToManager(withConfig config: ProxyConfig, withCompletionHandler completion: @escaping (NETunnelProviderManager?) -> Void) {
+        checkServerStatus { (status, vpnManagers) in
+            switch status {
+            case .ERROR:
+                completion(nil)
+            case .EMPTY:
+                self.createNewTypeServer { _newManager in
+                    if let newManager = _newManager {
+                        self.save(withConfig: config, intoManager: newManager, completionHander: {
+                            completion(newManager)
+                        })
+                    } else {
+                        completion(nil)
+                    }
+                }
+            case .CONVERTED:
+                let manager = vpnManagers[0]
+                self.save(withConfig: config, intoManager: manager, completionHander: {
+                    completion(manager)
+                })
+            case .NOTCONVERTED:
+                //impossible
+                completion(nil)
+            }
+        }
+    }
 
     func readSiteConfigsFromConfigFile() -> [ProxyConfig] {
         var proxyConfigs = [ProxyConfig]()
@@ -419,6 +436,7 @@ class SiteConfigController {
                 if firstItem.hasPrefix("proxy:") {
                     config.currentProxy = firstItem.substring(from: firstItem.index(firstItem.startIndex, offsetBy: 6))
                     items.removeFirst()
+                    items.removeLast()
 
                     for item in items {
                         let temp = item.components(separatedBy: ":")
@@ -436,9 +454,8 @@ class SiteConfigController {
                             config.setValue(byItem: name, value: option)
                         }
                     }
-
+                    proxyConfigs.append(config)
                 }
-                proxyConfigs.append(config)
             }
         } catch {
             print(error)
@@ -448,5 +465,19 @@ class SiteConfigController {
     }
 
 
+    func getSelectedServerIndex() -> Int? {
+        let defaults = UserDefaults.init(suiteName: groupName)
+
+        if let index = defaults?.value(forKey: kSelectedServerIndex) as? Int {
+            return index
+        }
+        return nil
+    }
+
+    func setSelectedServerIndex(withValue value: Int) {
+        let defaults = UserDefaults.init(suiteName: groupName)
+
+        defaults?.set(value, forKey: kSelectedServerIndex)
+    }
 
 }

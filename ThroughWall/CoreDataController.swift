@@ -120,9 +120,9 @@ class CoreDataController: NSObject {
                         }
                         for body in _bodies{
                             if body.type == "respnose" {
-                                responseBody.append((body.rawData as? Data) ?? Data())
+                                responseBody.append((body.rawData as Data?) ?? Data())
                             }else if body.type == "request" {
-                                requestBody.append((body.rawData as? Data) ?? Data())
+                                requestBody.append((body.rawData as Data?) ?? Data())
                             }
                             context.delete(body)
                         }

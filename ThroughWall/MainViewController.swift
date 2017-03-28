@@ -11,7 +11,6 @@ import NetworkExtension
 
 class MainViewController: UITableViewController {
 
-    var vpnManagers = [NETunnelProviderManager]()
     var currentVPNManager: NETunnelProviderManager? {
         willSet {
             if let vpnManager = newValue {
@@ -20,16 +19,16 @@ class MainViewController: UITableViewController {
         }
     }
 
-    var willEditVPNManager: NETunnelProviderManager?
-
     var currentVPNStatusLabel = UILabel()
     var currentVPNStatusLamp = UIImageView()
     var vpnStatusSwitch = UISwitch()
-    var blockADSwitch = UISwitch()
-    var globalModeSwitch = UISwitch()
+//    var blockADSwitch = UISwitch()
+//    var globalModeSwitch = UISwitch()
 
 
     var proxyConfigs = [ProxyConfig]()
+    var selectedServerIndex = 0
+    var willEditServerIndex = -1
 
     var currentVPNStatusIndicator: NEVPNStatus = .invalid {
         willSet {
@@ -39,15 +38,15 @@ class MainViewController: UITableViewController {
                 on = true
                 currentVPNStatusLabel.text = "Connecting..."
                 currentVPNStatusLamp.image = UIImage(named: "OrangeDot")
-                blockADSwitch.isEnabled = false
-                globalModeSwitch.isEnabled = false
+//                blockADSwitch.isEnabled = false
+//                globalModeSwitch.isEnabled = false
                 break
             case .connected:
                 on = true
                 currentVPNStatusLabel.text = "Connected"
                 currentVPNStatusLamp.image = UIImage(named: "GreenDot")
-                blockADSwitch.isEnabled = false
-                globalModeSwitch.isEnabled = false
+//                blockADSwitch.isEnabled = false
+//                globalModeSwitch.isEnabled = false
                 break
             case .disconnecting:
                 on = false
@@ -58,8 +57,8 @@ class MainViewController: UITableViewController {
                 on = false
                 currentVPNStatusLabel.text = "Not Connected"
                 currentVPNStatusLamp.image = UIImage(named: "GrayDot")
-                blockADSwitch.isEnabled = true
-                globalModeSwitch.isEnabled = true
+//                blockADSwitch.isEnabled = true
+//                globalModeSwitch.isEnabled = true
                 break
             default:
                 on = false
@@ -81,25 +80,30 @@ class MainViewController: UITableViewController {
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
 
         vpnStatusSwitch.addTarget(self, action: #selector(MainViewController.vpnStatusSwitchValueDidChange(_:)), for: .valueChanged)
-        blockADSwitch.addTarget(self, action: #selector(MainViewController.blockADSwitchValueDidChange(_:)), for: .valueChanged)
-        globalModeSwitch.addTarget(self, action: #selector(MainViewController.globalModeSwitchDidChange(_:)), for: .valueChanged)
+//        blockADSwitch.addTarget(self, action: #selector(MainViewController.blockADSwitchValueDidChange(_:)), for: .valueChanged)
+//        globalModeSwitch.addTarget(self, action: #selector(MainViewController.globalModeSwitchDidChange(_:)), for: .valueChanged)
         tableView.tableFooterView = UIView()
         tableView.backgroundColor = UIColor.groupTableViewBackground
         RuleFileUpdateController().tryUpdateRuleFileFromBundleFile()
-        readSettings()
+//        readSettings()
 
-        SiteConfigController().convertOldServer {
+        SiteConfigController().convertOldServer { newManager in
             print("completed")
+            self.currentVPNManager = newManager
+            self.proxyConfigs = SiteConfigController().readSiteConfigsFromConfigFile()
+            if let index = SiteConfigController().getSelectedServerIndex() {
+                self.selectedServerIndex = index
+            }
+
+            self.tableView.reloadData()
         }
         NotificationCenter.default.addObserver(self, selector: #selector(MainViewController.deleteEditingVPN), name: NSNotification.Name(rawValue: kDeleteEditingVPN), object: nil)
-
-
+        NotificationCenter.default.addObserver(self, selector: #selector(saveVPN(_:)), name: NSNotification.Name(rawValue: kSaveVPN), object: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationItem.title = "VPN"
-        self.loadConfigurationFromSystem()
 
         NotificationCenter.default.addObserver(self, selector: #selector(MainViewController.VPNStatusDidChange(_:)), name: NSNotification.Name.NEVPNStatusDidChange, object: nil)
 
@@ -120,59 +124,90 @@ class MainViewController: UITableViewController {
     }
 
 
-    func blockADSwitchValueDidChange(_ sender: UISwitch) {
-        let defaults = UserDefaults.init(suiteName: groupName)
-        defaults?.set(sender.isOn, forKey: blockADSetting)
-        defaults?.synchronize()
-    }
-
-    func globalModeSwitchDidChange(_ sender: UISwitch) {
-        let defaults = UserDefaults.init(suiteName: groupName)
-        defaults?.set(sender.isOn, forKey: globalModeSetting)
-        defaults?.synchronize()
-    }
-
-    func readSettings() {
-        let defaults = UserDefaults.init(suiteName: groupName)
-        var blockAD = false
-        var globalMode = false
-
-        if let block = defaults?.value(forKey: blockADSetting) as? Bool {
-            blockAD = block
-        }
-
-        if let global = defaults?.value(forKey: globalModeSetting) as? Bool {
-            globalMode = global
-        }
-
-
-        DispatchQueue.main.async {
-            self.blockADSwitch.isOn = blockAD
-            self.globalModeSwitch.isOn = globalMode
-        }
-
-    }
+//    func blockADSwitchValueDidChange(_ sender: UISwitch) {
+//        let defaults = UserDefaults.init(suiteName: groupName)
+//        defaults?.set(sender.isOn, forKey: blockADSetting)
+//        defaults?.synchronize()
+//    }
+//
+//    func globalModeSwitchDidChange(_ sender: UISwitch) {
+//        let defaults = UserDefaults.init(suiteName: groupName)
+//        defaults?.set(sender.isOn, forKey: globalModeSetting)
+//        defaults?.synchronize()
+//    }
+//
+//    func readSettings() {
+//        let defaults = UserDefaults.init(suiteName: groupName)
+//        var blockAD = false
+//        var globalMode = false
+//
+//        if let block = defaults?.value(forKey: blockADSetting) as? Bool {
+//            blockAD = block
+//        }
+//
+//        if let global = defaults?.value(forKey: globalModeSetting) as? Bool {
+//            globalMode = global
+//        }
+//
+//
+//        DispatchQueue.main.async {
+//            self.blockADSwitch.isOn = blockAD
+//            self.globalModeSwitch.isOn = globalMode
+//        }
+//    }
 
     func vpnStatusSwitchValueDidChange(_ sender: UISwitch) {
-        if vpnManagers.count > 0 {
-            if let currentVPNManager = self.currentVPNManager {
-                if sender.isOn {
-
-                    do {
-                        try currentVPNManager.connection.startVPNTunnel()
-                    } catch {
-                        print(error)
+        let on = sender.isOn
+        if let manager = self.currentVPNManager {
+            manager.loadFromPreferences(completionHandler: { (_error) in
+                if let error = _error{
+                    print(error)
+                    sender.isOn = false
+                }else {
+                    if self.trigerVPNManager(withManager: manager, shouldON: sender.isOn) == false {
+                        sender.isOn = false
                     }
-
-                } else {
-                    currentVPNManager.connection.stopVPNTunnel()
                 }
+            })
+        } else {
+            if proxyConfigs.count > selectedServerIndex {
+                let proxyConfig = proxyConfigs[selectedServerIndex]
+                SiteConfigController().forceSaveToManager(withConfig: proxyConfig, withCompletionHandler: { (_manager) in
+                    if let manager = _manager {
+                        self.currentVPNManager = manager
+                        manager.loadFromPreferences(completionHandler: { (_error) in
+                            if let error = _error{
+                                print(error)
+                                sender.isOn = false
+                            }else {
+                                if self.trigerVPNManager(withManager: manager, shouldON: on) == false {
+                                    sender.isOn = false
+                                }
+                            }
+                        })
+                    } else {
+                        sender.isOn = false
+                    }
+                })
             } else {
                 sender.isOn = false
             }
-        } else {
-            sender.isOn = false
         }
+    }
+
+    func trigerVPNManager(withManager manger: NETunnelProviderManager, shouldON on: Bool) -> Bool {
+        var result = true
+        if on {
+            do {
+                try manger.connection.startVPNTunnel()
+            } catch {
+                print(error)
+                result = false
+            }
+        } else {
+            manger.connection.stopVPNTunnel()
+        }
+        return result
     }
 
     func VPNStatusDidChange(_ notification: Notification?) {
@@ -194,13 +229,11 @@ class MainViewController: UITableViewController {
         // #warning Incomplete implementation, return the number of rows
         switch section {
         case 0:
-            //block ad section
-            //global mode section
-            return 2
-        case 1:
             //servers status section
+            return 1
+        case 1:
             //server list section
-            return vpnManagers.count + 2
+            return proxyConfigs.count + 1
         default:
             return 0
         }
@@ -220,7 +253,6 @@ class MainViewController: UITableViewController {
             return nil
         }
     }
-
 
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if let _ = self.tableView(tableView, titleForHeaderInSection: section) {
@@ -251,41 +283,20 @@ class MainViewController: UITableViewController {
         switch indexPath.section {
         case 0:
             //block ad section
-            if indexPath.row == 0 {
-                let cell = tableView.dequeueReusableCell(withIdentifier: "mainOption", for: indexPath)
-                cell.textLabel?.text = "Reject Function (Block AD)"
-                cell.accessoryView = blockADSwitch
-                cell.selectionStyle = .none
-                return cell
-            } else if indexPath.row == 1 {
-                //global mode section
-                let cell = tableView.dequeueReusableCell(withIdentifier: "mainOption", for: indexPath)
-                cell.textLabel?.text = "Global Mode"
-                cell.accessoryView = globalModeSwitch
-                cell.selectionStyle = .none
-                return cell
-            } else {
-                let cell = tableView.dequeueReusableCell(withIdentifier: "midStyle", for: indexPath)
-                cell.textLabel?.text = "Import Proxy Rule..."
-                return cell
-            }
+            let cell = tableView.dequeueReusableCell(withIdentifier: "status", for: indexPath)
+            cell.textLabel?.text = "Status"
+            currentVPNStatusLabel = cell.detailTextLabel!
+            cell.accessoryView = vpnStatusSwitch
+            currentVPNStatusLamp = cell.imageView!
+            cell.selectionStyle = .none
+            return cell
         case 1:
-            if indexPath.row == 0 {
-                //servers status section
-                let cell = tableView.dequeueReusableCell(withIdentifier: "status", for: indexPath)
-                cell.textLabel?.text = "Status"
-                currentVPNStatusLabel = cell.detailTextLabel!
-                cell.accessoryView = vpnStatusSwitch
-                currentVPNStatusLamp = cell.imageView!
-                cell.selectionStyle = .none
-                return cell
-            } else if indexPath.row <= vpnManagers.count {
-                //server list section
+            if indexPath.row < proxyConfigs.count {
                 let cell = tableView.dequeueReusableCell(withIdentifier: "list", for: indexPath)
-                let vpnManager = self.vpnManagers[indexPath.row - 1]
-                cell.detailTextLabel?.text = vpnManager.protocolConfiguration?.serverAddress
-                cell.textLabel?.text = (vpnManager.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration!["description"] as? String
-                if vpnManager.isEnabled {
+
+                cell.detailTextLabel?.text = proxyConfigs[indexPath.row].getValue(byItem: "server")
+                cell.textLabel?.text = proxyConfigs[indexPath.row].getValue(byItem: "description")
+                if indexPath.row == selectedServerIndex {
                     cell.imageView?.image = UIImage(named: "checkmark")
                 } else {
                     cell.imageView?.image = UIImage(named: "checkmark_empty")
@@ -297,7 +308,6 @@ class MainViewController: UITableViewController {
                 cell.textLabel?.text = "Add New Server..."
                 return cell
             }
-
         default:
             let cell = tableView.dequeueReusableCell(withIdentifier: "mainOption", for: indexPath)
             return cell
@@ -308,14 +318,16 @@ class MainViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 0 && indexPath.row == 2 {
             self.performSegue(withIdentifier: "rule", sender: nil)
-        } else if indexPath.section == 1 && indexPath.row > 0 {
-            if indexPath.row <= vpnManagers.count {
+        } else if indexPath.section == 1 {
+            if indexPath.row < proxyConfigs.count {
                 tableView.deselectRow(at: indexPath, animated: true)
-                let vpnManager = self.vpnManagers[indexPath.row - 1]
-                vpnManager.isEnabled = true
-                vpnManager.saveToPreferences { (error) -> Void in
-                    self.loadConfigurationFromSystem()
+                if let currentManager = currentVPNManager {
+                    SiteConfigController().save(withConfig: proxyConfigs[indexPath.row], intoManager: currentManager, completionHander: {
+                    })
                 }
+                self.selectedServerIndex = indexPath.row
+                SiteConfigController().setSelectedServerIndex(withValue: indexPath.row)
+                tableView.reloadData()
             } else {
                 addConfigure()
             }
@@ -324,10 +336,9 @@ class MainViewController: UITableViewController {
 
 
     override func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
-        if indexPath.row > 0 && indexPath.row <= vpnManagers.count {
-            willEditVPNManager = vpnManagers[indexPath.row - 1]
-            let showDelete = true
-            self.performSegue(withIdentifier: "configure", sender: showDelete)
+        if indexPath.row < proxyConfigs.count {
+            willEditServerIndex = indexPath.row
+            self.performSegue(withIdentifier: "configure", sender: nil)
         }
     }
 
@@ -366,54 +377,37 @@ class MainViewController: UITableViewController {
      }
      */
     func addConfigure() {
-        let manager = NETunnelProviderManager()
-        manager.loadFromPreferences {
-            print("loadFromPreferences \($0)")
-            let providerProtocol = NETunnelProviderProtocol()
-            providerProtocol.providerBundleIdentifier = kTunnelProviderBundle
-            providerProtocol.providerConfiguration = [String: AnyObject]()
-            manager.protocolConfiguration = providerProtocol
-
-            self.willEditVPNManager = manager
-            let showDelete = false
-            self.performSegue(withIdentifier: "configure", sender: showDelete)
-        }
+        willEditServerIndex = -1
+        self.performSegue(withIdentifier: "configure", sender: nil)
     }
 
-    func loadConfigurationFromSystem() {
-        NETunnelProviderManager.loadAllFromPreferences() { newManagers, error in
-            if error == nil {
-                guard let vpnManagers = newManagers else { return }
-                self.vpnManagers.removeAll()
-                for vpnManager in vpnManagers {
-                    if let providerProtocol = vpnManager.protocolConfiguration as? NETunnelProviderProtocol {
-                        if providerProtocol.providerBundleIdentifier == kTunnelProviderBundle {
-                            if vpnManager.isEnabled {
-                                self.currentVPNManager = vpnManager
-                            }
-                            self.vpnManagers.append(vpnManager)
-                        }
-                    }
-                }
-                self.vpnStatusSwitch.isEnabled = vpnManagers.count > 0
-                self.tableView.reloadData()
-                self.VPNStatusDidChange(nil)
-            } else {
-                print(error!)
+    func saveVPN(_ notification: NSNotification) {
+        if willEditServerIndex == -1 {
+            //add
+            if let newConfig = notification.userInfo?["proxyConfig"] as? ProxyConfig {
+                proxyConfigs.append(newConfig)
+                SiteConfigController().writeIntoSiteConfigFile(withConfigs: proxyConfigs)
+                tableView.reloadData()
             }
+        } else {
+            //save
+            SiteConfigController().writeIntoSiteConfigFile(withConfigs: proxyConfigs)
+            tableView.reloadData()
         }
     }
-
 
     func deleteEditingVPN() {
-        willEditVPNManager?.removeFromPreferences(completionHandler: { (error) in
-            if error == nil {
-                DispatchQueue.main.async {
-                    self.willEditVPNManager = nil
-                    self.loadConfigurationFromSystem()
-                }
-            }
-        })
+        let selectedServer = proxyConfigs[selectedServerIndex]
+        proxyConfigs.remove(at: willEditServerIndex)
+        if let newSelectedServerIndex = proxyConfigs.index(of: selectedServer) {
+            selectedServerIndex = newSelectedServerIndex
+            SiteConfigController().setSelectedServerIndex(withValue: selectedServerIndex)
+        } else {
+            selectedServerIndex = 0
+            SiteConfigController().setSelectedServerIndex(withValue: selectedServerIndex)
+        }
+        SiteConfigController().writeIntoSiteConfigFile(withConfigs: proxyConfigs)
+        tableView.reloadData()
     }
 
 
@@ -425,9 +419,9 @@ class MainViewController: UITableViewController {
         // Pass the selected object to the new view controller.
         if segue.identifier == "configure" {
             let destination = segue.destination as! ConfigureViewController
-            destination.vpnManager = willEditVPNManager
-            let showDelete = sender as! Bool
-            destination.showDelete = showDelete
+            if willEditServerIndex != -1 {
+                destination.proxyConfig = proxyConfigs[willEditServerIndex]
+            }
         }
     }
 }

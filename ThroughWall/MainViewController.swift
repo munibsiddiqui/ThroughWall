@@ -24,11 +24,11 @@ class MainViewController: UITableViewController {
     var vpnStatusSwitch = UISwitch()
 //    var blockADSwitch = UISwitch()
 //    var globalModeSwitch = UISwitch()
-
-
+    
     var proxyConfigs = [ProxyConfig]()
     var selectedServerIndex = 0
     var willEditServerIndex = -1
+    var icmpPing: ICMPPing?
 
     var currentVPNStatusIndicator: NEVPNStatus = .invalid {
         willSet {
@@ -84,6 +84,12 @@ class MainViewController: UITableViewController {
 //        globalModeSwitch.addTarget(self, action: #selector(MainViewController.globalModeSwitchDidChange(_:)), for: .valueChanged)
         tableView.tableFooterView = UIView()
         tableView.backgroundColor = UIColor.groupTableViewBackground
+        tableView.refreshControl = UIRefreshControl()
+        tableView.refreshControl?.attributedTitle = NSAttributedString(string: "Pull to ping servers")
+        tableView.refreshControl?.addTarget(self, action: #selector(refresh(sender:)), for: UIControlEvents.valueChanged)
+//        tableView.addSubview(refreshControl) // not required when using UITableViewController
+        
+        
         RuleFileUpdateController().tryUpdateRuleFileFromBundleFile()
 //        readSettings()
 
@@ -101,6 +107,19 @@ class MainViewController: UITableViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(saveVPN(_:)), name: NSNotification.Name(rawValue: kSaveVPN), object: nil)
     }
 
+    
+    func refresh(sender:AnyObject) {
+        // Code to refresh table view
+        icmpPing = ICMPPing(withHostName: "www.apple.com", intervalTime: 1, repeatTimes: 5)
+        icmpPing?.start { (delay) in
+            
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            self.tableView.refreshControl?.endRefreshing()
+        }
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationItem.title = "VPN"
@@ -123,38 +142,6 @@ class MainViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
 
-
-//    func blockADSwitchValueDidChange(_ sender: UISwitch) {
-//        let defaults = UserDefaults.init(suiteName: groupName)
-//        defaults?.set(sender.isOn, forKey: blockADSetting)
-//        defaults?.synchronize()
-//    }
-//
-//    func globalModeSwitchDidChange(_ sender: UISwitch) {
-//        let defaults = UserDefaults.init(suiteName: groupName)
-//        defaults?.set(sender.isOn, forKey: globalModeSetting)
-//        defaults?.synchronize()
-//    }
-//
-//    func readSettings() {
-//        let defaults = UserDefaults.init(suiteName: groupName)
-//        var blockAD = false
-//        var globalMode = false
-//
-//        if let block = defaults?.value(forKey: blockADSetting) as? Bool {
-//            blockAD = block
-//        }
-//
-//        if let global = defaults?.value(forKey: globalModeSetting) as? Bool {
-//            globalMode = global
-//        }
-//
-//
-//        DispatchQueue.main.async {
-//            self.blockADSwitch.isOn = blockAD
-//            self.globalModeSwitch.isOn = globalMode
-//        }
-//    }
 
     func vpnStatusSwitchValueDidChange(_ sender: UISwitch) {
         let on = sender.isOn

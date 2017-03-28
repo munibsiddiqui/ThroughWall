@@ -26,7 +26,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         // Add code here to start the process of connecting the tunnel.
         Fabric.with([Crashlytics.self])
         
-        DDLog.add(DDASLLogger.sharedInstance()) // ASL = Apple System Logs
+        DDLog.add(DDASLLogger.sharedInstance) // ASL = Apple System Logs
         
         let fileManager = FileManager.default
         var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName)!

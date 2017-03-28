@@ -47,6 +47,7 @@
 		34765C921E10EB240055C294 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C7E1E10D8810055C294 /* Common.swift */; };
 		34765C931E10EB270055C294 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C7E1E10D8810055C294 /* Common.swift */; };
 		34765C951E1116780055C294 /* RequestListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C941E1116780055C294 /* RequestListTableViewController.swift */; };
+		348AC2451E8A9C910072AB1B /* SimplePing.m in Sources */ = {isa = PBXBuildFile; fileRef = 348AC2441E8A9C910072AB1B /* SimplePing.m */; };
 		348E850A1E10CCAB00E55F64 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3474EC7E1DDC926C00EBF3C5 /* Main.storyboard */; };
 		349C99421DFA540A0079502B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3474EC841DDC926C00EBF3C5 /* Assets.xcassets */; };
 		34A26A6B1E13447400A8CC93 /* HistoryOptionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A26A6A1E13447400A8CC93 /* HistoryOptionTableViewController.swift */; };
@@ -312,6 +313,9 @@
 		34765C861E10D8810055C294 /* SelectInputViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectInputViewController.swift; sourceTree = "<group>"; };
 		34765C871E10D8810055C294 /* SelectionFieldCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectionFieldCell.swift; sourceTree = "<group>"; };
 		34765C941E1116780055C294 /* RequestListTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestListTableViewController.swift; sourceTree = "<group>"; };
+		348AC2431E8A9C910072AB1B /* ThroughWall-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ThroughWall-Bridging-Header.h"; sourceTree = "<group>"; };
+		348AC2441E8A9C910072AB1B /* SimplePing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimplePing.m; sourceTree = "<group>"; };
+		348AC2461E8A9CBF0072AB1B /* SimplePing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimplePing.h; sourceTree = "<group>"; };
 		34A26A6A1E13447400A8CC93 /* HistoryOptionTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryOptionTableViewController.swift; sourceTree = "<group>"; };
 		34C7D5721E25C9300052CE78 /* ArchivedTrafficCountTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArchivedTrafficCountTableViewController.swift; sourceTree = "<group>"; };
 		34CC5B211DDC9B790061AA44 /* BLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLog.h; sourceTree = "<group>"; };
@@ -1058,9 +1062,8 @@
 			isa = PBXGroup;
 			children = (
 				3474EC991DDC928400EBF3C5 /* Info.plist */,
+				348AC2421E8A9C420072AB1B /* tool */,
 				34CC5FE81DDCA6450061AA44 /* TWPacketTunnelProvider-Bridging-Header.h */,
-				34CC5FEB1DDCA65F0061AA44 /* dns.h */,
-				34CC5FEC1DDCA65F0061AA44 /* dns.m */,
 				3474EC961DDC928400EBF3C5 /* TWPacketTunnelProvider.entitlements */,
 			);
 			name = "Supporting Files";
@@ -1118,6 +1121,24 @@
 			path = TunnelLib;
 			sourceTree = "<group>";
 		};
+		348AC2421E8A9C420072AB1B /* tool */ = {
+			isa = PBXGroup;
+			children = (
+				34CC5FEB1DDCA65F0061AA44 /* dns.h */,
+				34CC5FEC1DDCA65F0061AA44 /* dns.m */,
+			);
+			name = tool;
+			sourceTree = "<group>";
+		};
+		348AC2471E8A9CC70072AB1B /* tool */ = {
+			isa = PBXGroup;
+			children = (
+				348AC2461E8A9CBF0072AB1B /* SimplePing.h */,
+				348AC2441E8A9C910072AB1B /* SimplePing.m */,
+			);
+			name = tool;
+			sourceTree = "<group>";
+		};
 		348CFFC91DEBF36400A2720E /* SupportingFiles */ = {
 			isa = PBXGroup;
 			children = (
@@ -1127,6 +1148,8 @@
 				3474EC841DDC926C00EBF3C5 /* Assets.xcassets */,
 				3474EC861DDC926C00EBF3C5 /* LaunchScreen.storyboard */,
 				3474EC891DDC926C00EBF3C5 /* Info.plist */,
+				348AC2431E8A9C910072AB1B /* ThroughWall-Bridging-Header.h */,
+				348AC2471E8A9CC70072AB1B /* tool */,
 			);
 			name = SupportingFiles;
 			sourceTree = "<group>";
@@ -2339,7 +2362,7 @@
 					3474EC761DDC926C00EBF3C5 = {
 						CreatedOnToolsVersion = 8.1;
 						DevelopmentTeam = JG7P2QYPN7;
-						LastSwiftMigration = 0810;
+						LastSwiftMigration = 0830;
 						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
@@ -2680,6 +2703,7 @@
 				34765C911E10D8810055C294 /* SelectionFieldCell.swift in Sources */,
 				34D2E4991E88EF31009A07A0 /* RuleListViewTableViewController.swift in Sources */,
 				34E3F1FC1E11428600FAD65C /* RequestDetailTableViewController.swift in Sources */,
+				348AC2451E8A9C910072AB1B /* SimplePing.m in Sources */,
 				34765C8F1E10D8810055C294 /* RuleViewController.swift in Sources */,
 				3433528D1DF943D100CF7281 /* CoreDataController.swift in Sources */,
 				345ECB871DF8F5C100F70ACC /* Rule.swift in Sources */,
@@ -3027,6 +3051,7 @@
 			baseConfigurationReference = 172477E3A4C2AE264451794D /* Pods-ThroughWall.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ThroughWall/ThroughWall.entitlements;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = JG7P2QYPN7;
@@ -3037,6 +3062,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "267affdb-31e9-42a0-9d5a-0e8f83627602";
 				PROVISIONING_PROFILE_SPECIFIER = Dev.ThroughWall;
+				SWIFT_OBJC_BRIDGING_HEADER = "ThroughWall/ThroughWall-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -3046,6 +3073,7 @@
 			baseConfigurationReference = C34FE648E3E3D603A18C27BD /* Pods-ThroughWall.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ThroughWall/ThroughWall.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				DEVELOPMENT_TEAM = JG7P2QYPN7;
@@ -3056,6 +3084,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "2db2c172-fa12-4204-b4e5-4fc043860216";
 				PROVISIONING_PROFILE_SPECIFIER = "XC iOS: Bingo.ThroughWall";
+				SWIFT_OBJC_BRIDGING_HEADER = "ThroughWall/ThroughWall-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;

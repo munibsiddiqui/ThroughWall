@@ -13,26 +13,8 @@ let CustomizeOption = "Custom"
 
 class ConfigureViewController: UITableViewController {
 
-//    var vpnManager: NETunnelProviderManager!
     var showDelete = false
-    var descriptionCell = InputTextFieldCell()
-    var serverCell = InputTextFieldCell()
-    var portCell = InputTextFieldCell()
-    var passwordCell = InputTextFieldCell()
-
     var proxyConfig = ProxyConfig()
-
-    var configuration: [String: AnyObject] {
-        var conf = [String: AnyObject]()
-
-        let items = proxyConfig.containedItems
-
-        for item in items {
-            conf[item] = proxyConfig.getValue(byItem: item) as AnyObject?
-        }
-
-        return conf
-    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,8 +34,10 @@ class ConfigureViewController: UITableViewController {
 
         tableView.tableFooterView = UIView()
         tableView.backgroundColor = UIColor.groupTableViewBackground
-
-        NotificationCenter.default.addObserver(self, selector: #selector(ConfigureViewController.didExtractedQRCode(notification:)), name: NSNotification.Name(rawValue: kQRCodeExtracted), object: nil)
+    }
+    
+    deinit {
+        print("dafdsfaweg")
     }
 
     override func didReceiveMemoryWarning() {
@@ -61,11 +45,8 @@ class ConfigureViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
 
-    deinit {
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kQRCodeExtracted), object: nil)
-    }
-
     func didExtractedQRCode(notification: Notification) {
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kQRCodeExtracted), object: nil)
         if var ss = notification.userInfo?["string"] as? String {
             if let preRange = ss.range(of: "ss://") {
                 ss.removeSubrange(preRange)
@@ -90,8 +71,12 @@ class ConfigureViewController: UITableViewController {
                         if let range = method.range(of: "-auth") {
                             method.removeSubrange(range)
                         }
-
-                        proxyConfig.currentProxy = "CUSTOM"
+                        
+//                        withUnsafePointer(to: &proxyConfig, { (p) in
+//                            print("proxyconfig \(p)")
+//                        })
+                        
+//                        proxyConfig.currentProxy = "CUSTOM"
                         proxyConfig.setValue(byItem: "description", value: "\(host):\(port)")
                         proxyConfig.setValue(byItem: "server", value: host)
                         proxyConfig.setValue(byItem: "port", value: port)
@@ -206,6 +191,7 @@ class ConfigureViewController: UITableViewController {
 
             } else {
                 view.endEditing(true)
+                 NotificationCenter.default.addObserver(self, selector: #selector(ConfigureViewController.didExtractedQRCode(notification:)), name: NSNotification.Name(rawValue: kQRCodeExtracted), object: nil)
                 performSegue(withIdentifier: "scanQRCode", sender: nil)
             }
         }

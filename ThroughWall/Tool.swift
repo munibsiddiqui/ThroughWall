@@ -19,6 +19,10 @@ class ProxyConfig: NSObject {
         "SOCKS5": ["proxy", "description", "server", "port", "user", "password"]
     ]
 
+    private let hiddenItems = [
+        "CUSTOM": ["delay"],
+    ]
+
     private let defaults = [
         "CUSTOM": ["proxy": "CUSTOM", "method": "aes-256-cfb", "dns": "System Default"],
         "HTTP": ["proxy": "HTTP"],
@@ -75,6 +79,7 @@ class ProxyConfig: NSObject {
 
     private var _currentProxy = ""
     private var _containedItems = [String]()
+    private var _containedHiddenItems = [String]()
     private var _values = [String: String]()
     private var _availableOptions = [String: [String: [String]]]()
 
@@ -87,6 +92,9 @@ class ProxyConfig: NSObject {
                 _currentProxy = newValue
                 if let items = items[currentProxy] {
                     _containedItems = items
+                }
+                if let items = hiddenItems[currentProxy] {
+                    _containedHiddenItems = items
                 }
                 if let defaults = defaults[currentProxy] {
                     _values = defaults
@@ -103,6 +111,10 @@ class ProxyConfig: NSObject {
 
     var containedItems: [String] {
         return _containedItems
+    }
+
+    var containedHiddenItems: [String] {
+        return _containedHiddenItems
     }
 
     func setValue(byItem item: String, value: String) {
@@ -252,7 +264,6 @@ class SiteConfigController {
             self.writeIntoSiteConfigFile(withConfigs: proxyConfigs)
             print("save config file")
         }
-
     }
 
     private func deleteOldServer(fromVPNManagers managers: [NETunnelProviderManager]) -> NETunnelProviderManager? {
@@ -319,13 +330,22 @@ class SiteConfigController {
 
             for config in configs {
 
-                let items = config.containedItems
+                var items = config.containedItems
                 //the first item should be proxy !!!
                 for item in items {
                     if let value = config.getValue(byItem: item) {
                         filehandle.write("\(item):\(value)\n".data(using: String.Encoding.utf8)!)
                     }
                 }
+
+                items = config.containedHiddenItems
+                for item in items {
+                    if let value = config.getValue(byItem: item) {
+                        filehandle.write("\(item):\(value)\n".data(using: String.Encoding.utf8)!)
+                    }
+                }
+
+
                 filehandle.write("#\n".data(using: String.Encoding.utf8)!)
             }
 
@@ -450,7 +470,7 @@ class SiteConfigController {
                             option = temp[1]
                         }
 
-                        if config.containedItems.contains(name) {
+                        if config.containedItems.contains(name) || config.containedHiddenItems.contains(name) {
                             config.setValue(byItem: name, value: option)
                         }
                     }
@@ -491,6 +511,8 @@ class ICMPPing: NSObject, SimplePingDelegate {
     private var pinger: SimplePing?
     private var sendTimer: Timer?
     private var pendingComplete: ((Int) -> Void)?
+    private var sendTimestamps = [Int: Date]()
+    private var delayTimes = [Int]()
 
     init(withHostName name: String, intervalTime interval: Int, repeatTimes rTimes: Int) {
         hostName = name
@@ -517,11 +539,23 @@ class ICMPPing: NSObject, SimplePingDelegate {
         if repeatTimes > 0 {
             pinger!.send(with: nil)
             repeatTimes = repeatTimes - 1
-        }else{
-            sendTimer?.invalidate()
-            //calculate
+        } else {
+            handleResult()
+        }
+    }
+
+    func handleResult() {
+        sendTimer?.invalidate()
+        let ave: Int
+        if delayTimes.count > 0 {
+            ave = delayTimes.reduce(0, +) / delayTimes.count
+        } else {
+            ave = -1
         }
 
+        if let complete = pendingComplete {
+            complete(ave)
+        }
     }
 
 
@@ -534,11 +568,19 @@ class ICMPPing: NSObject, SimplePingDelegate {
     }
 
     func simplePing(_ pinger: SimplePing, didSendPacket packet: Data, sequenceNumber: UInt16) {
-        print("#\(sequenceNumber) sent")
+        sendTimestamps[Int(sequenceNumber)] = Date()
+//        print("#\(sequenceNumber) sent")
     }
 
     func simplePing(_ pinger: SimplePing, didReceivePingResponsePacket packet: Data, sequenceNumber: UInt16) {
-        print("#\(sequenceNumber) received")
+        let receiveTimestamp = Date()
+        if let sendTimestamp = sendTimestamps[Int(sequenceNumber)] {
+            let deltaTime = receiveTimestamp.timeIntervalSince(sendTimestamp)
+//            print(deltaTime)
+            delayTimes.append(Int(deltaTime * 1000))
+        }
+
+//        print("#\(sequenceNumber) received")
     }
 
     func simplePing(_ pinger: SimplePing, didReceiveUnexpectedPacket packet: Data) {
@@ -547,10 +589,12 @@ class ICMPPing: NSObject, SimplePingDelegate {
 
     func simplePing(_ pinger: SimplePing, didFailWithError error: Error) {
         print(error)
+        handleResult()
     }
 
     func simplePing(_ pinger: SimplePing, didFailToSendPacket packet: Data, sequenceNumber: UInt16, error: Error) {
         print(error)
+        handleResult()
     }
 
 }

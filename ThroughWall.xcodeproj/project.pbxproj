@@ -41,7 +41,6 @@
 		34765C8C1E10D8810055C294 /* InputTextFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C821E10D8810055C294 /* InputTextFieldCell.swift */; };
 		34765C8D1E10D8810055C294 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C831E10D8810055C294 /* MainViewController.swift */; };
 		34765C8E1E10D8810055C294 /* RuleImportMethodTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C841E10D8810055C294 /* RuleImportMethodTableViewController.swift */; };
-		34765C8F1E10D8810055C294 /* RuleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C851E10D8810055C294 /* RuleViewController.swift */; };
 		34765C901E10D8810055C294 /* SelectInputViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C861E10D8810055C294 /* SelectInputViewController.swift */; };
 		34765C911E10D8810055C294 /* SelectionFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C871E10D8810055C294 /* SelectionFieldCell.swift */; };
 		34765C921E10EB240055C294 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C7E1E10D8810055C294 /* Common.swift */; };
@@ -50,6 +49,7 @@
 		348AC2451E8A9C910072AB1B /* SimplePing.m in Sources */ = {isa = PBXBuildFile; fileRef = 348AC2441E8A9C910072AB1B /* SimplePing.m */; };
 		348E850A1E10CCAB00E55F64 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3474EC7E1DDC926C00EBF3C5 /* Main.storyboard */; };
 		349C99421DFA540A0079502B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3474EC841DDC926C00EBF3C5 /* Assets.xcassets */; };
+		34A17DD51E8CF6F6005BC19B /* RuleListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A17DD41E8CF6F6005BC19B /* RuleListTableViewController.swift */; };
 		34A26A6B1E13447400A8CC93 /* HistoryOptionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A26A6A1E13447400A8CC93 /* HistoryOptionTableViewController.swift */; };
 		34BD966C1DDD392E002442BF /* ShadowsocksLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3474ECBB1DDC950000EBF3C5 /* ShadowsocksLib.framework */; };
 		34BD966D1DDD3932002442BF /* TunnelLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3474ECCD1DDC951100EBF3C5 /* TunnelLib.framework */; };
@@ -206,7 +206,7 @@
 		34CC5FF31DDCA6750061AA44 /* HTTPAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34CC5FEF1DDCA6750061AA44 /* HTTPAnalyzer.swift */; };
 		34CC5FF61DDCA9200061AA44 /* libresolv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 34CC5E7C1DDCA0EA0061AA44 /* libresolv.tbd */; };
 		34D154611E24AC7F00546B57 /* ScanQRCodeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34D154601E24AC7F00546B57 /* ScanQRCodeViewController.swift */; };
-		34D2E4991E88EF31009A07A0 /* RuleListViewTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34D2E4981E88EF31009A07A0 /* RuleListViewTableViewController.swift */; };
+		34D2E4991E88EF31009A07A0 /* RuleMainViewTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34D2E4981E88EF31009A07A0 /* RuleMainViewTableViewController.swift */; };
 		34E3F1FC1E11428600FAD65C /* RequestDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34E3F1FB1E11428600FAD65C /* RequestDetailTableViewController.swift */; };
 		560A5FB41FCB850B8240A0EF /* Pods_TWPacketTunnelProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D54040D7632C1761B2803BD /* Pods_TWPacketTunnelProvider.framework */; };
 		6F35DA3314EA72D537C22254 /* Pods_TunnelLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C49EBEDDB2AF6AB02D6E3DEC /* Pods_TunnelLib.framework */; };
@@ -309,13 +309,13 @@
 		34765C821E10D8810055C294 /* InputTextFieldCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InputTextFieldCell.swift; sourceTree = "<group>"; };
 		34765C831E10D8810055C294 /* MainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		34765C841E10D8810055C294 /* RuleImportMethodTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleImportMethodTableViewController.swift; sourceTree = "<group>"; };
-		34765C851E10D8810055C294 /* RuleViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleViewController.swift; sourceTree = "<group>"; };
 		34765C861E10D8810055C294 /* SelectInputViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectInputViewController.swift; sourceTree = "<group>"; };
 		34765C871E10D8810055C294 /* SelectionFieldCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectionFieldCell.swift; sourceTree = "<group>"; };
 		34765C941E1116780055C294 /* RequestListTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestListTableViewController.swift; sourceTree = "<group>"; };
 		348AC2431E8A9C910072AB1B /* ThroughWall-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ThroughWall-Bridging-Header.h"; sourceTree = "<group>"; };
 		348AC2441E8A9C910072AB1B /* SimplePing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimplePing.m; sourceTree = "<group>"; };
 		348AC2461E8A9CBF0072AB1B /* SimplePing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimplePing.h; sourceTree = "<group>"; };
+		34A17DD41E8CF6F6005BC19B /* RuleListTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleListTableViewController.swift; sourceTree = "<group>"; };
 		34A26A6A1E13447400A8CC93 /* HistoryOptionTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryOptionTableViewController.swift; sourceTree = "<group>"; };
 		34C7D5721E25C9300052CE78 /* ArchivedTrafficCountTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArchivedTrafficCountTableViewController.swift; sourceTree = "<group>"; };
 		34CC5B211DDC9B790061AA44 /* BLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLog.h; sourceTree = "<group>"; };
@@ -907,7 +907,7 @@
 		34CC5FFD1DDCAE5F0061AA44 /* ThroughWall.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ThroughWall.entitlements; sourceTree = "<group>"; };
 		34CC5FFE1DDCAEF10061AA44 /* TodayEx.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TodayEx.entitlements; sourceTree = "<group>"; };
 		34D154601E24AC7F00546B57 /* ScanQRCodeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScanQRCodeViewController.swift; sourceTree = "<group>"; };
-		34D2E4981E88EF31009A07A0 /* RuleListViewTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleListViewTableViewController.swift; sourceTree = "<group>"; };
+		34D2E4981E88EF31009A07A0 /* RuleMainViewTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleMainViewTableViewController.swift; sourceTree = "<group>"; };
 		34E3F1FB1E11428600FAD65C /* RequestDetailTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestDetailTableViewController.swift; sourceTree = "<group>"; };
 		3CE3B4B0CF2F4A6FF2DF8953 /* Pods-TunnelLib.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TunnelLib.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TunnelLib/Pods-TunnelLib.debug.xcconfig"; sourceTree = "<group>"; };
 		541B6C2129C7CA6D95A9FB35 /* Pods_ThroughWall.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThroughWall.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1166,8 +1166,8 @@
 		349D235F1E8511E400381DE1 /* RuleSettings */ = {
 			isa = PBXGroup;
 			children = (
-				34765C851E10D8810055C294 /* RuleViewController.swift */,
-				34D2E4981E88EF31009A07A0 /* RuleListViewTableViewController.swift */,
+				34D2E4981E88EF31009A07A0 /* RuleMainViewTableViewController.swift */,
+				34A17DD41E8CF6F6005BC19B /* RuleListTableViewController.swift */,
 			);
 			name = RuleSettings;
 			sourceTree = "<group>";
@@ -2701,10 +2701,9 @@
 				34765C8A1E10D8810055C294 /* HelpViewController.swift in Sources */,
 				3452C3481E763D80008CCC4E /* Tool.swift in Sources */,
 				34765C911E10D8810055C294 /* SelectionFieldCell.swift in Sources */,
-				34D2E4991E88EF31009A07A0 /* RuleListViewTableViewController.swift in Sources */,
+				34D2E4991E88EF31009A07A0 /* RuleMainViewTableViewController.swift in Sources */,
 				34E3F1FC1E11428600FAD65C /* RequestDetailTableViewController.swift in Sources */,
 				348AC2451E8A9C910072AB1B /* SimplePing.m in Sources */,
-				34765C8F1E10D8810055C294 /* RuleViewController.swift in Sources */,
 				3433528D1DF943D100CF7281 /* CoreDataController.swift in Sources */,
 				345ECB871DF8F5C100F70ACC /* Rule.swift in Sources */,
 				3474EC7B1DDC926C00EBF3C5 /* AppDelegate.swift in Sources */,
@@ -2712,6 +2711,7 @@
 				34765C881E10D8810055C294 /* Common.swift in Sources */,
 				3474EC831DDC926C00EBF3C5 /* ThroughWall.xcdatamodeld in Sources */,
 				34765C891E10D8810055C294 /* ConfigureViewController.swift in Sources */,
+				34A17DD51E8CF6F6005BC19B /* RuleListTableViewController.swift in Sources */,
 				34765C8B1E10D8810055C294 /* HistoryFigureViewController.swift in Sources */,
 				34765C951E1116780055C294 /* RequestListTableViewController.swift in Sources */,
 				34765C8D1E10D8810055C294 /* MainViewController.swift in Sources */,

@@ -85,21 +85,21 @@ class RequestDetailTableViewController: UITableViewController {
             if indexPath.row == 0 {
                 cell.textLabel?.text = "Request Time"
                 if hostRequest.requestTime != nil{
-                    cell.detailTextLabel?.text = localFormatter.string(from: hostRequest.requestTime as! Date)
+                    cell.detailTextLabel?.text = localFormatter.string(from: hostRequest.requestTime! as Date)
                 }else{
                     cell.detailTextLabel?.text = ""
                 }
             }else if indexPath.row == 1{
                 cell.textLabel?.text = "Response Time"
                 if hostRequest.responseTime != nil {
-                    cell.detailTextLabel?.text = localFormatter.string(from: hostRequest.responseTime as! Date)
+                    cell.detailTextLabel?.text = localFormatter.string(from: hostRequest.responseTime! as Date)
                 }else{
                     cell.detailTextLabel?.text = ""
                 }
             }else{
                 cell.textLabel?.text = "Disconnect Time"
                 if hostRequest.disconnectTime != nil {
-                    cell.detailTextLabel?.text = localFormatter.string(from: hostRequest.disconnectTime as! Date)
+                    cell.detailTextLabel?.text = localFormatter.string(from: hostRequest.disconnectTime! as Date)
                 }else{
                     cell.detailTextLabel?.text = ""
                 }

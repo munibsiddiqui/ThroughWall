@@ -257,11 +257,12 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     
     func handleHTTPRequestHead(withRequest request: String) {
         var (host, port) = getHostAndPort(fromHostComponentOfRequest: request)
-        let (hostName, portNumber, repostRequest) = extractHostAndPortWithRepost(fromRequest: request)
+        let (hostName, replaced, portNumber, repostRequest) = extractHostAndPortWithRepost(fromRequest: request)
         
-        if host == nil {
+        if host == nil || replaced {
             host = hostName
         }
+        
         if port == nil {
             port = portNumber ?? 80
         }
@@ -357,21 +358,28 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         }
     }
     
-    func extractHostAndPortWithRepost(fromRequest request: String) -> (String?, UInt16?, String?) {
+    func extractHostAndPortWithRepost(fromRequest request: String) -> (String?, Bool, UInt16?, String?) {
         var requestComponents = request.components(separatedBy: "\r\n")
         var destiReqComponents = requestComponents[0].components(separatedBy: " ")
         var host = ""
         var port: UInt16?
         if destiReqComponents.count != 3 {
             DDLogError("H\(intTag)H extractHostAndPortWithRepost: \(ConnectionError.RequestHeaderAnalysisError)")
-            return (nil, nil, nil)
+            return (nil, false, nil, nil)
         }
         
         //destiReqComponents[1]: http://***/...
-        var destiComponents = destiReqComponents[1].components(separatedBy: "/")
+        let newDestiReqComponent = Rule.sharedInstance.tryRewriteURL(withURLString: destiReqComponents[1])
+        let replaced: Bool
+        if newDestiReqComponent == destiReqComponents[1] {
+            replaced = false
+        }else{
+            replaced = true
+        }
+        var destiComponents = newDestiReqComponent.components(separatedBy: "/")
         if destiComponents.count < 3{
             DDLogError("H\(intTag)H extractHostAndPortWithRepost: \(ConnectionError.URLComponentAnalysisError)")
-            return (nil, nil, nil)
+            return (nil, replaced, nil, nil)
         }
         
         if destiComponents[2].hasPrefix("[") {
@@ -387,7 +395,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
                 port = UInt16(_port)
             }else{
                 DDLogError("H\(intTag)H extractHostAndPortWithRepost: \(ConnectionError.IPV6AnalysisError)")
-                return (nil , nil, nil)
+                return (nil , replaced, nil, nil)
             }
         }else{
             //ipv4 address or domain
@@ -404,7 +412,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         destiReqComponents[1] = "/\(destiComponents.joined(separator: "/"))"
         requestComponents[0] = destiReqComponents.joined(separator: " ")
         let repostRequest = requestComponents.joined(separator: "\r\n")
-        return (host, port, repostRequest)
+        return (host, replaced, port, repostRequest)
     }
     
     

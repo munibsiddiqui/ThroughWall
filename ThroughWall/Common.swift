@@ -12,6 +12,9 @@ let kChoosenRuleImportMethod = "Bingo.ThroughWall.ChoosenRuleImportMethod"
 let kRuleImportMethodValue = "Bingo.ThroughWall.RuleImportMethodValue"
 let kTapLocationInRuleView = "Bingo.ThroughWall.TapLocationInRuleView"
 let kQRCodeExtracted = "Bingo.ThroughWall.QRCodeExtracted"
+let kNewRuleValueUpdate = "Bingo.ThroughWall.NewRuleValueUpdate"
+let kRuleSaved = "Bingo.ThroughWall.RuleSaved"
+let kRuleDeleted = "Bingo.ThroughWall.RuleDeleted"
 
 let configFileName = "rule.config"
 let kTunnelProviderBundle = "Bingo.ThroughWall.TWPacketTunnelProvider"
@@ -27,9 +30,10 @@ let databaseFileName = "Record.sqlite"
 
 let groupName = "group.Bingo.ThroughWall"
 let ruleFileName = "rule.conf"
+let rewriteFileName = "rew.conf"
 let siteFileName = "site.conf"
 let PacketTunnelProviderLogFolderName = "PacketTunnelProvider"
-let bundlefileVersion = 0
+let bundlefileVersion = 1
 let savedFileVersion = "Bingo.SavedFileVersion"
 let currentFileSource = "Bingo.FileSource"
 let defaultFileSource = "Bingo.FileSource.Default"

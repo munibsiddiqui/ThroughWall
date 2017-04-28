@@ -127,7 +127,7 @@ class RequestListTableViewController: UITableViewController {
             attributeDescription.append(NSAttributedString(string: " "))
         }
 
-        attributeDescription.append(NSAttributedString(string: localFormatter.string(from: hostTraffic.requestTime as! Date)))
+        attributeDescription.append(NSAttributedString(string: localFormatter.string(from: hostTraffic.requestTime! as Date)))
         
         return attributeDescription
     }

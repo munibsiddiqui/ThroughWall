@@ -214,7 +214,7 @@ class MainViewController: UITableViewController {
     func VPNStatusDidChange(_ notification: Notification?) {
         if let currentVPNManager = self.currentVPNManager {
             currentVPNStatusIndicator = currentVPNManager.connection.status
-        }else {
+        } else {
             print("!!!!!")
         }
     }
@@ -333,7 +333,7 @@ class MainViewController: UITableViewController {
                         alertController.addAction(okAction)
                         self.present(alertController, animated: true, completion: nil)
                         return
-                    }else {
+                    } else {
                         SiteConfigController().save(withConfig: proxyConfigs[indexPath.row], intoManager: currentManager, completionHander: {
                         })
                     }
@@ -393,7 +393,7 @@ class MainViewController: UITableViewController {
         willEditServerIndex = -1
         self.performSegue(withIdentifier: "configure", sender: nil)
     }
-    
+
     @IBAction func addConfigure(_ sender: UIBarButtonItem) {
         addConfigure()
     }

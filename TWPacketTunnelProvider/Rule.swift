@@ -36,6 +36,7 @@ class Rule {
     private var suffixRules: [String: DomainRule]?
     private var containRules: [String: DomainRule]?
     private var ipRules: [String: DomainRule]?
+    private var rewriteRules: [[String]]?
     private var blockAD = false
     private var globalMode = false
 
@@ -71,6 +72,27 @@ class Rule {
         items.removeLast()
         return items
     }
+    
+    private func itemsInRewriteFile() -> [String] {
+        let fileManager = FileManager.default
+        guard var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName) else {
+            return []
+        }
+        url.appendPathComponent(rewriteFileName)
+        
+        var fileString = ""
+        do {
+            fileString = try String(contentsOf: url, encoding: String.Encoding.utf8)
+        } catch {
+            DDLogDebug("\(error)")
+            return []
+        }
+        
+        var items = fileString.components(separatedBy: "\n")
+        items.removeLast()
+        return items
+    }
+    
 
     private func translateToBinary(fromIP ip: String) -> String {
         var ipParts = ip.components(separatedBy: ".")
@@ -107,10 +129,21 @@ class Rule {
             let components = item.components(separatedBy: ",")
             result.append(components)
         }
-
         return result
     }
 
+    func getCurrentRewriteItems() -> [[String]] {
+        var result = [[String]]()
+        let items = itemsInRewriteFile()
+        
+        for item in items {
+            let components = item.components(separatedBy: " ")
+            if components.count >= 2 {
+                 result.append(components)
+            }
+        }
+        return result
+    }
 
     func analyzeRuleFile() {
 
@@ -120,7 +153,7 @@ class Rule {
         suffixRules = [String: DomainRule]()
         containRules = [String: DomainRule]()
         ipRules = [String: DomainRule]()
-
+        
         for item in items {
 //            DDLogVerbose(item)
             let components = item.components(separatedBy: ",")
@@ -143,6 +176,8 @@ class Rule {
                 }
             }
         }
+        
+        rewriteRules = getCurrentRewriteItems()
 
         let defaults = UserDefaults.init(suiteName: groupName)
 
@@ -244,4 +279,28 @@ class Rule {
         }
         return rule
     }
+    
+    
+    private func replace(_ url: String, byString bString: String, withPattern pattern: String) -> String {
+        let regex = try! NSRegularExpression(pattern: pattern, options: NSRegularExpression.Options(rawValue:0))
+        //    let matches = regex.matches(in: url, options: NSRegularExpression.MatchingOptions(rawValue:0), range: NSMakeRange(0, url.characters.count))
+        
+        let result = regex.stringByReplacingMatches(in: url, range: NSMakeRange(0, url.characters.count), withTemplate: bString)
+        
+        
+        return result
+    }
+    
+    func tryRewriteURL(withURLString urlString: String) -> String {
+        if let realRewriteRules = rewriteRules {
+            for rewrite in realRewriteRules {
+                let result = replace(urlString, byString: rewrite[1], withPattern: rewrite[0])
+                if result != urlString {
+                    return result
+                }
+            }
+        }
+        return urlString
+    }
+    
 }

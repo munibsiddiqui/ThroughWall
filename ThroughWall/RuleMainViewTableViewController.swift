@@ -30,6 +30,58 @@ class RuleFileUpdateController: NSObject {
         defaults?.synchronize()
     }
 
+
+    func readCurrentRuleFileContent() -> String {
+        //if default, return file in bundle. if custom, return file in downlaod position
+        var content = ""
+
+        if getCurrentFileSource() == defaultFileSource {
+            if let path = Bundle.main.path(forResource: "rule", ofType: "config") {
+                do {
+                    content = try String(contentsOfFile: path, encoding: String.Encoding.utf8)
+                } catch {
+                    print(error)
+                }
+            }
+        } else {
+            let customPath = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)[0] + "/" + configFileName
+            let fileManager = FileManager.default
+
+            if fileManager.fileExists(atPath: customPath) {
+                do {
+                    content = try String(contentsOfFile: customPath, encoding: String.Encoding.utf8)
+                } catch {
+                    print(error)
+                }
+            }
+        }
+        return content
+    }
+
+    func saveToCustomRuleFile(withContent content: String) {
+        let customPath = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)[0] + "/" + configFileName
+        let fileManager = FileManager.default
+
+        fileManager.createFile(atPath: customPath, contents: nil, attributes: nil)
+
+        do {
+            let filehandle = try FileHandle(forWritingTo: URL(fileURLWithPath: customPath))
+            filehandle.write(content.data(using: String.Encoding.utf8)!)
+            filehandle.synchronizeFile()
+            filehandle.closeFile()
+        } catch {
+            print(error)
+            return
+        }
+
+        saveToRuleFile(withContent: content)
+
+        let defaults = UserDefaults.init(suiteName: groupName)
+        defaults?.set(userImportFileSource, forKey: currentFileSource)
+        defaults?.synchronize()
+
+    }
+
     private func getCurrentFileSource() -> String {
         let defaults = UserDefaults(suiteName: groupName)
         var source = ""
@@ -63,21 +115,24 @@ class RuleFileUpdateController: NSObject {
             saveToRuleFile(fromURLString: path)
             let defaults = UserDefaults.init(suiteName: groupName)
             defaults?.set(bundlefileVersion, forKey: savedFileVersion)
+            defaults?.set(defaultFileSource, forKey: currentFileSource)
             defaults?.synchronize()
         }
     }
 
     private func saveToRuleFile(fromURLString urlString: String) {
-        let fileManager = FileManager.default
-        var fileString = ""
-
         do {
-            fileString = try String(contentsOfFile: urlString, encoding: String.Encoding.utf8)
+            let fileString = try String(contentsOfFile: urlString, encoding: String.Encoding.utf8)
+            saveToRuleFile(withContent: fileString)
         } catch {
-            return
+            NSLog("\(error))")
         }
+    }
 
-        let classifications = fileString.components(separatedBy: "[")
+    private func saveToRuleFile(withContent content: String) {
+        let fileManager = FileManager.default
+
+        let classifications = content.components(separatedBy: "[")
 
         for classification in classifications {
 
@@ -120,7 +175,28 @@ class RuleFileUpdateController: NSObject {
                             filehandle.write("\(item)\n".data(using: String.Encoding.utf8)!)
                         }
                         filehandle.synchronizeFile()
+                        filehandle.closeFile()
+                    } catch {
+                        print(error)
+                        return
+                    }
+                } else if name == "URL Rewrite" {
+                    //store rule into file
+                    guard var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName) else {
+                        return
+                    }
+                    url.appendPathComponent(rewriteFileName)
 
+                    fileManager.createFile(atPath: url.path, contents: nil, attributes: nil)
+
+                    do {
+                        let filehandle = try FileHandle(forWritingTo: url)
+                        for item in items {
+                            filehandle.seekToEndOfFile()
+                            filehandle.write("\(item)\n".data(using: String.Encoding.utf8)!)
+                        }
+                        filehandle.synchronizeFile()
+                        filehandle.closeFile()
                     } catch {
                         print(error)
                         return
@@ -129,6 +205,7 @@ class RuleFileUpdateController: NSObject {
             }
         }
     }
+
 }
 
 class RuleMainViewTableViewController: UITableViewController, URLSessionDownloadDelegate {
@@ -145,10 +222,10 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
-        
+
         tableView.tableFooterView = UIView()
         tableView.backgroundColor = UIColor.groupTableViewBackground
-        
+
         readSettings()
         globalModeSwitch.addTarget(self, action: #selector(globalModeSwitchDidChange(_:)), for: .valueChanged)
 
@@ -212,15 +289,15 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
             return nil
         }
     }
-    
+
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if let _ = self.tableView(tableView, titleForHeaderInSection: section) {
             return 60
         }
         return 40
     }
-    
-    
+
+
 //    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
 //        if section == 0 {
 //            return 60
@@ -228,7 +305,7 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
 //            return 0
 //        }
 //    }
-//    
+//
 //    override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
 //        if section == 0 {
 //            let view = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: 38))
@@ -240,7 +317,7 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
 //            return view
 //        }
 //    }
-    
+
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if let header = self.tableView(tableView, titleForHeaderInSection: section) {
             //global mode section
@@ -258,7 +335,7 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
             return view
         }
     }
-    
+
 
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -271,7 +348,7 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
                 cell.textLabel?.text = "Global mode"
                 cell.accessoryView = globalModeSwitch
             case 1:
-                cell.textLabel?.text = "Test rule"
+                cell.textLabel?.text = "Test Rule"
                 cell.accessoryType = .disclosureIndicator
             default:
                 break
@@ -294,10 +371,10 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
             let cell = tableView.dequeueReusableCell(withIdentifier: "actionCell", for: indexPath)
             switch indexPath.row {
             case 0:
-                cell.textLabel?.text = "As list"
+                cell.textLabel?.text = "As List"
                 cell.accessoryType = .disclosureIndicator
             case 1:
-                cell.textLabel?.text = "As raw TXT"
+                cell.textLabel?.text = "As Raw TXT"
                 cell.accessoryType = .disclosureIndicator
             default:
                 break
@@ -310,14 +387,14 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         return cell
     }
 
-    
+
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
         switch indexPath.section {
         case 0:
             switch indexPath.row {
             case 1:
-                print("222")
+                performSegue(withIdentifier: "showTestRule", sender: nil)
             default:
                 break
             }
@@ -336,6 +413,12 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
             switch indexPath.row {
             case 0:
                 performSegue(withIdentifier: "showRuleList", sender: nil)
+            case 1:
+                let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                let vc = storyboard.instantiateViewController(withIdentifier: "rawRuleTXTView") as! RawRuleTXTViewController
+                
+                self.navigationController?.pushViewController(vc, animated: true)
+//                performSegue(withIdentifier: "showRawTXT", sender: nil)
             default:
                 break
             }
@@ -350,7 +433,7 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         //        let alertController = UIAlertController(title: "Input URL", message: nil, preferredStyle: .alert)
         let listController = UIAlertController(title: "Files in Document", message: nil, preferredStyle: .actionSheet)
         let fileURLs = listConfigFilesInDocument()
-        let ruleFileNames = fileURLs.map{ $0.deletingPathExtension().lastPathComponent }
+        let ruleFileNames = fileURLs.map { $0.deletingPathExtension().lastPathComponent }
         for (index, ruleFileName) in ruleFileNames.enumerated() {
             let fileItem = UIAlertAction(title: ruleFileName, style: .default, handler: { (_) in
                 RuleFileUpdateController().updateRuleFileFromImportedFile(fileURLs[index].path)
@@ -361,25 +444,25 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
             })
             listController.addAction(fileItem)
         }
-        
+
         let cancelItem = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         listController.addAction(cancelItem)
         present(listController, animated: true, completion: nil)
     }
-    
+
     func listConfigFilesInDocument() -> [URL] {
         // Get the document directory url
-        let documentsUrl =  FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        
+        let documentsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+
         do {
             // Get the directory contents urls (including subfolders urls)
             let directoryContents = try FileManager.default.contentsOfDirectory(at: documentsUrl, includingPropertiesForKeys: nil, options: [])
             print(directoryContents)
-            
+
             // if you want to filter the directory contents you can do like this:
-            let ruleFiles = directoryContents.filter{ $0.pathExtension == "config" }
-            print("rule urls:",ruleFiles)
-            let ruleFileNames = ruleFiles.map{ $0.deletingPathExtension().lastPathComponent }
+            let ruleFiles = directoryContents.filter { $0.pathExtension == "config" }
+            print("rule urls:", ruleFiles)
+            let ruleFileNames = ruleFiles.map { $0.deletingPathExtension().lastPathComponent }
             print("rule list:", ruleFileNames)
             return ruleFiles
         } catch let error as NSError {
@@ -388,29 +471,29 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         return []
     }
 
-    
+
     func useDefaultRule() {
         let alertController = UIAlertController(title: "Using Default Rule?", message: "This will overwrite current rule", preferredStyle: .alert)
         let deleteAction = UIAlertAction(title: "Yes", style: .destructive, handler: { (_) in
             RuleFileUpdateController().forceUpdateRuleFileFromBundleFile()
         })
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-        
+
         alertController.addAction(cancelAction)
         alertController.addAction(deleteAction)
-        
+
         self.present(alertController, animated: true, completion: nil)
-        
+
     }
-    
-    
+
+
     func popTextFieldForURLInput() {
         let alertController = UIAlertController(title: "Input URL", message: nil, preferredStyle: .alert)
         alertController.addTextField(configurationHandler: { (textFiled) in
             textFiled.placeholder = "URL"
             NotificationCenter.default.addObserver(self, selector: #selector(RuleMainViewTableViewController.alertTextFieldDidChange(notification:)), name: NSNotification.Name.UITextFieldTextDidChange, object: textFiled)
         })
-        
+
         let okAction = UIAlertAction(title: "Done", style: .default, handler: { (_) in
             if let url = alertController.textFields?.first?.text {
                 self.downloadRuleFrom(url)
@@ -418,13 +501,13 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         })
         okAction.isEnabled = false
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-        
+
         alertController.addAction(cancelAction)
         alertController.addAction(okAction)
-        
+
         self.present(alertController, animated: true, completion: nil)
     }
-    
+
     func alertTextFieldDidChange(notification: NSNotification) {
         if let alertContorller = self.presentedViewController as? UIAlertController {
             guard let url = alertContorller.textFields?.first?.text else {
@@ -436,8 +519,8 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
             okAction.isEnabled = url.lengthOfBytes(using: String.Encoding.utf8) > 0
         }
     }
-    
-    
+
+
     func downloadRuleFrom(_ url: String) {
         //Download
         if let confURL = URL(string: url) {
@@ -448,7 +531,7 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
 //                self.downloadProgress.text = "0 %"
 //                self.downloadProgress.isHidden = false
             }
-            
+
             downloadTask.resume()
         }
     }
@@ -457,16 +540,16 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         let fileManager = FileManager.default
         fileManager.createFile(atPath: downloadFilePath, contents: content.data(using: String.Encoding.utf8), attributes: nil)
     }
-    
-    
+
+
     // MARK: - URLSessionDownloadDelegate
-    
+
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-        do{
-            let content =  try String(contentsOf: location, encoding: String.Encoding.utf8)
+        do {
+            let content = try String(contentsOf: location, encoding: String.Encoding.utf8)
             saveToConfigFile(content)
             RuleFileUpdateController().updateRuleFileFromImportedFile(downloadFilePath)
-        }catch{
+        } catch {
             print(error)
         }
         DispatchQueue.main.async {
@@ -480,24 +563,24 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
 //            })
         }
     }
-    
+
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
-        
+
         if totalBytesExpectedToWrite == NSURLSessionTransferSizeUnknown {
             DispatchQueue.main.async {
 //                self.downloadProgress.isHidden = true
 //                self.downloadIndicator.stopAnimating()
-                
+
             }
-        }else{
+        } else {
 //            let percent = Int(totalBytesWritten * 100 / totalBytesExpectedToWrite)
             DispatchQueue.main.async {
 //                self.downloadProgress.text = "\(percent) %"
             }
         }
     }
-    
-    
+
+
     /*
     // MARK: - Navigation
 

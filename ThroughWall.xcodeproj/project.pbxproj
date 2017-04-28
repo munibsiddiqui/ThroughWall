@@ -15,6 +15,7 @@
 		3433528E1DF943D500CF7281 /* CoreDataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3433528C1DF943D100CF7281 /* CoreDataController.swift */; };
 		3439FA061DEEB7A000F8CE59 /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3439FA051DEEB7A000F8CE59 /* Rule.swift */; };
 		3444AB861DF164B600FD3B9F /* Socks2HTTPS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3444AB851DF164B600FD3B9F /* Socks2HTTPS.swift */; };
+		3445FB091E8D5F82001504E9 /* RuleDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3445FB081E8D5F82001504E9 /* RuleDetailTableViewController.swift */; };
 		3452C3481E763D80008CCC4E /* Tool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3452C3471E763D80008CCC4E /* Tool.swift */; };
 		345ECB861DF8F48800F70ACC /* rule.config in Resources */ = {isa = PBXBuildFile; fileRef = 345ECB851DF8F48800F70ACC /* rule.config */; };
 		345ECB871DF8F5C100F70ACC /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3439FA051DEEB7A000F8CE59 /* Rule.swift */; };
@@ -36,7 +37,6 @@
 		3474ECD51DDC951100EBF3C5 /* TunnelLib.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3474ECCD1DDC951100EBF3C5 /* TunnelLib.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		34765C881E10D8810055C294 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C7E1E10D8810055C294 /* Common.swift */; };
 		34765C891E10D8810055C294 /* ConfigureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C7F1E10D8810055C294 /* ConfigureViewController.swift */; };
-		34765C8A1E10D8810055C294 /* HelpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C801E10D8810055C294 /* HelpViewController.swift */; };
 		34765C8B1E10D8810055C294 /* HistoryFigureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C811E10D8810055C294 /* HistoryFigureViewController.swift */; };
 		34765C8C1E10D8810055C294 /* InputTextFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C821E10D8810055C294 /* InputTextFieldCell.swift */; };
 		34765C8D1E10D8810055C294 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C831E10D8810055C294 /* MainViewController.swift */; };
@@ -46,8 +46,11 @@
 		34765C921E10EB240055C294 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C7E1E10D8810055C294 /* Common.swift */; };
 		34765C931E10EB270055C294 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C7E1E10D8810055C294 /* Common.swift */; };
 		34765C951E1116780055C294 /* RequestListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C941E1116780055C294 /* RequestListTableViewController.swift */; };
+		3482A2B11E9F0D9700A6B202 /* RuleProxySelectionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3482A2B01E9F0D9700A6B202 /* RuleProxySelectionTableViewController.swift */; };
 		348AC2451E8A9C910072AB1B /* SimplePing.m in Sources */ = {isa = PBXBuildFile; fileRef = 348AC2441E8A9C910072AB1B /* SimplePing.m */; };
 		348E850A1E10CCAB00E55F64 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3474EC7E1DDC926C00EBF3C5 /* Main.storyboard */; };
+		348F61971E8E4D0D00F6AF9A /* TestRuleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 348F61961E8E4D0D00F6AF9A /* TestRuleViewController.swift */; };
+		348F61991E8E540000F6AF9A /* RawRuleTXTViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 348F61981E8E540000F6AF9A /* RawRuleTXTViewController.swift */; };
 		349C99421DFA540A0079502B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3474EC841DDC926C00EBF3C5 /* Assets.xcassets */; };
 		34A17DD51E8CF6F6005BC19B /* RuleListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A17DD41E8CF6F6005BC19B /* RuleListTableViewController.swift */; };
 		34A26A6B1E13447400A8CC93 /* HistoryOptionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A26A6A1E13447400A8CC93 /* HistoryOptionTableViewController.swift */; };
@@ -278,6 +281,7 @@
 		3433528C1DF943D100CF7281 /* CoreDataController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataController.swift; sourceTree = "<group>"; };
 		3439FA051DEEB7A000F8CE59 /* Rule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Rule.swift; sourceTree = "<group>"; };
 		3444AB851DF164B600FD3B9F /* Socks2HTTPS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Socks2HTTPS.swift; sourceTree = "<group>"; };
+		3445FB081E8D5F82001504E9 /* RuleDetailTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleDetailTableViewController.swift; sourceTree = "<group>"; };
 		3452C3471E763D80008CCC4E /* Tool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tool.swift; sourceTree = "<group>"; };
 		345ECB851DF8F48800F70ACC /* rule.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = rule.config; sourceTree = "<group>"; };
 		3474EC771DDC926C00EBF3C5 /* ThroughWall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ThroughWall.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -304,7 +308,6 @@
 		3474ECD01DDC951100EBF3C5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		34765C7E1E10D8810055C294 /* Common.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
 		34765C7F1E10D8810055C294 /* ConfigureViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigureViewController.swift; sourceTree = "<group>"; };
-		34765C801E10D8810055C294 /* HelpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelpViewController.swift; sourceTree = "<group>"; };
 		34765C811E10D8810055C294 /* HistoryFigureViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryFigureViewController.swift; sourceTree = "<group>"; };
 		34765C821E10D8810055C294 /* InputTextFieldCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InputTextFieldCell.swift; sourceTree = "<group>"; };
 		34765C831E10D8810055C294 /* MainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
@@ -312,9 +315,12 @@
 		34765C861E10D8810055C294 /* SelectInputViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectInputViewController.swift; sourceTree = "<group>"; };
 		34765C871E10D8810055C294 /* SelectionFieldCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectionFieldCell.swift; sourceTree = "<group>"; };
 		34765C941E1116780055C294 /* RequestListTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestListTableViewController.swift; sourceTree = "<group>"; };
+		3482A2B01E9F0D9700A6B202 /* RuleProxySelectionTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleProxySelectionTableViewController.swift; sourceTree = "<group>"; };
 		348AC2431E8A9C910072AB1B /* ThroughWall-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ThroughWall-Bridging-Header.h"; sourceTree = "<group>"; };
 		348AC2441E8A9C910072AB1B /* SimplePing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimplePing.m; sourceTree = "<group>"; };
 		348AC2461E8A9CBF0072AB1B /* SimplePing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimplePing.h; sourceTree = "<group>"; };
+		348F61961E8E4D0D00F6AF9A /* TestRuleViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestRuleViewController.swift; sourceTree = "<group>"; };
+		348F61981E8E540000F6AF9A /* RawRuleTXTViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RawRuleTXTViewController.swift; sourceTree = "<group>"; };
 		34A17DD41E8CF6F6005BC19B /* RuleListTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleListTableViewController.swift; sourceTree = "<group>"; };
 		34A26A6A1E13447400A8CC93 /* HistoryOptionTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryOptionTableViewController.swift; sourceTree = "<group>"; };
 		34C7D5721E25C9300052CE78 /* ArchivedTrafficCountTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArchivedTrafficCountTableViewController.swift; sourceTree = "<group>"; };
@@ -1025,17 +1031,13 @@
 		3474EC791DDC926C00EBF3C5 /* ThroughWall */ = {
 			isa = PBXGroup;
 			children = (
-				349D235F1E8511E400381DE1 /* RuleSettings */,
+				349D235F1E8511E400381DE1 /* RuleConfig */,
 				349D235E1E84EF4200381DE1 /* ServerConfig */,
 				3452C3461E763D27008CCC4E /* MainView */,
-				34765C801E10D8810055C294 /* HelpViewController.swift */,
 				34765C811E10D8810055C294 /* HistoryFigureViewController.swift */,
 				34A26A6A1E13447400A8CC93 /* HistoryOptionTableViewController.swift */,
 				34C7D5721E25C9300052CE78 /* ArchivedTrafficCountTableViewController.swift */,
-				34765C821E10D8810055C294 /* InputTextFieldCell.swift */,
 				34765C841E10D8810055C294 /* RuleImportMethodTableViewController.swift */,
-				34765C861E10D8810055C294 /* SelectInputViewController.swift */,
-				34765C871E10D8810055C294 /* SelectionFieldCell.swift */,
 				34765C941E1116780055C294 /* RequestListTableViewController.swift */,
 				34E3F1FB1E11428600FAD65C /* RequestDetailTableViewController.swift */,
 				3474EC7E1DDC926C00EBF3C5 /* Main.storyboard */,
@@ -1159,17 +1161,24 @@
 			children = (
 				34D154601E24AC7F00546B57 /* ScanQRCodeViewController.swift */,
 				34765C7F1E10D8810055C294 /* ConfigureViewController.swift */,
+				34765C871E10D8810055C294 /* SelectionFieldCell.swift */,
+				34765C821E10D8810055C294 /* InputTextFieldCell.swift */,
+				34765C861E10D8810055C294 /* SelectInputViewController.swift */,
 			);
 			name = ServerConfig;
 			sourceTree = "<group>";
 		};
-		349D235F1E8511E400381DE1 /* RuleSettings */ = {
+		349D235F1E8511E400381DE1 /* RuleConfig */ = {
 			isa = PBXGroup;
 			children = (
 				34D2E4981E88EF31009A07A0 /* RuleMainViewTableViewController.swift */,
 				34A17DD41E8CF6F6005BC19B /* RuleListTableViewController.swift */,
+				3445FB081E8D5F82001504E9 /* RuleDetailTableViewController.swift */,
+				3482A2B01E9F0D9700A6B202 /* RuleProxySelectionTableViewController.swift */,
+				348F61961E8E4D0D00F6AF9A /* TestRuleViewController.swift */,
+				348F61981E8E540000F6AF9A /* RawRuleTXTViewController.swift */,
 			);
-			name = RuleSettings;
+			name = RuleConfig;
 			sourceTree = "<group>";
 		};
 		34CC5B1F1DDC9B790061AA44 /* tun2socks-iOS */ = {
@@ -2698,7 +2707,7 @@
 			files = (
 				34765C8E1E10D8810055C294 /* RuleImportMethodTableViewController.swift in Sources */,
 				34765C901E10D8810055C294 /* SelectInputViewController.swift in Sources */,
-				34765C8A1E10D8810055C294 /* HelpViewController.swift in Sources */,
+				3482A2B11E9F0D9700A6B202 /* RuleProxySelectionTableViewController.swift in Sources */,
 				3452C3481E763D80008CCC4E /* Tool.swift in Sources */,
 				34765C911E10D8810055C294 /* SelectionFieldCell.swift in Sources */,
 				34D2E4991E88EF31009A07A0 /* RuleMainViewTableViewController.swift in Sources */,
@@ -2708,13 +2717,16 @@
 				345ECB871DF8F5C100F70ACC /* Rule.swift in Sources */,
 				3474EC7B1DDC926C00EBF3C5 /* AppDelegate.swift in Sources */,
 				34765C8C1E10D8810055C294 /* InputTextFieldCell.swift in Sources */,
+				348F61971E8E4D0D00F6AF9A /* TestRuleViewController.swift in Sources */,
 				34765C881E10D8810055C294 /* Common.swift in Sources */,
 				3474EC831DDC926C00EBF3C5 /* ThroughWall.xcdatamodeld in Sources */,
 				34765C891E10D8810055C294 /* ConfigureViewController.swift in Sources */,
 				34A17DD51E8CF6F6005BC19B /* RuleListTableViewController.swift in Sources */,
 				34765C8B1E10D8810055C294 /* HistoryFigureViewController.swift in Sources */,
 				34765C951E1116780055C294 /* RequestListTableViewController.swift in Sources */,
+				348F61991E8E540000F6AF9A /* RawRuleTXTViewController.swift in Sources */,
 				34765C8D1E10D8810055C294 /* MainViewController.swift in Sources */,
+				3445FB091E8D5F82001504E9 /* RuleDetailTableViewController.swift in Sources */,
 				34C7D5731E25C9300052CE78 /* ArchivedTrafficCountTableViewController.swift in Sources */,
 				34A26A6B1E13447400A8CC93 /* HistoryOptionTableViewController.swift in Sources */,
 				34D154611E24AC7F00546B57 /* ScanQRCodeViewController.swift in Sources */,

@@ -264,7 +264,19 @@ class TodayViewController: UIViewController, NCWidgetProviding, UITableViewDeleg
         let cell = tableView.dequeueReusableCell(withIdentifier: "vpnListCell", for: indexPath) as! VPNTableViewContTableViewCell
         cell.VPNNameLabel.text = proxyConfigs[indexPath.row].getValue(byItem: "description")
         if let delayValue = proxyConfigs[indexPath.row].getValue(byItem: "delay") {
-            cell.VPNPingValueLabel.text = delayValue + " ms"
+            if let intDelayValue = Int(delayValue) {
+                switch intDelayValue {
+                case -1:
+                    cell.VPNPingValueLabel.attributedText = NSAttributedString(string: "Timeout", attributes: [NSForegroundColorAttributeName: UIColor.red])
+                case 0 ..< 100:
+                    cell.VPNPingValueLabel.attributedText = NSAttributedString(string: "\(delayValue) ms", attributes: [NSForegroundColorAttributeName: UIColor.init(red: 0.24, green: 0.545, blue: 0.153, alpha: 1.0)])
+                default:
+                    cell.VPNPingValueLabel.attributedText = NSAttributedString(string: "\(delayValue) ms", attributes: [NSForegroundColorAttributeName: UIColor.black])
+                }
+            } else {
+                cell.VPNPingValueLabel.text = ""
+            }
+//            cell.VPNPingValueLabel.text = delayValue + " ms"
         } else {
             cell.VPNPingValueLabel.text = "Unknown"
         }

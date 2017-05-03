@@ -217,7 +217,7 @@ class MainViewController: UITableViewController {
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 2
+        return 3
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -229,6 +229,8 @@ class MainViewController: UITableViewController {
         case 1:
             //server list section
             return proxyConfigs.count + 1
+        case 2:
+            return 1
         default:
             return 0
         }
@@ -252,6 +254,9 @@ class MainViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if let _ = self.tableView(tableView, titleForHeaderInSection: section) {
             return 60
+        }
+        if section == 2 {
+            return 0
         }
         return 40
     }
@@ -301,7 +306,7 @@ class MainViewController: UITableViewController {
                         case -1:
                             delayLabel.attributedText = NSAttributedString(string: "Timeout", attributes: [NSForegroundColorAttributeName: UIColor.red])
                         case 0 ..< 100:
-                            delayLabel.attributedText = NSAttributedString(string: "\(delayValue) ms", attributes: [NSForegroundColorAttributeName: UIColor.green])
+                            delayLabel.attributedText = NSAttributedString(string: "\(delayValue) ms", attributes: [NSForegroundColorAttributeName: UIColor.init(red: 0.24, green: 0.545, blue: 0.153, alpha: 1.0)])
                         default:
                             delayLabel.attributedText = NSAttributedString(string: "\(delayValue) ms", attributes: [NSForegroundColorAttributeName: UIColor.black])
                         }
@@ -328,6 +333,10 @@ class MainViewController: UITableViewController {
                 cell.textLabel?.text = "Add New Server..."
                 return cell
             }
+        case 2:
+            let cell = tableView.dequeueReusableCell(withIdentifier: "dragHintCell", for: indexPath)
+            cell.separatorInset = UIEdgeInsetsMake(0.0, 0.0, 0.0, cell.bounds.size.width)
+            return cell
         default:
             let cell = tableView.dequeueReusableCell(withIdentifier: "mainOption", for: indexPath)
             return cell

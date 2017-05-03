@@ -42,7 +42,7 @@ class TestRuleViewController: UIViewController, UITextFieldDelegate {
     func makeAttributeDescription(withProxyRule proxyRule: String) -> NSAttributedString {
         switch proxyRule.lowercased() {
         case "direct":
-            let attributeRule = NSAttributedString(string: proxyRule, attributes: [NSForegroundColorAttributeName: UIColor.green])
+            let attributeRule = NSAttributedString(string: proxyRule, attributes: [NSForegroundColorAttributeName: UIColor.init(red: 0.24, green: 0.545, blue: 0.153, alpha: 1.0)])
             return attributeRule
         case "proxy":
             let attributeRule = NSAttributedString(string: proxyRule, attributes: [NSForegroundColorAttributeName: UIColor.orange])

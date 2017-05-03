@@ -213,7 +213,7 @@ class RuleDetailTableViewController: UITableViewController, UITextFieldDelegate 
 
                 switch ruleItem[2].lowercased() {
                 case "direct":
-                    detailLabel.textColor = UIColor.green
+                    detailLabel.textColor = UIColor.init(red: 0.24, green: 0.545, blue: 0.153, alpha: 1.0)
                 case "proxy":
                     detailLabel.textColor = UIColor.orange
                 default:

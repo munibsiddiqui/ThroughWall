@@ -90,7 +90,7 @@ class RequestListTableViewController: UITableViewController {
         if let rule = hostTraffic.rule {
             switch rule {
             case "Direct":
-                let attributeRule = NSAttributedString(string: rule, attributes: [NSBackgroundColorAttributeName : UIColor.green])
+                let attributeRule = NSAttributedString(string: rule, attributes: [NSBackgroundColorAttributeName : UIColor.init(red: 0.24, green: 0.545, blue: 0.153, alpha: 1.0)])
                 attributeDescription.append(attributeRule)
                 attributeDescription.append(NSAttributedString(string: " "))
             case "Proxy":
@@ -107,7 +107,7 @@ class RequestListTableViewController: UITableViewController {
         if let requestHead = hostTraffic.requestHead {
             let requestType = requestHead.components(separatedBy: " ")[0]
             
-            let attributeRequestType = NSAttributedString(string: requestType, attributes: [NSForegroundColorAttributeName : UIColor.white, NSBackgroundColorAttributeName: UIColor.green])
+            let attributeRequestType = NSAttributedString(string: requestType, attributes: [NSForegroundColorAttributeName : UIColor.white, NSBackgroundColorAttributeName: UIColor.init(red: 0.24, green: 0.545, blue: 0.153, alpha: 1.0)])
             
             attributeDescription.append(attributeRequestType)
             attributeDescription.append(NSAttributedString(string: " "))

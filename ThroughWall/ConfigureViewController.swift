@@ -53,6 +53,7 @@ class ConfigureViewController: UITableViewController {
                 let removeRange = Range(uncheckedBounds: (lower: poundsignIndex, upper: ss.endIndex))
                 ss.removeSubrange(removeRange)
             }
+            ss = ss.padding(toLength: ((ss.characters.count+3)/4)*4,withPad: "=",startingAt: 0)
             let decodeData = Data.init(base64Encoded: ss)
             if let decodestring = String.init(data: decodeData ?? Data(), encoding: String.Encoding.utf8) {
                 let components = decodestring.components(separatedBy: ":")

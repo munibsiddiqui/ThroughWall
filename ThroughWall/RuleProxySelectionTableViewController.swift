@@ -76,7 +76,7 @@ class RuleProxySelectionTableViewController: UITableViewController {
 
         switch availableOptions[indexPath.row].lowercased() {
         case "direct":
-            cell.textLabel?.textColor = UIColor.green
+            cell.textLabel?.textColor = UIColor.init(red: 0.24, green: 0.545, blue: 0.153, alpha: 1.0)
         case "proxy":
             cell.textLabel?.textColor = UIColor.orange
         case "reject":

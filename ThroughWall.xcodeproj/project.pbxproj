@@ -19,6 +19,7 @@
 		3452C3481E763D80008CCC4E /* Tool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3452C3471E763D80008CCC4E /* Tool.swift */; };
 		345ECB861DF8F48800F70ACC /* rule.config in Resources */ = {isa = PBXBuildFile; fileRef = 345ECB851DF8F48800F70ACC /* rule.config */; };
 		345ECB871DF8F5C100F70ACC /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3439FA051DEEB7A000F8CE59 /* Rule.swift */; };
+		3469E9031EB9B9B20087DA38 /* VPNTableViewContTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3469E9021EB9B9B20087DA38 /* VPNTableViewContTableViewCell.swift */; };
 		3474EC7B1DDC926C00EBF3C5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3474EC7A1DDC926C00EBF3C5 /* AppDelegate.swift */; };
 		3474EC831DDC926C00EBF3C5 /* ThroughWall.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3474EC811DDC926C00EBF3C5 /* ThroughWall.xcdatamodeld */; };
 		3474EC851DDC926C00EBF3C5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3474EC841DDC926C00EBF3C5 /* Assets.xcassets */; };
@@ -211,6 +212,8 @@
 		34D154611E24AC7F00546B57 /* ScanQRCodeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34D154601E24AC7F00546B57 /* ScanQRCodeViewController.swift */; };
 		34D2E4991E88EF31009A07A0 /* RuleMainViewTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34D2E4981E88EF31009A07A0 /* RuleMainViewTableViewController.swift */; };
 		34E3F1FC1E11428600FAD65C /* RequestDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34E3F1FB1E11428600FAD65C /* RequestDetailTableViewController.swift */; };
+		34F0B8F01EB2DFED007A286B /* CommonTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34F0B8EF1EB2DFED007A286B /* CommonTool.swift */; };
+		34F0B8F11EB2DFED007A286B /* CommonTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34F0B8EF1EB2DFED007A286B /* CommonTool.swift */; };
 		560A5FB41FCB850B8240A0EF /* Pods_TWPacketTunnelProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D54040D7632C1761B2803BD /* Pods_TWPacketTunnelProvider.framework */; };
 		6F35DA3314EA72D537C22254 /* Pods_TunnelLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C49EBEDDB2AF6AB02D6E3DEC /* Pods_TunnelLib.framework */; };
 		8788255218AB66821DB5C29F /* Pods_TodayEx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6776F291F2979F3F8EA43E5 /* Pods_TodayEx.framework */; };
@@ -284,6 +287,7 @@
 		3445FB081E8D5F82001504E9 /* RuleDetailTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleDetailTableViewController.swift; sourceTree = "<group>"; };
 		3452C3471E763D80008CCC4E /* Tool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tool.swift; sourceTree = "<group>"; };
 		345ECB851DF8F48800F70ACC /* rule.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = rule.config; sourceTree = "<group>"; };
+		3469E9021EB9B9B20087DA38 /* VPNTableViewContTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VPNTableViewContTableViewCell.swift; sourceTree = "<group>"; };
 		3474EC771DDC926C00EBF3C5 /* ThroughWall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ThroughWall.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3474EC7A1DDC926C00EBF3C5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3474EC7F1DDC926C00EBF3C5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -915,6 +919,7 @@
 		34D154601E24AC7F00546B57 /* ScanQRCodeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScanQRCodeViewController.swift; sourceTree = "<group>"; };
 		34D2E4981E88EF31009A07A0 /* RuleMainViewTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleMainViewTableViewController.swift; sourceTree = "<group>"; };
 		34E3F1FB1E11428600FAD65C /* RequestDetailTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestDetailTableViewController.swift; sourceTree = "<group>"; };
+		34F0B8EF1EB2DFED007A286B /* CommonTool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommonTool.swift; sourceTree = "<group>"; };
 		3CE3B4B0CF2F4A6FF2DF8953 /* Pods-TunnelLib.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TunnelLib.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TunnelLib/Pods-TunnelLib.debug.xcconfig"; sourceTree = "<group>"; };
 		541B6C2129C7CA6D95A9FB35 /* Pods_ThroughWall.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThroughWall.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A7F08F73CD12752F1495C75 /* Pods-ShadowsocksLib.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ShadowsocksLib.release.xcconfig"; path = "Pods/Target Support Files/Pods-ShadowsocksLib/Pods-ShadowsocksLib.release.xcconfig"; sourceTree = "<group>"; };
@@ -1031,6 +1036,7 @@
 		3474EC791DDC926C00EBF3C5 /* ThroughWall */ = {
 			isa = PBXGroup;
 			children = (
+				34F0B8F21EB2DFFA007A286B /* Common */,
 				349D235F1E8511E400381DE1 /* RuleConfig */,
 				349D235E1E84EF4200381DE1 /* ServerConfig */,
 				3452C3461E763D27008CCC4E /* MainView */,
@@ -1041,7 +1047,6 @@
 				34765C941E1116780055C294 /* RequestListTableViewController.swift */,
 				34E3F1FB1E11428600FAD65C /* RequestDetailTableViewController.swift */,
 				3474EC7E1DDC926C00EBF3C5 /* Main.storyboard */,
-				34765C7E1E10D8810055C294 /* Common.swift */,
 				3433528B1DF943B700CF7281 /* Core Data */,
 				348CFFC91DEBF36400A2720E /* SupportingFiles */,
 			);
@@ -1093,6 +1098,7 @@
 			children = (
 				34CC5FFE1DDCAEF10061AA44 /* TodayEx.entitlements */,
 				3474ECAA1DDC92B900EBF3C5 /* TodayViewController.swift */,
+				3469E9021EB9B9B20087DA38 /* VPNTableViewContTableViewCell.swift */,
 				3474ECAC1DDC92B900EBF3C5 /* MainInterface.storyboard */,
 				3474ECAF1DDC92B900EBF3C5 /* Info.plist */,
 			);
@@ -2210,6 +2216,15 @@
 			name = "HTTP(S) Proxy";
 			sourceTree = "<group>";
 		};
+		34F0B8F21EB2DFFA007A286B /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				34F0B8EF1EB2DFED007A286B /* CommonTool.swift */,
+				34765C7E1E10D8810055C294 /* Common.swift */,
+			);
+			name = Common;
+			sourceTree = "<group>";
+		};
 		A243929DFB680E8018E7CA92 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -2709,6 +2724,7 @@
 				34765C901E10D8810055C294 /* SelectInputViewController.swift in Sources */,
 				3482A2B11E9F0D9700A6B202 /* RuleProxySelectionTableViewController.swift in Sources */,
 				3452C3481E763D80008CCC4E /* Tool.swift in Sources */,
+				34F0B8F01EB2DFED007A286B /* CommonTool.swift in Sources */,
 				34765C911E10D8810055C294 /* SelectionFieldCell.swift in Sources */,
 				34D2E4991E88EF31009A07A0 /* RuleMainViewTableViewController.swift in Sources */,
 				34E3F1FC1E11428600FAD65C /* RequestDetailTableViewController.swift in Sources */,
@@ -2754,7 +2770,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3469E9031EB9B9B20087DA38 /* VPNTableViewContTableViewCell.swift in Sources */,
 				34765C931E10EB270055C294 /* Common.swift in Sources */,
+				34F0B8F11EB2DFED007A286B /* CommonTool.swift in Sources */,
 				3474ECAB1DDC92B900EBF3C5 /* TodayViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

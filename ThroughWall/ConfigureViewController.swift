@@ -9,8 +9,6 @@
 import UIKit
 import NetworkExtension
 
-let CustomizeOption = "Custom"
-
 class ConfigureViewController: UITableViewController {
 
     var showDelete = false

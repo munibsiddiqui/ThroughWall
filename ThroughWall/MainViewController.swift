@@ -22,8 +22,6 @@ class MainViewController: UITableViewController {
     var currentVPNStatusLabel = UILabel()
     var currentVPNStatusLamp = UIImageView()
     var vpnStatusSwitch = UISwitch()
-//    var blockADSwitch = UISwitch()
-//    var globalModeSwitch = UISwitch()
 
     var proxyConfigs = [ProxyConfig]()
     var selectedServerIndex = 0
@@ -38,15 +36,11 @@ class MainViewController: UITableViewController {
                 on = true
                 currentVPNStatusLabel.text = "Connecting..."
                 currentVPNStatusLamp.image = UIImage(named: "OrangeDot")
-//                blockADSwitch.isEnabled = false
-//                globalModeSwitch.isEnabled = false
                 break
             case .connected:
                 on = true
                 currentVPNStatusLabel.text = "Connected"
                 currentVPNStatusLamp.image = UIImage(named: "GreenDot")
-//                blockADSwitch.isEnabled = false
-//                globalModeSwitch.isEnabled = false
                 break
             case .disconnecting:
                 on = false
@@ -57,8 +51,6 @@ class MainViewController: UITableViewController {
                 on = false
                 currentVPNStatusLabel.text = "Not Connected"
                 currentVPNStatusLamp.image = UIImage(named: "GrayDot")
-//                blockADSwitch.isEnabled = true
-//                globalModeSwitch.isEnabled = true
                 break
             default:
                 on = false
@@ -119,7 +111,7 @@ class MainViewController: UITableViewController {
                     self.tableView.refreshControl?.attributedTitle = NSAttributedString(string: server)
                 }
                 icmpPing?.start { (delay) in
-                    self.proxyConfigs[index].setValue(byItem: "delay", value: "\(delay)ms")
+                    self.proxyConfigs[index].setValue(byItem: "delay", value: "\(delay)")
                     self.testServerDelay(withIndex: index + 1)
                 }
             }
@@ -165,7 +157,7 @@ class MainViewController: UITableViewController {
                     print(error)
                     sender.isOn = false
                 } else {
-                    if self.trigerVPNManager(withManager: manager, shouldON: sender.isOn) == false {
+                    if self.trigerVPNManager(withManager: manager, shouldON: on) == false {
                         sender.isOn = false
                     }
                 }
@@ -297,11 +289,35 @@ class MainViewController: UITableViewController {
             if indexPath.row < proxyConfigs.count {
                 let cell = tableView.dequeueReusableCell(withIdentifier: "list", for: indexPath)
 
-                cell.detailTextLabel?.text = (proxyConfigs[indexPath.row].getValue(byItem: "server") ?? "") + " " + (proxyConfigs[indexPath.row].getValue(byItem: "delay") ?? "")
-                cell.textLabel?.text = proxyConfigs[indexPath.row].getValue(byItem: "description")
+                let textLabel = cell.viewWithTag(1) as! UILabel
+                textLabel.text = proxyConfigs[indexPath.row].getValue(byItem: "description")
+                let detailTextLabel = cell.viewWithTag(2) as! UILabel
+                detailTextLabel.text = (proxyConfigs[indexPath.row].getValue(byItem: "server") ?? "")
+                let delayLabel = cell.viewWithTag(3) as! UILabel
+
+                if let delayValue = proxyConfigs[indexPath.row].getValue(byItem: "delay") {
+                    if let intDelayValue = Int(delayValue) {
+                        switch intDelayValue {
+                        case -1:
+                            delayLabel.attributedText = NSAttributedString(string: "Timeout", attributes: [NSForegroundColorAttributeName: UIColor.red])
+                        case 0 ..< 100:
+                            delayLabel.attributedText = NSAttributedString(string: "\(delayValue) ms", attributes: [NSForegroundColorAttributeName: UIColor.green])
+                        default:
+                            delayLabel.attributedText = NSAttributedString(string: "\(delayValue) ms", attributes: [NSForegroundColorAttributeName: UIColor.black])
+                        }
+                    } else {
+                        delayLabel.text = ""
+                    }
+
+                } else {
+                    delayLabel.attributedText = NSAttributedString(string: "? ms", attributes: [NSForegroundColorAttributeName: UIColor.orange])
+                }
+
+
                 if indexPath.row == selectedServerIndex {
                     cell.imageView?.image = UIImage(named: "GrayDot")
                     currentVPNStatusLamp = cell.imageView!
+                    self.navigationItem.title = textLabel.text
                 } else {
                     cell.imageView?.image = UIImage(named: "TSDot")
                 }
@@ -320,11 +336,12 @@ class MainViewController: UITableViewController {
 
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+
         if indexPath.section == 0 && indexPath.row == 2 {
             self.performSegue(withIdentifier: "rule", sender: nil)
         } else if indexPath.section == 1 {
             if indexPath.row < proxyConfigs.count {
-                tableView.deselectRow(at: indexPath, animated: true)
                 if let currentManager = currentVPNManager {
                     if currentManager.connection.status == .connected || currentManager.connection.status == .connecting {
                         //pop a alert
@@ -335,6 +352,9 @@ class MainViewController: UITableViewController {
                         return
                     } else {
                         SiteConfigController().save(withConfig: proxyConfigs[indexPath.row], intoManager: currentManager, completionHander: {
+                            DispatchQueue.main.async {
+                                self.navigationItem.title = (currentManager.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration!["description"] as? String
+                            }
                         })
                     }
                 }

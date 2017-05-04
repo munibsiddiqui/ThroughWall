@@ -13,6 +13,8 @@ class ConfigureViewController: UITableViewController {
 
     var showDelete = false
     var proxyConfig = ProxyConfig()
+    var inputFields = [UITextField]()
+    let numberToolbar: UIToolbar = UIToolbar()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,10 +32,18 @@ class ConfigureViewController: UITableViewController {
             showDelete = true
         }
 
+        numberToolbar.barStyle = UIBarStyle.default
+        numberToolbar.items=[
+            UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.flexibleSpace, target: self, action: nil),
+            UIBarButtonItem(title: "Next", style: UIBarButtonItemStyle.plain, target: self, action: #selector(ConfigureViewController.nextTextFieldAfterPortField))
+        ]
+        
+        numberToolbar.sizeToFit()
+        
         tableView.tableFooterView = UIView()
         tableView.backgroundColor = UIColor.groupTableViewBackground
     }
-    
+
     deinit {
         print("dafdsfaweg")
     }
@@ -41,6 +51,10 @@ class ConfigureViewController: UITableViewController {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    func nextTextFieldAfterPortField() {
+        inputFields[3].becomeFirstResponder()
     }
 
     func didExtractedQRCode(notification: Notification) {
@@ -53,7 +67,7 @@ class ConfigureViewController: UITableViewController {
                 let removeRange = Range(uncheckedBounds: (lower: poundsignIndex, upper: ss.endIndex))
                 ss.removeSubrange(removeRange)
             }
-            ss = ss.padding(toLength: ((ss.characters.count+3)/4)*4,withPad: "=",startingAt: 0)
+            ss = ss.padding(toLength: ((ss.characters.count + 3) / 4) * 4, withPad: "=", startingAt: 0)
             let decodeData = Data.init(base64Encoded: ss)
             if let decodestring = String.init(data: decodeData ?? Data(), encoding: String.Encoding.utf8) {
                 let components = decodestring.components(separatedBy: ":")
@@ -70,11 +84,11 @@ class ConfigureViewController: UITableViewController {
                         if let range = method.range(of: "-auth") {
                             method.removeSubrange(range)
                         }
-                        
+
 //                        withUnsafePointer(to: &proxyConfig, { (p) in
 //                            print("proxyconfig \(p)")
 //                        })
-                        
+
 //                        proxyConfig.currentProxy = "CUSTOM"
                         proxyConfig.setValue(byItem: "description", value: "\(host):\(port)")
                         proxyConfig.setValue(byItem: "server", value: host)
@@ -90,7 +104,7 @@ class ConfigureViewController: UITableViewController {
                 }
             }
         }
-        
+
         let alertController = UIAlertController(title: "Extract QRCode Failed", message: nil, preferredStyle: .alert)
         let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
 
@@ -147,11 +161,53 @@ class ConfigureViewController: UITableViewController {
                 let cell = tableView.dequeueReusableCell(withIdentifier: "inputTextField", for: indexPath) as! InputTextFieldCell
                 cell.item.text = proxyConfig.shownName[item]
                 cell.itemDetail.text = proxyConfig.getValue(byItem: item)
+
+                if let keyboardType = proxyConfig.getKeyboardType(byItem: item) {
+                    switch keyboardType[0] {
+                    case "number":
+                        cell.itemDetail.keyboardType = .numberPad
+                        cell.itemDetail.inputAccessoryView = numberToolbar
+                    case "url":
+                        cell.itemDetail.keyboardType = .URL
+                    default:
+                        cell.itemDetail.keyboardType = .default
+                    }
+
+                    switch keyboardType[1] {
+                    case "next":
+                        cell.itemDetail.returnKeyType = .next
+                    default:
+                        cell.itemDetail.returnKeyType = .done
+                    }
+                }
+
+                if !inputFields.contains(cell.itemDetail) {
+                    inputFields.append(cell.itemDetail)
+                }
+                inputFields.sort() {
+
+
+                    if $0.convert($0.bounds, to: nil).origin.y < $1.convert($1.bounds, to: nil).origin.y {
+                        return true
+                    }
+                    return false
+                }
 //                cell.itemDetail.placeholder = placeholder
 
                 cell.valueChanged = {
                     self.proxyConfig.setValue(byItem: item, value: cell.itemDetail.text!)
                 }
+
+                cell.returnPressed = {
+                    if let index = self.inputFields.index(of: cell.itemDetail) {
+                        if index < self.inputFields.count - 1 {
+                            self.inputFields[index + 1].becomeFirstResponder()
+                        } else {
+                            cell.itemDetail.resignFirstResponder()
+                        }
+                    }
+                }
+
                 return cell
             }
         }
@@ -190,7 +246,7 @@ class ConfigureViewController: UITableViewController {
 
             } else {
                 view.endEditing(true)
-                 NotificationCenter.default.addObserver(self, selector: #selector(ConfigureViewController.didExtractedQRCode(notification:)), name: NSNotification.Name(rawValue: kQRCodeExtracted), object: nil)
+                NotificationCenter.default.addObserver(self, selector: #selector(ConfigureViewController.didExtractedQRCode(notification:)), name: NSNotification.Name(rawValue: kQRCodeExtracted), object: nil)
                 performSegue(withIdentifier: "scanQRCode", sender: nil)
             }
         }

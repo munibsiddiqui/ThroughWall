@@ -89,6 +89,9 @@ class TodayViewController: UIViewController, NCWidgetProviding, UITableViewDeleg
 
         SiteConfigController().convertOldServer { newManager in
             print("completed")
+            if newManager == nil {
+                return
+            }
             self.currentVPNManager = newManager
             self.currentVPNStatusIndicator = self.currentVPNManager!.connection.status
             self.proxyConfigs = SiteConfigController().readSiteConfigsFromConfigFile()

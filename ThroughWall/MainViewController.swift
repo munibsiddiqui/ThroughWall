@@ -70,12 +70,13 @@ class MainViewController: UITableViewController {
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+        self.navigationItem.title = "VPN"
 
         vpnStatusSwitch.addTarget(self, action: #selector(MainViewController.vpnStatusSwitchValueDidChange(_:)), for: .valueChanged)
         tableView.tableFooterView = UIView()
         tableView.backgroundColor = UIColor.groupTableViewBackground
         tableView.refreshControl = UIRefreshControl()
-        tableView.refreshControl?.attributedTitle = NSAttributedString(string: "Pull to ping servers")
+//        tableView.refreshControl?.attributedTitle = NSAttributedString(string: "Pull to ping servers")
         tableView.refreshControl?.addTarget(self, action: #selector(testServerDelay(sender:)), for: UIControlEvents.valueChanged)
 
 
@@ -84,6 +85,9 @@ class MainViewController: UITableViewController {
 
         SiteConfigController().convertOldServer { newManager in
             print("completed")
+            if newManager == nil {
+                return
+            }
             self.currentVPNManager = newManager
             self.currentVPNStatusIndicator = self.currentVPNManager!.connection.status
             self.proxyConfigs = SiteConfigController().readSiteConfigsFromConfigFile()
@@ -97,11 +101,26 @@ class MainViewController: UITableViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(saveVPN(_:)), name: NSNotification.Name(rawValue: kSaveVPN), object: nil)
     }
 
-
     func testServerDelay(sender: AnyObject) {
+        if let manager = currentVPNManager {
+            if manager.connection.status != .disconnected {
+
+                let alertController = UIAlertController(title: "Ping is disabled now", message: "Ping is not accurate while connecting to a server", preferredStyle: .alert)
+                let okAction = UIAlertAction(title: "Done", style: .default, handler: { _ in
+                    DispatchQueue.main.async {
+                        self.tableView.refreshControl?.endRefreshing()
+                        self.tableView.refreshControl?.attributedTitle = NSAttributedString(string: "")
+                    }
+                })
+
+                alertController.addAction(okAction)
+
+                self.present(alertController, animated: true, completion: nil)
+                return
+            }
+        }
         testServerDelay(withIndex: 0)
     }
-
 
     func testServerDelay(withIndex index: Int) {
         if index < proxyConfigs.count {
@@ -119,7 +138,7 @@ class MainViewController: UITableViewController {
             SiteConfigController().writeIntoSiteConfigFile(withConfigs: proxyConfigs)
             DispatchQueue.main.async {
                 self.tableView.refreshControl?.endRefreshing()
-                self.tableView.refreshControl?.attributedTitle = NSAttributedString(string: "Pull to ping servers")
+                self.tableView.refreshControl?.attributedTitle = NSAttributedString(string: "")
                 self.tableView.reloadData()
             }
         }
@@ -128,8 +147,6 @@ class MainViewController: UITableViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.navigationItem.title = "VPN"
-
         NotificationCenter.default.addObserver(self, selector: #selector(MainViewController.VPNStatusDidChange(_:)), name: NSNotification.Name.NEVPNStatusDidChange, object: nil)
 
     }
@@ -165,7 +182,7 @@ class MainViewController: UITableViewController {
                     }
                 })
             })
-           
+
         } else {
             if proxyConfigs.count > selectedServerIndex {
                 let proxyConfig = proxyConfigs[selectedServerIndex]
@@ -228,13 +245,14 @@ class MainViewController: UITableViewController {
         // #warning Incomplete implementation, return the number of rows
         switch section {
         case 0:
-            //servers status section
             return 1
         case 1:
+            //servers status section
+            return 1
+        case 2:
             //server list section
             return proxyConfigs.count + 1
-        case 2:
-            return 1
+
         default:
             return 0
         }
@@ -242,11 +260,11 @@ class MainViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch section {
-        case 0:
+        case 1:
             //block ad section
             //global mode section
             return nil
-        case 1:
+        case 2:
             //servers status section
             //server list section
             return nil
@@ -256,11 +274,14 @@ class MainViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if section == 0 {
+            return 0
+        }
+        if section == 1 {
+            return 10
+        }
         if let _ = self.tableView(tableView, titleForHeaderInSection: section) {
             return 60
-        }
-        if section == 2 {
-            return 0
         }
         return 40
     }
@@ -285,7 +306,7 @@ class MainViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         // Configure the cell...
         switch indexPath.section {
-        case 0:
+        case 1:
             //block ad section
             let cell = tableView.dequeueReusableCell(withIdentifier: "status", for: indexPath)
             cell.textLabel?.text = "Status"
@@ -294,7 +315,7 @@ class MainViewController: UITableViewController {
 //            currentVPNStatusLamp = cell.imageView!
             cell.selectionStyle = .none
             return cell
-        case 1:
+        case 2:
             if indexPath.row < proxyConfigs.count {
                 let cell = tableView.dequeueReusableCell(withIdentifier: "list", for: indexPath)
 
@@ -324,7 +345,20 @@ class MainViewController: UITableViewController {
 
 
                 if indexPath.row == selectedServerIndex {
-                    cell.imageView?.image = UIImage(named: "GrayDot")
+                    if let manager = currentVPNManager {
+                        switch manager.connection.status {
+                        case .connected:
+                            cell.imageView?.image = UIImage(named: "GreenDot")
+                        case .connecting:
+                            fallthrough
+                        case .disconnecting:
+                            cell.imageView?.image = UIImage(named: "OrangeDot")
+                        default:
+                            cell.imageView?.image = UIImage(named: "GrayDot")
+                        }
+                    } else {
+                        cell.imageView?.image = UIImage(named: "GrayDot")
+                    }
                     currentVPNStatusLamp = cell.imageView!
                     self.navigationItem.title = textLabel.text
                 } else {
@@ -337,7 +371,7 @@ class MainViewController: UITableViewController {
                 cell.textLabel?.text = "Add New Server..."
                 return cell
             }
-        case 2:
+        case 0:
             let cell = tableView.dequeueReusableCell(withIdentifier: "dragHintCell", for: indexPath)
             cell.separatorInset = UIEdgeInsetsMake(0.0, 0.0, 0.0, cell.bounds.size.width)
             return cell
@@ -351,14 +385,12 @@ class MainViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
 
-        if indexPath.section == 0 && indexPath.row == 2 {
-            self.performSegue(withIdentifier: "rule", sender: nil)
-        } else if indexPath.section == 1 {
+        if indexPath.section == 2 {
             if indexPath.row < proxyConfigs.count {
                 if let currentManager = currentVPNManager {
                     if currentManager.connection.status == .connected || currentManager.connection.status == .connecting {
                         //pop a alert
-                        let alertController = UIAlertController(title: "Disconnect before changing", message: nil, preferredStyle: .alert)
+                        let alertController = UIAlertController(title: "Error", message: "Please disconnect before changing server", preferredStyle: .alert)
                         let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
                         alertController.addAction(okAction)
                         self.present(alertController, animated: true, completion: nil)

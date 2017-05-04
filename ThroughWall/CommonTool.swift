@@ -69,6 +69,15 @@ class ProxyConfig: NSObject {
         ]
     ]
     
+    private let keyboadType  = [
+        "CUSTOM": [
+            "description": ["default", "next"],
+            "server": ["url", "next"],
+            "port": ["number", "next"],
+            "password": ["default", "done"]
+        ]
+    ]
+    
     let shownName = [
         "proxy": "ProxyType",
         "description": "Description",
@@ -85,7 +94,7 @@ class ProxyConfig: NSObject {
     private var _containedHiddenItems = [String]()
     private var _values = [String: String]()
     private var _availableOptions = [String: [String: [String]]]()
-    
+    private var _keyboardType = [String: [String]]()
     var currentProxy: String {
         set {
             if proxies.contains(newValue) {
@@ -104,6 +113,9 @@ class ProxyConfig: NSObject {
                 }
                 if let availavles = availables[currentProxy] {
                     _availableOptions = availavles
+                }
+                if let keyboadType = keyboadType[currentProxy] {
+                    _keyboardType = keyboadType
                 }
             }
         }
@@ -144,6 +156,10 @@ class ProxyConfig: NSObject {
         } else {
             return nil
         }
+    }
+    
+    func getKeyboardType(byItem item: String) -> [String]? {
+        return _keyboardType[item]
     }
     
     func setCustomOption(byItem item: String, option: String) {

@@ -14,7 +14,7 @@ class InputTextFieldCell: UITableViewCell, UITextFieldDelegate {
     @IBOutlet weak var itemDetail: UITextField!
     
     var valueChanged: ((Void) -> Void)?
-    
+    var returnPressed: ((Void) -> Void)?
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -28,7 +28,8 @@ class InputTextFieldCell: UITableViewCell, UITextFieldDelegate {
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
+//        textField.resignFirstResponder()
+        returnPressed?()
         return true
     }
     

@@ -152,16 +152,20 @@ class MainViewController: UITableViewController {
     func vpnStatusSwitchValueDidChange(_ sender: UISwitch) {
         let on = sender.isOn
         if let manager = self.currentVPNManager {
-            manager.loadFromPreferences(completionHandler: { (_error) in
-                if let error = _error {
-                    print(error)
-                    sender.isOn = false
-                } else {
-                    if self.trigerVPNManager(withManager: manager, shouldON: on) == false {
+            manager.isEnabled = true
+            manager.saveToPreferences(completionHandler: { _ in
+                manager.loadFromPreferences(completionHandler: { (_error) in
+                    if let error = _error {
+                        print(error)
                         sender.isOn = false
+                    } else {
+                        if self.trigerVPNManager(withManager: manager, shouldON: on) == false {
+                            sender.isOn = false
+                        }
                     }
-                }
+                })
             })
+           
         } else {
             if proxyConfigs.count > selectedServerIndex {
                 let proxyConfig = proxyConfigs[selectedServerIndex]

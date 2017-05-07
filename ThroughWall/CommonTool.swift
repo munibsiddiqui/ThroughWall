@@ -73,8 +73,8 @@ class ProxyConfig: NSObject {
         "CUSTOM": [
             "description": ["default", "next"],
             "server": ["url", "next"],
-            "port": ["number", "next"],
-            "password": ["default", "done"]
+            "port": ["number", "accessary", "next"],
+            "password": ["default", "secure", "done"]
         ]
     ]
     

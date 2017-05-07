@@ -29,6 +29,7 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         readSettings()
         globalModeSwitch.addTarget(self, action: #selector(globalModeSwitchDidChange(_:)), for: .valueChanged)
 
+        setTopArear()
     }
 
     override func didReceiveMemoryWarning() {
@@ -36,6 +37,26 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         // Dispose of any resources that can be recreated.
     }
 
+    func setTopArear() {
+        navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
+        navigationController?.navigationBar.tintColor = UIColor.white
+        navigationController?.navigationBar.isTranslucent = false
+        navigationController?.navigationBar.setBackgroundImage(image(fromColor: topUIColor), for: .any, barMetrics: .default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        self.navigationItem.title = "Config"
+    }
+    
+    func image(fromColor color: UIColor) -> UIImage {
+        let rect = CGRect(x: 0, y: 0, width: view.frame.size.width, height: view.frame.size.height)
+        UIGraphicsBeginImageContext(rect.size)
+        let context = UIGraphicsGetCurrentContext()
+        context?.setFillColor(color.cgColor)
+        context?.fill(rect)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsGetCurrentContext()
+        return image!
+    }
+    
 
     func globalModeSwitchDidChange(_ sender: UISwitch) {
         let defaults = UserDefaults.init(suiteName: groupName)

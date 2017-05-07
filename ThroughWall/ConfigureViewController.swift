@@ -33,13 +33,13 @@ class ConfigureViewController: UITableViewController {
         }
 
         numberToolbar.barStyle = UIBarStyle.default
-        numberToolbar.items=[
+        numberToolbar.items = [
             UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.flexibleSpace, target: self, action: nil),
             UIBarButtonItem(title: "Next", style: UIBarButtonItemStyle.plain, target: self, action: #selector(ConfigureViewController.nextTextFieldAfterPortField))
         ]
-        
+
         numberToolbar.sizeToFit()
-        
+
         tableView.tableFooterView = UIView()
         tableView.backgroundColor = UIColor.groupTableViewBackground
     }
@@ -52,7 +52,7 @@ class ConfigureViewController: UITableViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
+
     func nextTextFieldAfterPortField() {
         inputFields[3].becomeFirstResponder()
     }
@@ -162,22 +162,27 @@ class ConfigureViewController: UITableViewController {
                 cell.item.text = proxyConfig.shownName[item]
                 cell.itemDetail.text = proxyConfig.getValue(byItem: item)
 
-                if let keyboardType = proxyConfig.getKeyboardType(byItem: item) {
-                    switch keyboardType[0] {
-                    case "number":
-                        cell.itemDetail.keyboardType = .numberPad
-                        cell.itemDetail.inputAccessoryView = numberToolbar
-                    case "url":
-                        cell.itemDetail.keyboardType = .URL
-                    default:
-                        cell.itemDetail.keyboardType = .default
-                    }
+                if let keyboardTypes = proxyConfig.getKeyboardType(byItem: item) {
 
-                    switch keyboardType[1] {
-                    case "next":
-                        cell.itemDetail.returnKeyType = .next
-                    default:
-                        cell.itemDetail.returnKeyType = .done
+                    for type in keyboardTypes {
+                        switch type {
+                        case "number":
+                            cell.itemDetail.keyboardType = .numberPad
+                        case "accessary":
+                            cell.itemDetail.inputAccessoryView = numberToolbar
+                        case "url":
+                            cell.itemDetail.keyboardType = .URL
+                        case "default":
+                            cell.itemDetail.keyboardType = .default
+                        case "next":
+                            cell.itemDetail.returnKeyType = .next
+                        case "done":
+                            cell.itemDetail.returnKeyType = .done
+                        case "secure":
+                            cell.itemDetail.isSecureTextEntry = true
+                        default:
+                            break
+                        }
                     }
                 }
 
@@ -230,7 +235,7 @@ class ConfigureViewController: UITableViewController {
             }
         } else {
             if showDelete {
-                let alertController = UIAlertController(title: "Delete Proxy Server", message: nil, preferredStyle: .alert)
+                let alertController = UIAlertController(title: "Delete Proxy Server?", message: nil, preferredStyle: .alert)
                 let deleteAction = UIAlertAction(title: "Delete", style: .destructive, handler: { (_) in
                     NotificationCenter.default.post(name: NSNotification.Name(rawValue: kDeleteEditingVPN), object: nil)
                     DispatchQueue.main.async {

@@ -89,15 +89,16 @@ class TodayViewController: UIViewController, NCWidgetProviding, UITableViewDeleg
 
         SiteConfigController().convertOldServer { newManager in
             print("completed")
-            if newManager == nil {
-                return
+
+            if newManager != nil {
+                self.currentVPNManager = newManager
+                self.currentVPNStatusIndicator = self.currentVPNManager!.connection.status
             }
-            self.currentVPNManager = newManager
-            self.currentVPNStatusIndicator = self.currentVPNManager!.connection.status
             self.proxyConfigs = SiteConfigController().readSiteConfigsFromConfigFile()
             if let index = SiteConfigController().getSelectedServerIndex() {
                 self.selectedServerIndex = index
             }
+
             //TODO
             self.tableview.reloadData()
         }
@@ -287,6 +288,9 @@ class TodayViewController: UIViewController, NCWidgetProviding, UITableViewDeleg
         if indexPath.row == selectedServerIndex {
 //            cell.setSelected(true, animated: false)
             cell.accessoryType = .checkmark
+            vpnName.text = cell.VPNNameLabel.text
+        } else {
+            cell.accessoryType = .none
         }
         return cell
     }

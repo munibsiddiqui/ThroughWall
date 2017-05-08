@@ -1147,7 +1147,7 @@
                                 <rect key="frame" x="0.0" y="64" width="375" height="331.5"/>
                                 <subviews>
                                     <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Add" translatesAutoresizingMaskIntoConstraints="NO" id="KDc-iY-xhw">
-                                        <rect key="frame" x="93.5" y="71.5" width="187.5" height="187.5"/>
+                                        <rect key="frame" x="131.5" y="109.5" width="112.5" height="112.5"/>
                                         <gestureRecognizers/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="KDc-iY-xhw" secondAttribute="height" multiplier="1:1" id="Gc4-Ba-cdt"/>
@@ -1160,7 +1160,7 @@
                                 <gestureRecognizers/>
                                 <constraints>
                                     <constraint firstItem="KDc-iY-xhw" firstAttribute="centerY" secondItem="wCB-KM-Azb" secondAttribute="centerY" id="1nj-I2-3Z5"/>
-                                    <constraint firstItem="KDc-iY-xhw" firstAttribute="width" secondItem="wCB-KM-Azb" secondAttribute="width" multiplier="0.5" id="367-D5-vps"/>
+                                    <constraint firstItem="KDc-iY-xhw" firstAttribute="width" secondItem="wCB-KM-Azb" secondAttribute="width" multiplier="0.3" id="367-D5-vps"/>
                                     <constraint firstItem="KDc-iY-xhw" firstAttribute="centerX" secondItem="wCB-KM-Azb" secondAttribute="centerX" id="gZ1-Sw-GHR"/>
                                 </constraints>
                             </view>

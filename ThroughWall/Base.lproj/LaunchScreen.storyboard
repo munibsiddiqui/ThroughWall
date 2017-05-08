@@ -36,6 +36,7 @@
                                 </constraints>
                             </imageView>
                         </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="I8K-Jt-vL4" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="Fir-KM-hgI"/>
                             <constraint firstItem="I8K-Jt-vL4" firstAttribute="centerY" secondItem="xb3-aO-Qok" secondAttribute="top" multiplier="0.8" id="SVl-ag-8Fj"/>

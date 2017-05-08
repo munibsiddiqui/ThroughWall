@@ -16,6 +16,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     @IBOutlet weak var operationAreaView: UIView!
     @IBOutlet weak var tableViewTopConstraint: NSLayoutConstraint!
     @IBOutlet weak var currentVPNStatusLabel: UILabel!
+    @IBOutlet weak var buttonImageView: UIImageView!
 
     var addedBackground = false
     var selectedServerIndex = 0
@@ -25,14 +26,14 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     var currentVPNStatusLamp = UIImageView()
 
     let waveAnimationayer = CAReplicatorLayer()
-    let buttonLayer = CALayer()
+//    let buttonLayer = CALayer()
 
     var instanceCount = 0
-    let waveDuration: Double = 1.0
+    let waveDuration: Double = 3.0
     let waveStep: CGFloat = 15
-    var buttonDimension: CGFloat {
-        return buttonLayer.frame.width
-    }
+//    var buttonDimension: CGFloat {
+//        return buttonLayer.frame.width
+//    }
 
     var currentVPNManager: NETunnelProviderManager? {
         willSet {
@@ -73,7 +74,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
                 break
             }
 //            vpnStatusSwitch.isOn = on
-            
+
             setOperationArea()
         }
     }
@@ -84,7 +85,8 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
 
         // Do any additional setup after loading the view.
         sleepToDelayWelcomePage()
-        setTopArear()
+        setTopArea()
+        setTabBarArea()
         setupTableView()
         tryUpdateRuleFile()
         convertToNewServerStyle()
@@ -131,15 +133,15 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     func addLayersToOperationArea() {
 
-        let miniDimension = (operationAreaView.frame.width < operationAreaView.frame.height ? operationAreaView.frame.width : operationAreaView.frame.height)
-        buttonLayer.frame = CGRect(origin: .zero, size: .init(width: miniDimension / 3, height: miniDimension / 3))
-        buttonLayer.position = CGPoint(x: operationAreaView.frame.width / 2, y: operationAreaView.frame.height / 2)
+//        let miniDimension = (operationAreaView.frame.width < operationAreaView.frame.height ? operationAreaView.frame.width : operationAreaView.frame.height)
+//        buttonLayer.frame = CGRect(origin: .zero, size: .init(width: miniDimension / 3, height: miniDimension / 3))
+//        buttonLayer.position = CGPoint(x: operationAreaView.frame.width / 2, y: operationAreaView.frame.height / 2)
 
         waveAnimationayer.frame = CGRect(origin: .zero, size: operationAreaView.frame.size)
         waveAnimationayer.position = CGPoint(x: operationAreaView.frame.width / 2, y: operationAreaView.frame.height / 2)
 
         addWaveAnimationLayer()
-        addButtonLayer()
+//        addButtonLayer()
     }
 
     func addWaveAnimationLayer() {
@@ -151,16 +153,15 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         operationAreaView.layer.addSublayer(waveAnimationayer)
     }
 
-    func addButtonLayer() {
-        if let sublayers = operationAreaView.layer.sublayers {
-            if sublayers.contains(buttonLayer) {
-                return
-            }
-        }
-        operationAreaView.layer.addSublayer(buttonLayer)
-
-
-    }
+//    func addButtonLayer() {
+//        if let sublayers = operationAreaView.layer.sublayers {
+//            if sublayers.contains(buttonLayer) {
+//                return
+//            }
+//        }
+//        operationAreaView.layer.addSublayer(buttonLayer)
+//
+//    }
 
     func getOffStateCGPath(withDimension dimension: CGFloat) -> CGPath {
         let combinedPath = CGMutablePath()
@@ -199,8 +200,9 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     func addBaseColorLayerToButtonLayer(withCentrePoint point: CGPoint, andRadius radius: CGFloat, andColor color: UIColor) {
         let colorLayer = CAShapeLayer()
-        buttonLayer.addSublayer(colorLayer)
-        colorLayer.frame = CGRect(origin: .zero, size: buttonLayer.frame.size)
+        buttonImageView.layer.addSublayer(colorLayer)
+//        buttonImageView.layer.insertSublayer(colorLayer, at: 0)
+        colorLayer.frame = CGRect(origin: .zero, size: buttonImageView.frame.size)
 
         let circlePath = UIBezierPath(arcCenter: point, radius: radius, startAngle: 0, endAngle: CGFloat.pi * 2, clockwise: true)
 
@@ -211,7 +213,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     func addBaseColorLayerToButtonLayer() {
 
-        let dimension = buttonDimension
+        let dimension = buttonImageView.frame.width
 
         addBaseColorLayerToButtonLayer(withCentrePoint: CGPoint(x: dimension / 2.0, y: dimension / 2.0), andRadius: dimension / 2.0 + 60, andColor: UIColor(red: 255.0 / 255.0, green: 88.0 / 255.0, blue: 24.0 / 255.0, alpha: 0.14))
 
@@ -220,71 +222,78 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     func drawOffStateButton() {
 
-        buttonLayer.sublayers = nil
-
+//        buttonLayer.sublayers = nil
+//
+//        addBaseColorLayerToButtonLayer()
+//
+//        let iconLayer = CAShapeLayer()
+//
+//        buttonLayer.addSublayer(iconLayer)
+//        iconLayer.frame = CGRect(origin: .zero, size: buttonLayer.frame.size)
+//
+//        let dimension: CGFloat = buttonDimension
+//
+//        iconLayer.path = getOffStateCGPath(withDimension: dimension)
+//        iconLayer.fillColor = UIColor.clear.cgColor
+//        iconLayer.strokeColor = UIColor.white.cgColor
+//        iconLayer.lineWidth = 12
+//        iconLayer.lineCap = kCALineCapRound
+        buttonImageView.image = UIImage(named: "Disconnected")
+        buttonImageView.layer.sublayers = nil
         addBaseColorLayerToButtonLayer()
-
-        let iconLayer = CAShapeLayer()
-
-        buttonLayer.addSublayer(iconLayer)
-        iconLayer.frame = CGRect(origin: .zero, size: buttonLayer.frame.size)
-
-        let dimension: CGFloat = buttonDimension
-
-        iconLayer.path = getOffStateCGPath(withDimension: dimension)
-        iconLayer.fillColor = UIColor.clear.cgColor
-        iconLayer.strokeColor = UIColor.white.cgColor
-        iconLayer.lineWidth = 12
-        iconLayer.lineCap = kCALineCapRound
     }
 
     func drawOnStateButton() {
-        buttonLayer.sublayers = nil
-        
+//        buttonLayer.sublayers = nil
+//
+//        addBaseColorLayerToButtonLayer()
+//
+//        let iconLayer = CAShapeLayer()
+//
+//        buttonLayer.addSublayer(iconLayer)
+//        iconLayer.frame = CGRect(origin: .zero, size: buttonLayer.frame.size)
+//
+//        let dimension: CGFloat = buttonDimension
+//
+//        iconLayer.path = getOffStateCGPath(withDimension: dimension)
+//        iconLayer.fillColor = UIColor.clear.cgColor
+//        iconLayer.strokeColor = UIColor.green.cgColor
+//        iconLayer.lineWidth = 12
+//        iconLayer.lineCap = kCALineCapRound
+        buttonImageView.image = UIImage(named: "Connected")
+        buttonImageView.layer.sublayers = nil
         addBaseColorLayerToButtonLayer()
-        
-        let iconLayer = CAShapeLayer()
-        
-        buttonLayer.addSublayer(iconLayer)
-        iconLayer.frame = CGRect(origin: .zero, size: buttonLayer.frame.size)
-        
-        let dimension: CGFloat = buttonDimension
-        
-        iconLayer.path = getOffStateCGPath(withDimension: dimension)
-        iconLayer.fillColor = UIColor.clear.cgColor
-        iconLayer.strokeColor = UIColor.green.cgColor
-        iconLayer.lineWidth = 12
-        iconLayer.lineCap = kCALineCapRound
     }
 
     func drawAddServerButton() {
-        buttonLayer.sublayers = nil
-
-        let circleLayer = CAShapeLayer()
-        let crossLayer = CAShapeLayer()
-        buttonLayer.addSublayer(circleLayer)
-        buttonLayer.addSublayer(crossLayer)
-
-        let dimension: CGFloat = buttonDimension * 3 / 2
-
-        circleLayer.frame = CGRect(origin: .zero, size: CGSize(width: dimension, height: dimension))
-        crossLayer.frame = CGRect(origin: .zero, size: CGSize(width: dimension, height: dimension))
-
-        circleLayer.position = CGPoint(x: buttonDimension / 2, y: buttonDimension / 2)
-        crossLayer.position = CGPoint(x: buttonDimension / 2, y: buttonDimension / 2)
-
-        let (circlePath, crossPath) = getAddStateCGPath(withDimension: dimension)
-
-        circleLayer.path = circlePath
-        circleLayer.fillColor = UIColor.clear.cgColor
-        circleLayer.strokeColor = UIColor.white.cgColor
-        circleLayer.lineWidth = 2
-
-        crossLayer.path = crossPath
-        crossLayer.fillColor = UIColor.clear.cgColor
-        crossLayer.strokeColor = UIColor.white.cgColor
-        crossLayer.lineWidth = 6
-
+//        buttonLayer.sublayers = nil
+//
+//        let circleLayer = CAShapeLayer()
+//        let crossLayer = CAShapeLayer()
+//        buttonLayer.addSublayer(circleLayer)
+//        buttonLayer.addSublayer(crossLayer)
+//
+//        let dimension: CGFloat = buttonDimension * 3 / 2
+//
+//        circleLayer.frame = CGRect(origin: .zero, size: CGSize(width: dimension, height: dimension))
+//        crossLayer.frame = CGRect(origin: .zero, size: CGSize(width: dimension, height: dimension))
+//
+//        circleLayer.position = CGPoint(x: buttonDimension / 2, y: buttonDimension / 2)
+//        crossLayer.position = CGPoint(x: buttonDimension / 2, y: buttonDimension / 2)
+//
+//        let (circlePath, crossPath) = getAddStateCGPath(withDimension: dimension)
+//
+//        circleLayer.path = circlePath
+//        circleLayer.fillColor = UIColor.clear.cgColor
+//        circleLayer.strokeColor = UIColor.white.cgColor
+//        circleLayer.lineWidth = 2
+//
+//        crossLayer.path = crossPath
+//        crossLayer.fillColor = UIColor.clear.cgColor
+//        crossLayer.strokeColor = UIColor.white.cgColor
+//        crossLayer.lineWidth = 6
+        buttonImageView.image = UIImage(named: "Add")
+        buttonImageView.layer.sublayers = nil
     }
 
     func connectionAnimationStart() {
@@ -312,7 +321,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     func addAnimationToCircleLayer(_ circleLayer: CAShapeLayer) {
 
         var eRadius = ((waveAnimationayer.frame.width < waveAnimationayer.frame.height ? waveAnimationayer.frame.width : waveAnimationayer.frame.height)) / 2
-        let bRadius = buttonDimension / 2 + 3 * waveStep
+        let bRadius = buttonImageView.frame.width / 2 + 3 * waveStep
 
         instanceCount = Int((eRadius - bRadius) / 2 / waveStep) + 1
 
@@ -391,7 +400,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         Thread.sleep(forTimeInterval: 1.0)
     }
 
-    func setTopArear() {
+    func setTopArea() {
         navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
         navigationController?.navigationBar.tintColor = UIColor.white
         navigationController?.navigationBar.isTranslucent = false
@@ -399,6 +408,11 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         navigationController?.navigationBar.shadowImage = UIImage()
         self.navigationItem.title = "Chisel"
     }
+
+    func setTabBarArea() {
+        self.tabBarController?.tabBar.tintColor = UIColor.init(red: 255.0 / 255.0, green: 88.0 / 255.0, blue: 24.0 / 255.0, alpha: 1.0)
+    }
+
 
     func setupTableView() {
         tableView.tableFooterView = UIView()
@@ -419,7 +433,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
 //                    if let manager = self.currentVPNManager {
 //                        manager.connection.stopVPNTunnel()
 //                    }
-                    
+
                     self.setOperationArea()
                 }
             }

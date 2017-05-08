@@ -391,11 +391,11 @@
             </objects>
             <point key="canvasLocation" x="-682" y="1814"/>
         </scene>
-        <!--Main-->
+        <!--Home-->
         <scene sceneID="I06-mY-qU3">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="2rT-Up-U14" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Main" image="Server" id="Ule-c8-gex"/>
+                    <tabBarItem key="tabBarItem" title="Home" image="Home" id="Ule-c8-gex"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="QSa-Uj-E3g">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
@@ -1112,7 +1112,7 @@
         <scene sceneID="ceD-5V-X2T">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="w7G-Cf-gGd" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Config" id="Zvt-U8-wLU"/>
+                    <tabBarItem key="tabBarItem" title="Config" image="Config" id="Zvt-U8-wLU"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="ZRF-CH-sGy">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
@@ -1145,10 +1145,24 @@
                             </view>
                             <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wCB-KM-Azb">
                                 <rect key="frame" x="0.0" y="64" width="375" height="331.5"/>
+                                <subviews>
+                                    <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Add" translatesAutoresizingMaskIntoConstraints="NO" id="KDc-iY-xhw">
+                                        <rect key="frame" x="93.5" y="71.5" width="187.5" height="187.5"/>
+                                        <gestureRecognizers/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="KDc-iY-xhw" secondAttribute="height" multiplier="1:1" id="Gc4-Ba-cdt"/>
+                                        </constraints>
+                                        <connections>
+                                            <outletCollection property="gestureRecognizers" destination="4wO-Zq-UZY" appends="YES" id="lBe-NJ-2AD"/>
+                                        </connections>
+                                    </imageView>
+                                </subviews>
                                 <gestureRecognizers/>
-                                <connections>
-                                    <outletCollection property="gestureRecognizers" destination="vNA-IS-VIo" appends="YES" id="F8W-YO-FAu"/>
-                                </connections>
+                                <constraints>
+                                    <constraint firstItem="KDc-iY-xhw" firstAttribute="centerY" secondItem="wCB-KM-Azb" secondAttribute="centerY" id="1nj-I2-3Z5"/>
+                                    <constraint firstItem="KDc-iY-xhw" firstAttribute="width" secondItem="wCB-KM-Azb" secondAttribute="width" multiplier="0.5" id="367-D5-vps"/>
+                                    <constraint firstItem="KDc-iY-xhw" firstAttribute="centerX" secondItem="wCB-KM-Azb" secondAttribute="centerX" id="gZ1-Sw-GHR"/>
+                                </constraints>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Disconnected" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Snu-2L-nPu">
                                 <rect key="frame" x="134" y="356" width="106" height="21"/>
@@ -1243,6 +1257,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="backgroundView" destination="u5L-em-fHX" id="Pyg-eE-w8X"/>
+                        <outlet property="buttonImageView" destination="KDc-iY-xhw" id="0ko-AU-mw3"/>
                         <outlet property="currentVPNStatusLabel" destination="Snu-2L-nPu" id="INa-bu-JRq"/>
                         <outlet property="operationAreaView" destination="wCB-KM-Azb" id="K2K-oQ-AgS"/>
                         <outlet property="tableView" destination="oww-yy-FkV" id="e7y-qm-Wz1"/>
@@ -1251,9 +1266,9 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="wAC-94-wIy" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <tapGestureRecognizer id="vNA-IS-VIo">
+                <tapGestureRecognizer id="4wO-Zq-UZY">
                     <connections>
-                        <action selector="operationViewTouched:" destination="EjS-Wh-yy3" id="8xv-et-fRV"/>
+                        <action selector="operationViewTouched:" destination="EjS-Wh-yy3" id="ZLj-gb-6wv"/>
                     </connections>
                 </tapGestureRecognizer>
             </objects>
@@ -1261,7 +1276,9 @@
         </scene>
     </scenes>
     <resources>
+        <image name="Add" width="225" height="225"/>
+        <image name="Config" width="33" height="32"/>
         <image name="GrayDot" width="16" height="16"/>
-        <image name="Server" width="15" height="15"/>
+        <image name="Home" width="33" height="32"/>
     </resources>
 </document>

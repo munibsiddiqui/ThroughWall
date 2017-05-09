@@ -1143,25 +1143,25 @@
                                 <rect key="frame" x="0.0" y="64" width="375" height="554"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
-                            <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wCB-KM-Azb">
+                            <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wCB-KM-Azb" customClass="OperationView" customModule="ThroughWall" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="64" width="375" height="331.5"/>
                                 <subviews>
-                                    <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Add" translatesAutoresizingMaskIntoConstraints="NO" id="KDc-iY-xhw">
-                                        <rect key="frame" x="131.5" y="109.5" width="112.5" height="112.5"/>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="11b-MN-KDy">
+                                        <rect key="frame" x="125.5" y="104" width="124" height="124"/>
                                         <gestureRecognizers/>
                                         <constraints>
-                                            <constraint firstAttribute="width" secondItem="KDc-iY-xhw" secondAttribute="height" multiplier="1:1" id="Gc4-Ba-cdt"/>
+                                            <constraint firstAttribute="width" secondItem="11b-MN-KDy" secondAttribute="height" multiplier="1:1" id="iYg-OE-DNp"/>
                                         </constraints>
                                         <connections>
-                                            <outletCollection property="gestureRecognizers" destination="4wO-Zq-UZY" appends="YES" id="lBe-NJ-2AD"/>
+                                            <outletCollection property="gestureRecognizers" destination="WQe-uS-Ezf" appends="YES" id="pR9-ff-u72"/>
                                         </connections>
-                                    </imageView>
+                                    </view>
                                 </subviews>
                                 <gestureRecognizers/>
                                 <constraints>
-                                    <constraint firstItem="KDc-iY-xhw" firstAttribute="centerY" secondItem="wCB-KM-Azb" secondAttribute="centerY" id="1nj-I2-3Z5"/>
-                                    <constraint firstItem="KDc-iY-xhw" firstAttribute="width" secondItem="wCB-KM-Azb" secondAttribute="width" multiplier="0.3" id="367-D5-vps"/>
-                                    <constraint firstItem="KDc-iY-xhw" firstAttribute="centerX" secondItem="wCB-KM-Azb" secondAttribute="centerX" id="gZ1-Sw-GHR"/>
+                                    <constraint firstItem="11b-MN-KDy" firstAttribute="centerY" secondItem="wCB-KM-Azb" secondAttribute="centerY" id="Ixr-wC-Stx"/>
+                                    <constraint firstItem="11b-MN-KDy" firstAttribute="centerX" secondItem="wCB-KM-Azb" secondAttribute="centerX" id="Nsy-Wd-dJR"/>
+                                    <constraint firstItem="11b-MN-KDy" firstAttribute="width" secondItem="wCB-KM-Azb" secondAttribute="width" multiplier="0.33" id="Tbv-yy-fnH"/>
                                 </constraints>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Disconnected" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Snu-2L-nPu">
@@ -1257,18 +1257,17 @@
                     </navigationItem>
                     <connections>
                         <outlet property="backgroundView" destination="u5L-em-fHX" id="Pyg-eE-w8X"/>
-                        <outlet property="buttonImageView" destination="KDc-iY-xhw" id="0ko-AU-mw3"/>
                         <outlet property="currentVPNStatusLabel" destination="Snu-2L-nPu" id="INa-bu-JRq"/>
-                        <outlet property="operationAreaView" destination="wCB-KM-Azb" id="K2K-oQ-AgS"/>
+                        <outlet property="operationAreaView" destination="wCB-KM-Azb" id="Pqe-x0-Ea9"/>
                         <outlet property="tableView" destination="oww-yy-FkV" id="e7y-qm-Wz1"/>
                         <outlet property="tableViewTopConstraint" destination="dnM-aW-Hm0" id="FLk-mK-BRa"/>
                         <segue destination="Ptd-O0-ZbV" kind="show" identifier="configure" id="qYG-Wn-vne"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="wAC-94-wIy" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <tapGestureRecognizer id="4wO-Zq-UZY">
+                <tapGestureRecognizer id="WQe-uS-Ezf">
                     <connections>
-                        <action selector="operationViewTouched:" destination="EjS-Wh-yy3" id="ZLj-gb-6wv"/>
+                        <action selector="operationViewTouched:" destination="EjS-Wh-yy3" id="su5-gl-Mjg"/>
                     </connections>
                 </tapGestureRecognizer>
             </objects>
@@ -1276,7 +1275,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="Add" width="225" height="225"/>
         <image name="Config" width="33" height="32"/>
         <image name="GrayDot" width="16" height="16"/>
         <image name="Home" width="33" height="32"/>

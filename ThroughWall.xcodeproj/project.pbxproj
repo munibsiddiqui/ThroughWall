@@ -47,6 +47,7 @@
 		34765C921E10EB240055C294 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C7E1E10D8810055C294 /* Common.swift */; };
 		34765C931E10EB270055C294 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C7E1E10D8810055C294 /* Common.swift */; };
 		34765C951E1116780055C294 /* RequestListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C941E1116780055C294 /* RequestListTableViewController.swift */; };
+		3479D0001EC1D61200AD3458 /* OperationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3479CFFF1EC1D61200AD3458 /* OperationView.swift */; };
 		347B23401EBCCE1400AFE057 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 347B233F1EBCCE1400AFE057 /* HomeViewController.swift */; };
 		3482A2B11E9F0D9700A6B202 /* RuleProxySelectionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3482A2B01E9F0D9700A6B202 /* RuleProxySelectionTableViewController.swift */; };
 		348AC2451E8A9C910072AB1B /* SimplePing.m in Sources */ = {isa = PBXBuildFile; fileRef = 348AC2441E8A9C910072AB1B /* SimplePing.m */; };
@@ -320,6 +321,7 @@
 		34765C861E10D8810055C294 /* SelectInputViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectInputViewController.swift; sourceTree = "<group>"; };
 		34765C871E10D8810055C294 /* SelectionFieldCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectionFieldCell.swift; sourceTree = "<group>"; };
 		34765C941E1116780055C294 /* RequestListTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestListTableViewController.swift; sourceTree = "<group>"; };
+		3479CFFF1EC1D61200AD3458 /* OperationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationView.swift; sourceTree = "<group>"; };
 		347B233F1EBCCE1400AFE057 /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		3482A2B01E9F0D9700A6B202 /* RuleProxySelectionTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleProxySelectionTableViewController.swift; sourceTree = "<group>"; };
 		348AC2431E8A9C910072AB1B /* ThroughWall-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ThroughWall-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -1004,6 +1006,7 @@
 			isa = PBXGroup;
 			children = (
 				347B233F1EBCCE1400AFE057 /* HomeViewController.swift */,
+				3479CFFF1EC1D61200AD3458 /* OperationView.swift */,
 				34765C831E10D8810055C294 /* MainViewController.swift */,
 				3452C3471E763D80008CCC4E /* Tool.swift */,
 			);
@@ -2737,6 +2740,7 @@
 				3474EC7B1DDC926C00EBF3C5 /* AppDelegate.swift in Sources */,
 				34765C8C1E10D8810055C294 /* InputTextFieldCell.swift in Sources */,
 				348F61971E8E4D0D00F6AF9A /* TestRuleViewController.swift in Sources */,
+				3479D0001EC1D61200AD3458 /* OperationView.swift in Sources */,
 				347B23401EBCCE1400AFE057 /* HomeViewController.swift in Sources */,
 				34765C881E10D8810055C294 /* Common.swift in Sources */,
 				3474EC831DDC926C00EBF3C5 /* ThroughWall.xcdatamodeld in Sources */,

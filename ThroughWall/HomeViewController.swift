@@ -24,17 +24,17 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     var proxyConfigs = [ProxyConfig]()
     var icmpPing: ICMPPing?
     var currentVPNStatusLamp = UIImageView()
-    var viewDisappeared = false
+//    var viewDisappeared = false
 
-    let waveAnimationayer = CAReplicatorLayer()
-    let buttonLayer = CALayer()
+//    let waveAnimationayer = CAReplicatorLayer()
+//    let buttonLayer = CALayer()
 
-    var instanceCount = 0
+//    var instanceCount = 0
     let waveDuration: Double = 3.0
     let waveStep: CGFloat = 15
-    var buttonDimension: CGFloat {
-        return buttonLayer.frame.width
-    }
+//    var buttonDimension: CGFloat {
+//        return buttonLayer.frame.width
+//    }
 
     var currentVPNManager: NETunnelProviderManager? {
         willSet {
@@ -45,9 +45,9 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
 
     var currentVPNStatusIndicator: NEVPNStatus = .invalid {
-        willSet {
-            print("\(newValue)")
-            setAllStatusIndication()
+        didSet {
+            print("new status \(currentVPNStatusIndicator.rawValue)")
+            setOperationArea()
         }
     }
 
@@ -59,6 +59,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         sleepToDelayWelcomePage()
         setTopArea()
         setTabBarArea()
+        setOperationArea()
         setupTableView()
         tryUpdateRuleFile()
         convertToNewServerStyle()
@@ -75,16 +76,16 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         // Dispose of any resources that can be recreated.
     }
 
-    override func viewDidLayoutSubviews() {
-        if addedBackground {
-            backgroundView.layer.sublayers?[0].removeFromSuperlayer()
-        }
-        addLayersToOperationArea()
-        setAllStatusIndication()
-        setFadeBackground(withTopColor: topUIColor, bottomColor: bottomUIColor)
-        reloadTable()
-        addedBackground = true
-    }
+//    override func viewDidLayoutSubviews() {
+//        if addedBackground {
+//            backgroundView.layer.sublayers?[0].removeFromSuperlayer()
+//        }
+//        addLayersToOperationArea()
+//        setAllStatusIndication()
+//        setFadeBackground(withTopColor: topUIColor, bottomColor: bottomUIColor)
+//        reloadTable()
+//        addedBackground = true
+//    }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -97,264 +98,295 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         super.viewWillDisappear(animated)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name.NEVPNStatusDidChange, object: nil)
         NotificationCenter.default.removeObserver(self, name: .UIApplicationWillEnterForeground, object: nil)
-        viewDisappeared = true
+//        viewDisappeared = true
     }
 
     override func viewDidAppear(_ animated: Bool) {
-        waveAnimationQuietlyStart()
-        if viewDisappeared {
-            setAllStatusIndication()
-            viewDisappeared = false
-        }
+//        waveAnimationQuietlyStart()
+//        if viewDisappeared {
+//            setAllStatusIndication()
+//            viewDisappeared = false
+//        }
     }
 
 
     func viewResume() {
-        waveAnimationQuietlyStart()
-        setAllStatusIndication()
+//        waveAnimationQuietlyStart()
+//        setAllStatusIndication()
     }
 
 
     // MARK: - Tools
 
 
-    func addLayersToOperationArea() {
-
-        let miniDimension = (operationAreaView.frame.width < operationAreaView.frame.height ? operationAreaView.frame.width : operationAreaView.frame.height)
-        buttonLayer.frame = CGRect(origin: .zero, size: .init(width: miniDimension / 3, height: miniDimension / 3))
-        buttonLayer.position = CGPoint(x: operationAreaView.frame.width / 2, y: operationAreaView.frame.height / 2)
-
-        waveAnimationayer.frame = CGRect(origin: .zero, size: operationAreaView.frame.size)
-        waveAnimationayer.position = CGPoint(x: operationAreaView.frame.width / 2, y: operationAreaView.frame.height / 2)
-
-        addWaveAnimationLayer()
-        addButtonLayer()
-    }
-
-    func addWaveAnimationLayer() {
-        if let sublayers = operationAreaView.layer.sublayers {
-            if sublayers.contains(waveAnimationayer) {
-                return
-            }
-        }
-
-        operationAreaView.layer.addSublayer(waveAnimationayer)
-    }
-
-    func waveAnimationQuietlyStart() {
-        waveAnimationayer.sublayers = nil
-
-        let circleLayer = CAShapeLayer()
-
-        waveAnimationayer.addSublayer(circleLayer)
-
-        circleLayer.frame = CGRect(origin: .zero, size: waveAnimationayer.frame.size)
-
-        circleLayer.isHidden = true
-
-        addAnimationToCircleLayer(circleLayer)
-
-        waveAnimationayer.instanceCount = instanceCount
-        waveAnimationayer.instanceDelay = waveDuration / CFTimeInterval(instanceCount)
-    }
-
-    func addButtonLayer() {
-        if let sublayers = operationAreaView.layer.sublayers {
-            if sublayers.contains(buttonLayer) {
-                return
-            }
-        }
-        operationAreaView.layer.addSublayer(buttonLayer)
-
-
-    }
-
-    func getOffStateCGPath(withDimension dimension: CGFloat) -> CGPath {
-        let combinedPath = CGMutablePath()
-
-        let circlePath = UIBezierPath(arcCenter: CGPoint(x: dimension / 2.0, y: dimension / 2.0), radius: dimension / 2.0, startAngle: -CGFloat.pi * 120 / 180, endAngle: -CGFloat.pi * 60 / 180, clockwise: false)
-
-        combinedPath.addPath(circlePath.cgPath)
-
-        let linePath = UIBezierPath()
-
-        linePath.move(to: CGPoint(x: dimension / 2, y: dimension / 2))
-        linePath.addLine(to: CGPoint(x: dimension / 2, y: 0))
-
-        combinedPath.addPath(linePath.cgPath)
-
-        return combinedPath
-    }
-
-    func getAddStateCGPath(withDimension dimension: CGFloat) -> (CGPath, CGPath) {
-        let combinedPath = CGMutablePath()
-
-        let circlePath = UIBezierPath(arcCenter: CGPoint(x: dimension / 2.0, y: dimension / 2.0), radius: dimension / 2.0, startAngle: 0, endAngle: CGFloat.pi * 2, clockwise: false)
-
-        let horizantalLinePath = UIBezierPath()
-        horizantalLinePath.move(to: CGPoint(x: dimension / 2 - 30, y: dimension / 2))
-        horizantalLinePath.addLine(to: CGPoint(x: dimension / 2 + 30, y: dimension / 2))
-        combinedPath.addPath(horizantalLinePath.cgPath)
-
-        let verticalLinePath = UIBezierPath()
-        verticalLinePath.move(to: CGPoint(x: dimension / 2, y: dimension / 2 - 30))
-        verticalLinePath.addLine(to: CGPoint(x: dimension / 2, y: dimension / 2 + 30))
-        combinedPath.addPath(verticalLinePath.cgPath)
-
-        return (circlePath.cgPath, combinedPath)
-    }
-
-    func addBaseColorLayerToButtonLayer(withCentrePoint point: CGPoint, andRadius radius: CGFloat, andColor color: UIColor) {
-        let colorLayer = CAShapeLayer()
-        buttonLayer.addSublayer(colorLayer)
-        colorLayer.frame = CGRect(origin: .zero, size: buttonLayer.frame.size)
-
-        let circlePath = UIBezierPath(arcCenter: point, radius: radius, startAngle: 0, endAngle: CGFloat.pi * 2, clockwise: true)
-
-        colorLayer.path = circlePath.cgPath
-        colorLayer.fillColor = color.cgColor
-    }
-
-
-    func addBaseColorLayerToButtonLayer() {
-
-        let dimension = buttonDimension
-
-        addBaseColorLayerToButtonLayer(withCentrePoint: CGPoint(x: dimension / 2.0, y: dimension / 2.0), andRadius: dimension / 2.0 + 60, andColor: UIColor(red: 255.0 / 255.0, green: 88.0 / 255.0, blue: 24.0 / 255.0, alpha: 0.14))
-
-        addBaseColorLayerToButtonLayer(withCentrePoint: CGPoint(x: dimension / 2.0, y: dimension / 2.0), andRadius: dimension / 2.0 + 30, andColor: UIColor(red: 255.0 / 255.0, green: 88.0 / 255.0, blue: 24.0 / 255.0, alpha: 0.22))
-    }
-
-    func drawIconOnButtonLayer(withImageName name: String) {
-        let iconLayer = CALayer()
-        buttonLayer.addSublayer(iconLayer)
-        iconLayer.frame = CGRect(origin: .zero, size: buttonLayer.frame.size)
-        iconLayer.contents = UIImage(named: name)?.cgImage
-    }
-
-    func drawOffStateButton() {
-        buttonLayer.sublayers = nil
-
-        addBaseColorLayerToButtonLayer()
-        drawIconOnButtonLayer(withImageName: "Disconnected")
-    }
-
-    func drawOnStateButton() {
-        buttonLayer.sublayers = nil
-
-        addBaseColorLayerToButtonLayer()
-        drawIconOnButtonLayer(withImageName: "Connected")
-    }
-
-    func drawAddServerButton() {
-        buttonLayer.sublayers = nil
-        drawIconOnButtonLayer(withImageName: "Add")
-    }
-
-    func connectionAnimationStart() {
-        if let sublayers = waveAnimationayer.sublayers {
-            for sublayer in sublayers {
-                sublayer.isHidden = false
+    func setOperationArea() {
+        DispatchQueue.main.async {
+            if self.proxyConfigs.count == 0 {
+                self.operationAreaView.setButtonImage(withImageName: "Add", withBackCircleDrawed: false)
+                self.currentVPNStatusLabel.text = "Add"
+            } else {
+                switch self.currentVPNStatusIndicator {
+                    
+                case .connecting:
+                    self.operationAreaView.setButtonImage(withImageName: "Connected", withBackCircleDrawed: true)
+                    self.operationAreaView.forceStartAnimation()
+                    self.setVPNStatusIndicator(withLabelText: "Connecting...", andLampImageName: "OrangeDot")
+                case .connected:
+                    self.operationAreaView.setButtonImage(withImageName: "Connected", withBackCircleDrawed: true)
+                    self.operationAreaView.stopAnimation()
+                    self.setVPNStatusIndicator(withLabelText: "Connected", andLampImageName: "GreenDot")
+                case .disconnecting:
+                    self.operationAreaView.setButtonImage(withImageName: "Disconnected", withBackCircleDrawed: true)
+                    self.operationAreaView.forceStartAnimation()
+                    self.setVPNStatusIndicator(withLabelText: "Disconnecting...", andLampImageName: "OrangeDot")
+                case .disconnected:
+                    self.operationAreaView.setButtonImage(withImageName: "Disconnected", withBackCircleDrawed: true)
+                    self.operationAreaView.stopAnimation()
+                    self.setVPNStatusIndicator(withLabelText: "Disconnected", andLampImageName: "GrayDot")
+                default:
+                    self.operationAreaView.setButtonImage(withImageName: "Disconnected", withBackCircleDrawed: true)
+                    self.operationAreaView.stopAnimation()
+                    self.setVPNStatusIndicator(withLabelText: "Disconnected", andLampImageName: "GrayDot")
+                }
             }
         }
     }
-
-    func connectionAnimationEnd() {
-        if let sublayers = waveAnimationayer.sublayers {
-            for sublayer in sublayers {
-                sublayer.isHidden = true
-            }
-        }
+    
+    func setVPNStatusIndicator(withLabelText text: String, andLampImageName imageName: String) {
+        currentVPNStatusLabel.text = text
+        currentVPNStatusLamp.image = UIImage(named: imageName)
+        print(text)
     }
+    
+    
+//    func addLayersToOperationArea() {
+//
+//        let miniDimension = (operationAreaView.frame.width < operationAreaView.frame.height ? operationAreaView.frame.width : operationAreaView.frame.height)
+//        buttonLayer.frame = CGRect(origin: .zero, size: .init(width: miniDimension / 3, height: miniDimension / 3))
+//        buttonLayer.position = CGPoint(x: operationAreaView.frame.width / 2, y: operationAreaView.frame.height / 2)
+//
+//        waveAnimationayer.frame = CGRect(origin: .zero, size: operationAreaView.frame.size)
+//        waveAnimationayer.position = CGPoint(x: operationAreaView.frame.width / 2, y: operationAreaView.frame.height / 2)
+//
+//        addWaveAnimationLayer()
+//        addButtonLayer()
+//    }
+//
+//    func addWaveAnimationLayer() {
+//        if let sublayers = operationAreaView.layer.sublayers {
+//            if sublayers.contains(waveAnimationayer) {
+//                return
+//            }
+//        }
+//
+//        operationAreaView.layer.addSublayer(waveAnimationayer)
+//    }
+//
+//    func waveAnimationQuietlyStart() {
+//        waveAnimationayer.sublayers = nil
+//
+//        let circleLayer = CAShapeLayer()
+//
+//        waveAnimationayer.addSublayer(circleLayer)
+//
+//        circleLayer.frame = CGRect(origin: .zero, size: waveAnimationayer.frame.size)
+//
+//        circleLayer.isHidden = true
+//
+//        addAnimationToCircleLayer(circleLayer)
+//
+//        waveAnimationayer.instanceCount = instanceCount
+//        waveAnimationayer.instanceDelay = waveDuration / CFTimeInterval(instanceCount)
+//    }
 
+//    func addButtonLayer() {
+//        if let sublayers = operationAreaView.layer.sublayers {
+//            if sublayers.contains(buttonLayer) {
+//                return
+//            }
+//        }
+//        operationAreaView.layer.addSublayer(buttonLayer)
+//
+//
+//    }
 
-    func addAnimationToCircleLayer(_ circleLayer: CAShapeLayer) {
+//    func getOffStateCGPath(withDimension dimension: CGFloat) -> CGPath {
+//        let combinedPath = CGMutablePath()
+//
+//        let circlePath = UIBezierPath(arcCenter: CGPoint(x: dimension / 2.0, y: dimension / 2.0), radius: dimension / 2.0, startAngle: -CGFloat.pi * 120 / 180, endAngle: -CGFloat.pi * 60 / 180, clockwise: false)
+//
+//        combinedPath.addPath(circlePath.cgPath)
+//
+//        let linePath = UIBezierPath()
+//
+//        linePath.move(to: CGPoint(x: dimension / 2, y: dimension / 2))
+//        linePath.addLine(to: CGPoint(x: dimension / 2, y: 0))
+//
+//        combinedPath.addPath(linePath.cgPath)
+//
+//        return combinedPath
+//    }
+//
+//    func getAddStateCGPath(withDimension dimension: CGFloat) -> (CGPath, CGPath) {
+//        let combinedPath = CGMutablePath()
+//
+//        let circlePath = UIBezierPath(arcCenter: CGPoint(x: dimension / 2.0, y: dimension / 2.0), radius: dimension / 2.0, startAngle: 0, endAngle: CGFloat.pi * 2, clockwise: false)
+//
+//        let horizantalLinePath = UIBezierPath()
+//        horizantalLinePath.move(to: CGPoint(x: dimension / 2 - 30, y: dimension / 2))
+//        horizantalLinePath.addLine(to: CGPoint(x: dimension / 2 + 30, y: dimension / 2))
+//        combinedPath.addPath(horizantalLinePath.cgPath)
+//
+//        let verticalLinePath = UIBezierPath()
+//        verticalLinePath.move(to: CGPoint(x: dimension / 2, y: dimension / 2 - 30))
+//        verticalLinePath.addLine(to: CGPoint(x: dimension / 2, y: dimension / 2 + 30))
+//        combinedPath.addPath(verticalLinePath.cgPath)
+//
+//        return (circlePath.cgPath, combinedPath)
+//    }
 
-        var eRadius = ((waveAnimationayer.frame.width < waveAnimationayer.frame.height ? waveAnimationayer.frame.width : waveAnimationayer.frame.height)) / 2
-        let bRadius = buttonDimension / 2 + 3 * waveStep
+//    func addBaseColorLayerToButtonLayer(withCentrePoint point: CGPoint, andRadius radius: CGFloat, andColor color: UIColor) {
+//        let colorLayer = CAShapeLayer()
+//        buttonLayer.addSublayer(colorLayer)
+//        colorLayer.frame = CGRect(origin: .zero, size: buttonLayer.frame.size)
+//
+//        let circlePath = UIBezierPath(arcCenter: point, radius: radius, startAngle: 0, endAngle: CGFloat.pi * 2, clockwise: true)
+//
+//        colorLayer.path = circlePath.cgPath
+//        colorLayer.fillColor = color.cgColor
+//    }
+//
+//
+//    func addBaseColorLayerToButtonLayer() {
+//
+//        let dimension = buttonDimension
+//
+//        addBaseColorLayerToButtonLayer(withCentrePoint: CGPoint(x: dimension / 2.0, y: dimension / 2.0), andRadius: dimension / 2.0 + 60, andColor: UIColor(red: 255.0 / 255.0, green: 88.0 / 255.0, blue: 24.0 / 255.0, alpha: 0.14))
+//
+//        addBaseColorLayerToButtonLayer(withCentrePoint: CGPoint(x: dimension / 2.0, y: dimension / 2.0), andRadius: dimension / 2.0 + 30, andColor: UIColor(red: 255.0 / 255.0, green: 88.0 / 255.0, blue: 24.0 / 255.0, alpha: 0.22))
+//    }
 
-        instanceCount = Int((eRadius - bRadius) / 2 / waveStep) + 1
+//    func drawIconOnButtonLayer(withImageName name: String) {
+//        let iconLayer = CALayer()
+//        buttonLayer.addSublayer(iconLayer)
+//        iconLayer.frame = CGRect(origin: .zero, size: buttonLayer.frame.size)
+//        iconLayer.contents = UIImage(named: name)?.cgImage
+//    }
+//
+//    func drawOffStateButton() {
+//        buttonLayer.sublayers = nil
+//
+//        addBaseColorLayerToButtonLayer()
+//        drawIconOnButtonLayer(withImageName: "Disconnected")
+//    }
+//
+//    func drawOnStateButton() {
+//        buttonLayer.sublayers = nil
+//
+//        addBaseColorLayerToButtonLayer()
+//        drawIconOnButtonLayer(withImageName: "Connected")
+//    }
+//
+//    func drawAddServerButton() {
+//        buttonLayer.sublayers = nil
+//        drawIconOnButtonLayer(withImageName: "Add")
+//    }
+//
+//    func connectionAnimationStart() {
+//        if let sublayers = waveAnimationayer.sublayers {
+//            for sublayer in sublayers {
+//                sublayer.isHidden = false
+//            }
+//        }
+//    }
+//
+//    func connectionAnimationEnd() {
+//        if let sublayers = waveAnimationayer.sublayers {
+//            for sublayer in sublayers {
+//                sublayer.isHidden = true
+//            }
+//        }
+//    }
 
-        eRadius = CGFloat(instanceCount) * 2 * waveStep + bRadius
+//
+//    func addAnimationToCircleLayer(_ circleLayer: CAShapeLayer) {
+//
+//        var eRadius = ((waveAnimationayer.frame.width < waveAnimationayer.frame.height ? waveAnimationayer.frame.width : waveAnimationayer.frame.height)) / 2
+//        let bRadius = buttonDimension / 2 + 3 * waveStep
+//
+//        instanceCount = Int((eRadius - bRadius) / 2 / waveStep) + 1
+//
+//        eRadius = CGFloat(instanceCount) * 2 * waveStep + bRadius
+//
+//        let beginCirclePath = UIBezierPath(arcCenter: CGPoint(x: waveAnimationayer.frame.size.width / 2.0, y: waveAnimationayer.frame.size.height / 2.0), radius: bRadius, startAngle: 0.0, endAngle: CGFloat(Double.pi * 2.0), clockwise: true)
+//
+//
+//        let endCirclePath = UIBezierPath(arcCenter: CGPoint(x: waveAnimationayer.frame.size.width / 2.0, y: waveAnimationayer.frame.size.height / 2.0), radius: eRadius, startAngle: 0.0, endAngle: CGFloat(Double.pi * 2.0), clockwise: true)
+//
+//        circleLayer.path = beginCirclePath.cgPath
+//        circleLayer.fillColor = UIColor.clear.cgColor
+//        circleLayer.strokeColor = UIColor(red: 255.0 / 255.0, green: 88.0 / 255.0, blue: 24.0 / 255.0, alpha: 0.14).cgColor
+//        circleLayer.lineWidth = 2 * waveStep
+//        circleLayer.opacity = 0
+//
+//        let fadeOut = CABasicAnimation(keyPath: "opacity")
+//        fadeOut.fromValue = 1
+//        fadeOut.toValue = 0
+//        fadeOut.duration = waveDuration
+//        fadeOut.repeatCount = Float.greatestFiniteMagnitude
+//        circleLayer.add(fadeOut, forKey: nil)
+//
+//        let pathAdmin = CABasicAnimation(keyPath: "path")
+//        pathAdmin.fromValue = circleLayer.path
+//        pathAdmin.toValue = endCirclePath.cgPath
+//        pathAdmin.duration = waveDuration
+//        pathAdmin.repeatCount = Float.greatestFiniteMagnitude
+//        circleLayer.add(pathAdmin, forKey: nil)
+//
+//        let colorFade = CABasicAnimation(keyPath: "strokeColor")
+//        colorFade.fromValue = topUIColor.cgColor
+//        colorFade.toValue = UIColor.white.cgColor
+//        colorFade.duration = waveDuration
+//        colorFade.repeatCount = Float.greatestFiniteMagnitude
+//        circleLayer.add(colorFade, forKey: nil)
+//    }
 
-        let beginCirclePath = UIBezierPath(arcCenter: CGPoint(x: waveAnimationayer.frame.size.width / 2.0, y: waveAnimationayer.frame.size.height / 2.0), radius: bRadius, startAngle: 0.0, endAngle: CGFloat(Double.pi * 2.0), clockwise: true)
-
-
-        let endCirclePath = UIBezierPath(arcCenter: CGPoint(x: waveAnimationayer.frame.size.width / 2.0, y: waveAnimationayer.frame.size.height / 2.0), radius: eRadius, startAngle: 0.0, endAngle: CGFloat(Double.pi * 2.0), clockwise: true)
-
-        circleLayer.path = beginCirclePath.cgPath
-        circleLayer.fillColor = UIColor.clear.cgColor
-        circleLayer.strokeColor = UIColor(red: 255.0 / 255.0, green: 88.0 / 255.0, blue: 24.0 / 255.0, alpha: 0.14).cgColor
-        circleLayer.lineWidth = 2 * waveStep
-        circleLayer.opacity = 0
-
-        let fadeOut = CABasicAnimation(keyPath: "opacity")
-        fadeOut.fromValue = 1
-        fadeOut.toValue = 0
-        fadeOut.duration = waveDuration
-        fadeOut.repeatCount = Float.greatestFiniteMagnitude
-        circleLayer.add(fadeOut, forKey: nil)
-
-        let pathAdmin = CABasicAnimation(keyPath: "path")
-        pathAdmin.fromValue = circleLayer.path
-        pathAdmin.toValue = endCirclePath.cgPath
-        pathAdmin.duration = waveDuration
-        pathAdmin.repeatCount = Float.greatestFiniteMagnitude
-        circleLayer.add(pathAdmin, forKey: nil)
-
-        let colorFade = CABasicAnimation(keyPath: "strokeColor")
-        colorFade.fromValue = topUIColor.cgColor
-        colorFade.toValue = UIColor.white.cgColor
-        colorFade.duration = waveDuration
-        colorFade.repeatCount = Float.greatestFiniteMagnitude
-        circleLayer.add(colorFade, forKey: nil)
-    }
-
-
-    func setFadeBackground(withTopColor topColor: UIColor, bottomColor: UIColor) {
-        let gradientLayer = CAGradientLayer()
-        gradientLayer.colors = [topColor.cgColor, bottomColor.cgColor]
-        gradientLayer.locations = [0.0, 1.0]
-        gradientLayer.frame = backgroundView.frame
-        backgroundView.layer.insertSublayer(gradientLayer, at: 0)
-    }
-
-    func setAllStatusIndication() {
-        print("Set")
-        print(Date().timeIntervalSince1970)
-        if proxyConfigs.count == 0 {
-            drawAddServerButton()
-            currentVPNStatusLabel.text = "Add"
-        } else {
-            switch currentVPNStatusIndicator {
-            case .disconnected:
-                drawOffStateButton()
-                connectionAnimationEnd()
-                currentVPNStatusLabel.text = "Disconnected"
-                currentVPNStatusLamp.image = UIImage(named: "GrayDot")
-            case .connecting:
-                drawOnStateButton()
-                connectionAnimationStart()
-                currentVPNStatusLabel.text = "Connecting..."
-                currentVPNStatusLamp.image = UIImage(named: "OrangeDot")
-            case .connected:
-                drawOnStateButton()
-                connectionAnimationEnd()
-                currentVPNStatusLabel.text = "Connected"
-                currentVPNStatusLamp.image = UIImage(named: "GreenDot")
-            case .disconnecting:
-                drawOffStateButton()
-                connectionAnimationStart()
-                currentVPNStatusLabel.text = "Disconnecting..."
-                currentVPNStatusLamp.image = UIImage(named: "OrangeDot")
-            default:
-                drawOffStateButton()
-                connectionAnimationEnd()
-                currentVPNStatusLabel.text = "Disconnected"
-                currentVPNStatusLamp.image = UIImage(named: "GrayDot")
-            }
-        }
-    }
+//    func setAllStatusIndication() {
+//        print("Set")
+//        print(Date().timeIntervalSince1970)
+//        if proxyConfigs.count == 0 {
+//            drawAddServerButton()
+//            currentVPNStatusLabel.text = "Add"
+//        } else {
+//            switch currentVPNStatusIndicator {
+//            case .disconnected:
+//                drawOffStateButton()
+//                connectionAnimationEnd()
+//                currentVPNStatusLabel.text = "Disconnected"
+//                currentVPNStatusLamp.image = UIImage(named: "GrayDot")
+//            case .connecting:
+//                drawOnStateButton()
+//                connectionAnimationStart()
+//                currentVPNStatusLabel.text = "Connecting..."
+//                currentVPNStatusLamp.image = UIImage(named: "OrangeDot")
+//            case .connected:
+//                drawOnStateButton()
+//                connectionAnimationEnd()
+//                currentVPNStatusLabel.text = "Connected"
+//                currentVPNStatusLamp.image = UIImage(named: "GreenDot")
+//            case .disconnecting:
+//                drawOffStateButton()
+//                connectionAnimationStart()
+//                currentVPNStatusLabel.text = "Disconnecting..."
+//                currentVPNStatusLamp.image = UIImage(named: "OrangeDot")
+//            default:
+//                drawOffStateButton()
+//                connectionAnimationEnd()
+//                currentVPNStatusLabel.text = "Disconnected"
+//                currentVPNStatusLamp.image = UIImage(named: "GrayDot")
+//            }
+//        }
+//    }
 
 
 
@@ -396,7 +428,8 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
 //                        manager.connection.stopVPNTunnel()
 //                    }
 
-                    self.setAllStatusIndication()
+//                    self.setAllStatusIndication()
+                    self.setOperationArea()
                 }
             }
         } else {
@@ -406,7 +439,8 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
                 DispatchQueue.main.async {
                     self.view.layoutIfNeeded()
                     // change to connection
-                    self.setAllStatusIndication()
+//                    self.setAllStatusIndication()
+                    self.setOperationArea()
                 }
             }
         }
@@ -432,6 +466,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
             }
 
             self.reloadTable()
+            self.setOperationArea()
         }
     }
 
@@ -524,8 +559,6 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     func setVPNManager(withManager manger: NETunnelProviderManager, shouldON on: Bool) -> Bool {
         var result = true
-        print("Triger")
-        print(Date().timeIntervalSince1970)
         if on {
             do {
                 try manger.connection.startVPNTunnel()

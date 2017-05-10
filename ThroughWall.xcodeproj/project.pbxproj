@@ -20,6 +20,7 @@
 		345ECB861DF8F48800F70ACC /* rule.config in Resources */ = {isa = PBXBuildFile; fileRef = 345ECB851DF8F48800F70ACC /* rule.config */; };
 		345ECB871DF8F5C100F70ACC /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3439FA051DEEB7A000F8CE59 /* Rule.swift */; };
 		3469E9031EB9B9B20087DA38 /* VPNTableViewContTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3469E9021EB9B9B20087DA38 /* VPNTableViewContTableViewCell.swift */; };
+		346FBAF51EC2EEA2007E9B8D /* BackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 346FBAF41EC2EEA2007E9B8D /* BackgroundView.swift */; };
 		3474EC7B1DDC926C00EBF3C5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3474EC7A1DDC926C00EBF3C5 /* AppDelegate.swift */; };
 		3474EC831DDC926C00EBF3C5 /* ThroughWall.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3474EC811DDC926C00EBF3C5 /* ThroughWall.xcdatamodeld */; };
 		3474EC851DDC926C00EBF3C5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3474EC841DDC926C00EBF3C5 /* Assets.xcassets */; };
@@ -290,6 +291,7 @@
 		3452C3471E763D80008CCC4E /* Tool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tool.swift; sourceTree = "<group>"; };
 		345ECB851DF8F48800F70ACC /* rule.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = rule.config; sourceTree = "<group>"; };
 		3469E9021EB9B9B20087DA38 /* VPNTableViewContTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VPNTableViewContTableViewCell.swift; sourceTree = "<group>"; };
+		346FBAF41EC2EEA2007E9B8D /* BackgroundView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackgroundView.swift; sourceTree = "<group>"; };
 		3474EC771DDC926C00EBF3C5 /* ThroughWall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ThroughWall.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3474EC7A1DDC926C00EBF3C5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3474EC7F1DDC926C00EBF3C5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -1006,6 +1008,7 @@
 			isa = PBXGroup;
 			children = (
 				347B233F1EBCCE1400AFE057 /* HomeViewController.swift */,
+				346FBAF41EC2EEA2007E9B8D /* BackgroundView.swift */,
 				3479CFFF1EC1D61200AD3458 /* OperationView.swift */,
 				34765C831E10D8810055C294 /* MainViewController.swift */,
 				3452C3471E763D80008CCC4E /* Tool.swift */,
@@ -2735,6 +2738,7 @@
 				34D2E4991E88EF31009A07A0 /* RuleMainViewTableViewController.swift in Sources */,
 				34E3F1FC1E11428600FAD65C /* RequestDetailTableViewController.swift in Sources */,
 				348AC2451E8A9C910072AB1B /* SimplePing.m in Sources */,
+				346FBAF51EC2EEA2007E9B8D /* BackgroundView.swift in Sources */,
 				3433528D1DF943D100CF7281 /* CoreDataController.swift in Sources */,
 				345ECB871DF8F5C100F70ACC /* Rule.swift in Sources */,
 				3474EC7B1DDC926C00EBF3C5 /* AppDelegate.swift in Sources */,

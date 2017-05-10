@@ -34,8 +34,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         
         let logFileManager = DDLogFileManagerDefault(logsDirectory: url.path)
         let fileLogger: DDFileLogger = DDFileLogger(logFileManager: logFileManager) // File Logger
-        fileLogger.rollingFrequency = TimeInterval(60*60*24)  // 24 hours
-        fileLogger.logFileManager.maximumNumberOfLogFiles = 0
+        fileLogger.rollingFrequency = TimeInterval(60*60)  // 1 hours
+//        fileLogger.logFileManager.maximumNumberOfLogFiles = 1
         DDLog.add(fileLogger)
         
         defaultDebugLevel = DDLogLevel.verbose

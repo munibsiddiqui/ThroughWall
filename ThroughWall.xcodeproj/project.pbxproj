@@ -16,6 +16,7 @@
 		3439FA061DEEB7A000F8CE59 /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3439FA051DEEB7A000F8CE59 /* Rule.swift */; };
 		3444AB861DF164B600FD3B9F /* Socks2HTTPS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3444AB851DF164B600FD3B9F /* Socks2HTTPS.swift */; };
 		3445FB091E8D5F82001504E9 /* RuleDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3445FB081E8D5F82001504E9 /* RuleDetailTableViewController.swift */; };
+		344EF2C91EC345980055A049 /* LogViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 344EF2C81EC345980055A049 /* LogViewController.swift */; };
 		3452C3481E763D80008CCC4E /* Tool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3452C3471E763D80008CCC4E /* Tool.swift */; };
 		345ECB861DF8F48800F70ACC /* rule.config in Resources */ = {isa = PBXBuildFile; fileRef = 345ECB851DF8F48800F70ACC /* rule.config */; };
 		345ECB871DF8F5C100F70ACC /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3439FA051DEEB7A000F8CE59 /* Rule.swift */; };
@@ -288,6 +289,7 @@
 		3439FA051DEEB7A000F8CE59 /* Rule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Rule.swift; sourceTree = "<group>"; };
 		3444AB851DF164B600FD3B9F /* Socks2HTTPS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Socks2HTTPS.swift; sourceTree = "<group>"; };
 		3445FB081E8D5F82001504E9 /* RuleDetailTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleDetailTableViewController.swift; sourceTree = "<group>"; };
+		344EF2C81EC345980055A049 /* LogViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogViewController.swift; sourceTree = "<group>"; };
 		3452C3471E763D80008CCC4E /* Tool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tool.swift; sourceTree = "<group>"; };
 		345ECB851DF8F48800F70ACC /* rule.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = rule.config; sourceTree = "<group>"; };
 		3469E9021EB9B9B20087DA38 /* VPNTableViewContTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VPNTableViewContTableViewCell.swift; sourceTree = "<group>"; };
@@ -1192,6 +1194,7 @@
 				3482A2B01E9F0D9700A6B202 /* RuleProxySelectionTableViewController.swift */,
 				348F61961E8E4D0D00F6AF9A /* TestRuleViewController.swift */,
 				348F61981E8E540000F6AF9A /* RawRuleTXTViewController.swift */,
+				344EF2C81EC345980055A049 /* LogViewController.swift */,
 			);
 			name = RuleConfig;
 			sourceTree = "<group>";
@@ -2750,6 +2753,7 @@
 				3474EC831DDC926C00EBF3C5 /* ThroughWall.xcdatamodeld in Sources */,
 				34765C891E10D8810055C294 /* ConfigureViewController.swift in Sources */,
 				34A17DD51E8CF6F6005BC19B /* RuleListTableViewController.swift in Sources */,
+				344EF2C91EC345980055A049 /* LogViewController.swift in Sources */,
 				34765C8B1E10D8810055C294 /* HistoryFigureViewController.swift in Sources */,
 				34765C951E1116780055C294 /* RequestListTableViewController.swift in Sources */,
 				348F61991E8E540000F6AF9A /* RawRuleTXTViewController.swift in Sources */,

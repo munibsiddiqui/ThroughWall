@@ -322,7 +322,7 @@ class SiteConfigController {
                     print("save new manager \(error!)")
                     completionHandler(nil)
                 } else {
-                    print("saved new manger")
+                    print("saved new manager")
                     completionHandler(manager)
                 }
             }

@@ -13,6 +13,7 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
     var downloadTask: URLSessionDownloadTask!
     let downloadFilePath = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)[0] + "/" + configFileName
 
+    var hiddenHitTimes = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,6 +32,12 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
 
         setTopArear()
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        hiddenHitTimes = 0
+    }
+    
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -214,6 +221,15 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         switch indexPath.section {
         case 0:
             switch indexPath.row {
+            case 0:
+                hiddenHitTimes = hiddenHitTimes + 1
+                if hiddenHitTimes == 5 {
+                    let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                    let vc = storyboard.instantiateViewController(withIdentifier: "LogTXTView") as! LogViewController
+                    
+                    self.navigationController?.pushViewController(vc, animated: true)
+                }
+                
             case 1:
                 performSegue(withIdentifier: "showTestRule", sender: nil)
             default:

@@ -176,6 +176,8 @@ class WaveButtonView: ButtonView {
     private var animationDelegate = AnimationDelegate()
     
     
+    // MARK: - -----
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         addWaveLayer()
@@ -193,6 +195,8 @@ class WaveButtonView: ButtonView {
     private func setCallback() {
         animationDelegate.didStopCallback = animationDidStop
     }
+    
+    
     
     private func addWaveLayer() {
         if let sublayers = self.layer.sublayers {

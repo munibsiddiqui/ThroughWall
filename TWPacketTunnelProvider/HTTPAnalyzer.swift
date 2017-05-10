@@ -257,10 +257,16 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     
     func handleHTTPRequestHead(withRequest request: String) {
         var (host, port) = getHostAndPort(fromHostComponentOfRequest: request)
-        let (hostName, replaced, portNumber, repostRequest) = extractHostAndPortWithRepost(fromRequest: request)
+        var (hostName, replaced, portNumber, repostRequest) = extractHostAndPortWithRepost(fromRequest: request)
         
-        if host == nil || replaced {
+        if host == nil {
             host = hostName
+        }else if replaced{
+            //replace host in request
+            host = hostName
+            if repostRequest != nil {
+                repostRequest = replaceHostItem(repostRequest!)
+            }
         }
         
         if port == nil {
@@ -298,6 +304,24 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         }
         return (host, port)
     }
+    
+    func replaceHostItem(_ request: String) -> String {
+        var requestComponents = request.components(separatedBy: "\r\n")
+        for (index, requestComponent) in requestComponents.enumerated() {
+            if requestComponent.hasPrefix("Host: ") {
+                var temp = requestComponent.substring(from: requestComponent.index(requestComponent.startIndex, offsetBy: 6))
+                temp = "http://" + temp
+                temp = Rule.sharedInstance.tryRewriteURL(withURLString: temp)
+                if let slashIndex = temp.range(of: "//") {
+                    temp = temp.substring(from: slashIndex.upperBound)
+                    temp = "Host: " + temp
+                    requestComponents[index] = temp
+                }
+            }
+        }
+        return requestComponents.joined(separator: "\r\n")
+    }
+    
     
     func getKeepAliveInfo(fromRequest request: String) -> Bool {
         if let connetionType = extractDetail(from: request, by: "Connection") {

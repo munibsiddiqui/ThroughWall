@@ -16,25 +16,16 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     @IBOutlet weak var operationAreaView: OperationView!
     @IBOutlet weak var tableViewTopConstraint: NSLayoutConstraint!
     @IBOutlet weak var currentVPNStatusLabel: UILabel!
-//    @IBOutlet weak var buttonImageView: UIImageView!
-
+    
     var addedBackground = false
     var selectedServerIndex = 0
     var willEditServerIndex = -1
     var proxyConfigs = [ProxyConfig]()
     var icmpPing: ICMPPing?
     var currentVPNStatusLamp = UIImageView()
-//    var viewDisappeared = false
 
-//    let waveAnimationayer = CAReplicatorLayer()
-//    let buttonLayer = CALayer()
-
-//    var instanceCount = 0
-    let waveDuration: Double = 3.0
-    let waveStep: CGFloat = 15
-//    var buttonDimension: CGFloat {
-//        return buttonLayer.frame.width
-//    }
+    let waveDuration: Double = 1.5
+    let waveStep: CGFloat = 30
 
     var currentVPNManager: NETunnelProviderManager? {
         willSet {
@@ -46,7 +37,6 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     var currentVPNStatusIndicator: NEVPNStatus = .invalid {
         didSet {
-            print("new status \(currentVPNStatusIndicator.rawValue)")
             setOperationArea()
         }
     }
@@ -59,7 +49,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         sleepToDelayWelcomePage()
         setTopArea()
         setTabBarArea()
-        setOperationArea()
+        setupOperationArea()
         setupTableView()
         tryUpdateRuleFile()
         convertToNewServerStyle()
@@ -76,48 +66,32 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         // Dispose of any resources that can be recreated.
     }
 
-//    override func viewDidLayoutSubviews() {
-//        if addedBackground {
-//            backgroundView.layer.sublayers?[0].removeFromSuperlayer()
-//        }
-//        addLayersToOperationArea()
-//        setAllStatusIndication()
-//        setFadeBackground(withTopColor: topUIColor, bottomColor: bottomUIColor)
-//        reloadTable()
-//        addedBackground = true
-//    }
-
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
+        
+        setOperationArea()
         NotificationCenter.default.addObserver(self, selector: #selector(VPNStatusDidChange(_:)), name: NSNotification.Name.NEVPNStatusDidChange, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(viewResume), name: .UIApplicationWillEnterForeground, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(animationResume), name: .UIApplicationWillEnterForeground, object: nil)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name.NEVPNStatusDidChange, object: nil)
         NotificationCenter.default.removeObserver(self, name: .UIApplicationWillEnterForeground, object: nil)
-//        viewDisappeared = true
-    }
-
-    override func viewDidAppear(_ animated: Bool) {
-//        waveAnimationQuietlyStart()
-//        if viewDisappeared {
-//            setAllStatusIndication()
-//            viewDisappeared = false
-//        }
     }
 
 
-    func viewResume() {
-//        waveAnimationQuietlyStart()
-//        setAllStatusIndication()
+    func animationResume() {
+        setOperationArea()
     }
 
 
     // MARK: - Tools
 
+    func setupOperationArea() {
+//        operationAreaView.waveStep = waveStep
+        operationAreaView.waveDuration = waveDuration
+    }
 
     func setOperationArea() {
         DispatchQueue.main.async {
@@ -126,7 +100,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
                 self.currentVPNStatusLabel.text = "Add"
             } else {
                 switch self.currentVPNStatusIndicator {
-                    
+
                 case .connecting:
                     self.operationAreaView.setButtonImage(withImageName: "Connected", withBackCircleDrawed: true)
                     self.operationAreaView.forceStartAnimation()
@@ -151,244 +125,11 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
             }
         }
     }
-    
+
     func setVPNStatusIndicator(withLabelText text: String, andLampImageName imageName: String) {
         currentVPNStatusLabel.text = text
         currentVPNStatusLamp.image = UIImage(named: imageName)
-        print(text)
     }
-    
-    
-//    func addLayersToOperationArea() {
-//
-//        let miniDimension = (operationAreaView.frame.width < operationAreaView.frame.height ? operationAreaView.frame.width : operationAreaView.frame.height)
-//        buttonLayer.frame = CGRect(origin: .zero, size: .init(width: miniDimension / 3, height: miniDimension / 3))
-//        buttonLayer.position = CGPoint(x: operationAreaView.frame.width / 2, y: operationAreaView.frame.height / 2)
-//
-//        waveAnimationayer.frame = CGRect(origin: .zero, size: operationAreaView.frame.size)
-//        waveAnimationayer.position = CGPoint(x: operationAreaView.frame.width / 2, y: operationAreaView.frame.height / 2)
-//
-//        addWaveAnimationLayer()
-//        addButtonLayer()
-//    }
-//
-//    func addWaveAnimationLayer() {
-//        if let sublayers = operationAreaView.layer.sublayers {
-//            if sublayers.contains(waveAnimationayer) {
-//                return
-//            }
-//        }
-//
-//        operationAreaView.layer.addSublayer(waveAnimationayer)
-//    }
-//
-//    func waveAnimationQuietlyStart() {
-//        waveAnimationayer.sublayers = nil
-//
-//        let circleLayer = CAShapeLayer()
-//
-//        waveAnimationayer.addSublayer(circleLayer)
-//
-//        circleLayer.frame = CGRect(origin: .zero, size: waveAnimationayer.frame.size)
-//
-//        circleLayer.isHidden = true
-//
-//        addAnimationToCircleLayer(circleLayer)
-//
-//        waveAnimationayer.instanceCount = instanceCount
-//        waveAnimationayer.instanceDelay = waveDuration / CFTimeInterval(instanceCount)
-//    }
-
-//    func addButtonLayer() {
-//        if let sublayers = operationAreaView.layer.sublayers {
-//            if sublayers.contains(buttonLayer) {
-//                return
-//            }
-//        }
-//        operationAreaView.layer.addSublayer(buttonLayer)
-//
-//
-//    }
-
-//    func getOffStateCGPath(withDimension dimension: CGFloat) -> CGPath {
-//        let combinedPath = CGMutablePath()
-//
-//        let circlePath = UIBezierPath(arcCenter: CGPoint(x: dimension / 2.0, y: dimension / 2.0), radius: dimension / 2.0, startAngle: -CGFloat.pi * 120 / 180, endAngle: -CGFloat.pi * 60 / 180, clockwise: false)
-//
-//        combinedPath.addPath(circlePath.cgPath)
-//
-//        let linePath = UIBezierPath()
-//
-//        linePath.move(to: CGPoint(x: dimension / 2, y: dimension / 2))
-//        linePath.addLine(to: CGPoint(x: dimension / 2, y: 0))
-//
-//        combinedPath.addPath(linePath.cgPath)
-//
-//        return combinedPath
-//    }
-//
-//    func getAddStateCGPath(withDimension dimension: CGFloat) -> (CGPath, CGPath) {
-//        let combinedPath = CGMutablePath()
-//
-//        let circlePath = UIBezierPath(arcCenter: CGPoint(x: dimension / 2.0, y: dimension / 2.0), radius: dimension / 2.0, startAngle: 0, endAngle: CGFloat.pi * 2, clockwise: false)
-//
-//        let horizantalLinePath = UIBezierPath()
-//        horizantalLinePath.move(to: CGPoint(x: dimension / 2 - 30, y: dimension / 2))
-//        horizantalLinePath.addLine(to: CGPoint(x: dimension / 2 + 30, y: dimension / 2))
-//        combinedPath.addPath(horizantalLinePath.cgPath)
-//
-//        let verticalLinePath = UIBezierPath()
-//        verticalLinePath.move(to: CGPoint(x: dimension / 2, y: dimension / 2 - 30))
-//        verticalLinePath.addLine(to: CGPoint(x: dimension / 2, y: dimension / 2 + 30))
-//        combinedPath.addPath(verticalLinePath.cgPath)
-//
-//        return (circlePath.cgPath, combinedPath)
-//    }
-
-//    func addBaseColorLayerToButtonLayer(withCentrePoint point: CGPoint, andRadius radius: CGFloat, andColor color: UIColor) {
-//        let colorLayer = CAShapeLayer()
-//        buttonLayer.addSublayer(colorLayer)
-//        colorLayer.frame = CGRect(origin: .zero, size: buttonLayer.frame.size)
-//
-//        let circlePath = UIBezierPath(arcCenter: point, radius: radius, startAngle: 0, endAngle: CGFloat.pi * 2, clockwise: true)
-//
-//        colorLayer.path = circlePath.cgPath
-//        colorLayer.fillColor = color.cgColor
-//    }
-//
-//
-//    func addBaseColorLayerToButtonLayer() {
-//
-//        let dimension = buttonDimension
-//
-//        addBaseColorLayerToButtonLayer(withCentrePoint: CGPoint(x: dimension / 2.0, y: dimension / 2.0), andRadius: dimension / 2.0 + 60, andColor: UIColor(red: 255.0 / 255.0, green: 88.0 / 255.0, blue: 24.0 / 255.0, alpha: 0.14))
-//
-//        addBaseColorLayerToButtonLayer(withCentrePoint: CGPoint(x: dimension / 2.0, y: dimension / 2.0), andRadius: dimension / 2.0 + 30, andColor: UIColor(red: 255.0 / 255.0, green: 88.0 / 255.0, blue: 24.0 / 255.0, alpha: 0.22))
-//    }
-
-//    func drawIconOnButtonLayer(withImageName name: String) {
-//        let iconLayer = CALayer()
-//        buttonLayer.addSublayer(iconLayer)
-//        iconLayer.frame = CGRect(origin: .zero, size: buttonLayer.frame.size)
-//        iconLayer.contents = UIImage(named: name)?.cgImage
-//    }
-//
-//    func drawOffStateButton() {
-//        buttonLayer.sublayers = nil
-//
-//        addBaseColorLayerToButtonLayer()
-//        drawIconOnButtonLayer(withImageName: "Disconnected")
-//    }
-//
-//    func drawOnStateButton() {
-//        buttonLayer.sublayers = nil
-//
-//        addBaseColorLayerToButtonLayer()
-//        drawIconOnButtonLayer(withImageName: "Connected")
-//    }
-//
-//    func drawAddServerButton() {
-//        buttonLayer.sublayers = nil
-//        drawIconOnButtonLayer(withImageName: "Add")
-//    }
-//
-//    func connectionAnimationStart() {
-//        if let sublayers = waveAnimationayer.sublayers {
-//            for sublayer in sublayers {
-//                sublayer.isHidden = false
-//            }
-//        }
-//    }
-//
-//    func connectionAnimationEnd() {
-//        if let sublayers = waveAnimationayer.sublayers {
-//            for sublayer in sublayers {
-//                sublayer.isHidden = true
-//            }
-//        }
-//    }
-
-//
-//    func addAnimationToCircleLayer(_ circleLayer: CAShapeLayer) {
-//
-//        var eRadius = ((waveAnimationayer.frame.width < waveAnimationayer.frame.height ? waveAnimationayer.frame.width : waveAnimationayer.frame.height)) / 2
-//        let bRadius = buttonDimension / 2 + 3 * waveStep
-//
-//        instanceCount = Int((eRadius - bRadius) / 2 / waveStep) + 1
-//
-//        eRadius = CGFloat(instanceCount) * 2 * waveStep + bRadius
-//
-//        let beginCirclePath = UIBezierPath(arcCenter: CGPoint(x: waveAnimationayer.frame.size.width / 2.0, y: waveAnimationayer.frame.size.height / 2.0), radius: bRadius, startAngle: 0.0, endAngle: CGFloat(Double.pi * 2.0), clockwise: true)
-//
-//
-//        let endCirclePath = UIBezierPath(arcCenter: CGPoint(x: waveAnimationayer.frame.size.width / 2.0, y: waveAnimationayer.frame.size.height / 2.0), radius: eRadius, startAngle: 0.0, endAngle: CGFloat(Double.pi * 2.0), clockwise: true)
-//
-//        circleLayer.path = beginCirclePath.cgPath
-//        circleLayer.fillColor = UIColor.clear.cgColor
-//        circleLayer.strokeColor = UIColor(red: 255.0 / 255.0, green: 88.0 / 255.0, blue: 24.0 / 255.0, alpha: 0.14).cgColor
-//        circleLayer.lineWidth = 2 * waveStep
-//        circleLayer.opacity = 0
-//
-//        let fadeOut = CABasicAnimation(keyPath: "opacity")
-//        fadeOut.fromValue = 1
-//        fadeOut.toValue = 0
-//        fadeOut.duration = waveDuration
-//        fadeOut.repeatCount = Float.greatestFiniteMagnitude
-//        circleLayer.add(fadeOut, forKey: nil)
-//
-//        let pathAdmin = CABasicAnimation(keyPath: "path")
-//        pathAdmin.fromValue = circleLayer.path
-//        pathAdmin.toValue = endCirclePath.cgPath
-//        pathAdmin.duration = waveDuration
-//        pathAdmin.repeatCount = Float.greatestFiniteMagnitude
-//        circleLayer.add(pathAdmin, forKey: nil)
-//
-//        let colorFade = CABasicAnimation(keyPath: "strokeColor")
-//        colorFade.fromValue = topUIColor.cgColor
-//        colorFade.toValue = UIColor.white.cgColor
-//        colorFade.duration = waveDuration
-//        colorFade.repeatCount = Float.greatestFiniteMagnitude
-//        circleLayer.add(colorFade, forKey: nil)
-//    }
-
-//    func setAllStatusIndication() {
-//        print("Set")
-//        print(Date().timeIntervalSince1970)
-//        if proxyConfigs.count == 0 {
-//            drawAddServerButton()
-//            currentVPNStatusLabel.text = "Add"
-//        } else {
-//            switch currentVPNStatusIndicator {
-//            case .disconnected:
-//                drawOffStateButton()
-//                connectionAnimationEnd()
-//                currentVPNStatusLabel.text = "Disconnected"
-//                currentVPNStatusLamp.image = UIImage(named: "GrayDot")
-//            case .connecting:
-//                drawOnStateButton()
-//                connectionAnimationStart()
-//                currentVPNStatusLabel.text = "Connecting..."
-//                currentVPNStatusLamp.image = UIImage(named: "OrangeDot")
-//            case .connected:
-//                drawOnStateButton()
-//                connectionAnimationEnd()
-//                currentVPNStatusLabel.text = "Connected"
-//                currentVPNStatusLamp.image = UIImage(named: "GreenDot")
-//            case .disconnecting:
-//                drawOffStateButton()
-//                connectionAnimationStart()
-//                currentVPNStatusLabel.text = "Disconnecting..."
-//                currentVPNStatusLamp.image = UIImage(named: "OrangeDot")
-//            default:
-//                drawOffStateButton()
-//                connectionAnimationEnd()
-//                currentVPNStatusLabel.text = "Disconnected"
-//                currentVPNStatusLamp.image = UIImage(named: "GrayDot")
-//            }
-//        }
-//    }
-
-
 
     func sleepToDelayWelcomePage() {
         Thread.sleep(forTimeInterval: 1.0)
@@ -423,12 +164,6 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
                 tableViewTopConstraint = tableViewTopConstraint.setMultiplier(multiplier: 1.0)
                 DispatchQueue.main.async {
                     self.view.layoutIfNeeded()
-                    // change to add
-//                    if let manager = self.currentVPNManager {
-//                        manager.connection.stopVPNTunnel()
-//                    }
-
-//                    self.setAllStatusIndication()
                     self.setOperationArea()
                 }
             }
@@ -438,8 +173,6 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
                 tableViewTopConstraint = tableViewTopConstraint.setMultiplier(multiplier: 0.64)
                 DispatchQueue.main.async {
                     self.view.layoutIfNeeded()
-                    // change to connection
-//                    self.setAllStatusIndication()
                     self.setOperationArea()
                 }
             }
@@ -510,8 +243,12 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
             switch currentVPNStatusIndicator {
             case .invalid:
                 fallthrough
+            case .disconnecting:
+                fallthrough
             case .disconnected:
                 break
+            case .connecting:
+                fallthrough
             case .connected:
                 shouldOn = false
             default:
@@ -526,7 +263,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
                     }
                     manager.loadFromPreferences(completionHandler: { (_error) in
                         if let error = _error {
-                            print(error)
+                             self.showError(error, title: "load preferences 2")
 
                         } else {
                             if self.setVPNManager(withManager: manager, shouldON: shouldOn) == false {
@@ -543,7 +280,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
                             self.currentVPNManager = manager
                             manager.loadFromPreferences(completionHandler: { (_error) in
                                 if let error = _error {
-                                    print(error)
+                                     self.showError(error, title: "load preferences")
                                     return
                                 }
                                 if self.setVPNManager(withManager: manager, shouldON: shouldOn) == false {
@@ -556,6 +293,17 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
             }
         }
     }
+    
+    func showError(_ error: Error, title: String) {
+        DispatchQueue.main.async {
+            let alertController = UIAlertController(title: "\(title) Error", message: "\(error)", preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+            
+            alertController.addAction(okAction)
+            
+            self.present(alertController, animated: true, completion: nil)
+        }
+    }
 
     func setVPNManager(withManager manger: NETunnelProviderManager, shouldON on: Bool) -> Bool {
         var result = true
@@ -563,8 +311,10 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
             do {
                 try manger.connection.startVPNTunnel()
             } catch {
-                print(error)
+                showError(error, title: "start vpn")
+                
                 result = false
+                
             }
         } else {
             manger.connection.stopVPNTunnel()

@@ -33,11 +33,14 @@ let ruleFileName = "rule.conf"
 let rewriteFileName = "rew.conf"
 let siteFileName = "site.conf"
 let PacketTunnelProviderLogFolderName = "PacketTunnelProvider"
-let bundlefileVersion = 1
+let bundlefileVersion = 2
 let savedFileVersion = "Bingo.SavedFileVersion"
 let currentFileSource = "Bingo.FileSource"
 let defaultFileSource = "Bingo.FileSource.Default"
 let userImportFileSource = "Bingo.FileSource.UserImport"
+
+let klogLevel = "Bingo.LogLevel"
+let logLevels = ["off","error","warning","info","debug","verbose","all"]
 
 let blockADSetting = "Bingo.blockADSetting"
 let globalModeSetting = "Bingo.globalModeSetting"

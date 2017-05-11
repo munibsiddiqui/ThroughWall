@@ -8,12 +8,20 @@
 
 import UIKit
 
-class RuleListTableViewController: UITableViewController {
+class RuleListTableViewController: UITableViewController, UISearchResultsUpdating, UISearchControllerDelegate, UISearchBarDelegate {
 
     var ruleItems = [[String]]()
     var rewriteItems = [[String]]()
 
+    var filteredRuleItems = [[String]]()
+    var filteredRewriteItems = [[String]]()
+
     var selectedIndex = -1
+
+    let searchController = UISearchController(searchResultsController: nil)
+
+
+    var filterText = ""
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,12 +32,26 @@ class RuleListTableViewController: UITableViewController {
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
 
+        navigationController?.navigationBar.barTintColor = topUIColor
+
         tableView.tableFooterView = UIView()
         tableView.backgroundColor = UIColor.groupTableViewBackground
+
+//        self.edgesForExtendedLayout = UIRectEdge.all
+        self.extendedLayoutIncludesOpaqueBars = true
 
         NotificationCenter.default.addObserver(self, selector: #selector(RuleListTableViewController.ruleSaved(notification:)), name: NSNotification.Name(rawValue: kRuleSaved), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(RuleListTableViewController.ruleDeleted(notification:)), name: NSNotification.Name(rawValue: kRuleDeleted), object: nil)
 
+        searchController.searchResultsUpdater = self
+        searchController.dimsBackgroundDuringPresentation = false
+        searchController.delegate = self
+//        searchController.searchBar.scopeButtonTitles = ["All", "Rewrite", "Direct", "Proxy", "Reject"]
+//        searchController.searchBar.delegate = self
+
+        tableView.tableHeaderView = searchController.searchBar
+
+        definesPresentationContext = true
     }
 
     deinit {
@@ -96,7 +118,6 @@ class RuleListTableViewController: UITableViewController {
 
     }
 
-
     func makeRulesIntoContent() -> String {
         var content = "[URL Rewrite]\n"
 
@@ -116,6 +137,46 @@ class RuleListTableViewController: UITableViewController {
     }
 
 
+    func applyFilter(withText text: String) {
+        filteredRuleItems.removeAll()
+        filteredRewriteItems.removeAll()
+        for ruleItem in ruleItems {
+            for item in ruleItem {
+                if item.lowercased().contains(text) {
+                    filteredRuleItems.append(ruleItem)
+                    break
+                }
+            }
+        }
+
+        for rewriteItem in rewriteItems {
+            for item in rewriteItem {
+                if item.lowercased().contains(text) {
+                    filteredRewriteItems.append(rewriteItem)
+                    break
+                }
+            }
+        }
+
+        tableView.reloadData()
+    }
+
+
+    // MARK: - UISearchControllerDelegate
+//    func willDismissSearchController(_ searchController: UISearchController) {
+//        let indexPath = IndexPath(row: 0, section: 0)
+//        tableView.scrollToRow(at: indexPath, at: .top, animated: false)
+//    }
+
+    // MARK: - UISearchResultsUpdating
+
+    func updateSearchResults(for searchController: UISearchController) {
+        if let text = searchController.searchBar.text {
+            filterText = text.lowercased()
+            applyFilter(withText: text.lowercased())
+        }
+    }
+
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -125,6 +186,9 @@ class RuleListTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
+        if searchController.isActive {
+            return filteredRewriteItems.count + filteredRuleItems.count
+        }
         return rewriteItems.count + ruleItems.count
     }
 
@@ -133,16 +197,34 @@ class RuleListTableViewController: UITableViewController {
 
         let cell = tableView.dequeueReusableCell(withIdentifier: "listCell", for: indexPath)
 
-        if indexPath.row < rewriteItems.count {
-            let item = rewriteItems[indexPath.row]
+        if searchController.isActive {
+            if indexPath.row < filteredRewriteItems.count {
+                let item = filteredRewriteItems[indexPath.row]
 
-            cell.textLabel?.text = item[0]
-            cell.detailTextLabel?.text = item[1]
+                cell.textLabel?.attributedText = usingFilterTextTohightlight(item[0])
+                cell.detailTextLabel?.attributedText = usingFilterTextTohightlight(item[1])
+            } else {
+                let item = filteredRuleItems[indexPath.row - filteredRewriteItems.count]
+
+                cell.textLabel?.attributedText = usingFilterTextTohightlight(item[1])
+                
+                //In fact, usingFilterTextTohightlight doesn't work now
+                cell.detailTextLabel?.attributedText = usingFilterTextTohightlight(attributedText: makeAttributeDescription(withMatchRule: item[0], andProxyRule: item[2]))
+            }
         } else {
-            let item = ruleItems[indexPath.row - rewriteItems.count]
-
-            cell.textLabel?.text = item[1]
-            cell.detailTextLabel?.attributedText = makeAttributeDescription(withMatchRule: item[0], andProxyRule: item[2])
+            if indexPath.row < rewriteItems.count {
+                let item = rewriteItems[indexPath.row]
+                cell.textLabel?.attributedText = nil
+                cell.detailTextLabel?.attributedText = nil
+                cell.textLabel?.text = item[0]
+                cell.detailTextLabel?.text = item[1]
+            } else {
+                let item = ruleItems[indexPath.row - rewriteItems.count]
+                cell.textLabel?.attributedText = nil
+                cell.detailTextLabel?.attributedText = nil
+                cell.textLabel?.text = item[1]
+                cell.detailTextLabel?.attributedText = makeAttributeDescription(withMatchRule: item[0], andProxyRule: item[2])
+            }
         }
 
         return cell
@@ -170,6 +252,38 @@ class RuleListTableViewController: UITableViewController {
         return attributeDescription
     }
 
+    func usingFilterTextTohightlight(_ text: String) -> NSAttributedString {
+        let attributedText = NSAttributedString(string: text)
+        return usingFilterTextTohightlight(attributedText: attributedText)
+    }
+
+    func usingFilterTextTohightlight(attributedText attributeText: NSAttributedString) -> NSAttributedString {
+        let mutableAttText = NSMutableAttributedString(attributedString: attributeText)
+        let text = attributeText.string
+
+        for range in searchRangesOfFilterText(inString: text) {
+            
+            mutableAttText.addAttribute(NSBackgroundColorAttributeName, value: UIColor.yellow, range: text.toNSRange(from: range))
+        }
+        return mutableAttText
+    }
+
+    func searchRangesOfFilterText(inString str: String) -> [Range<String.Index>] {
+        var endRange = str.endIndex
+        var ranges = [Range<String.Index>]()
+        while true {
+            let subString = str.substring(to: endRange)
+            if let range = subString.range(of: filterText, options: [.literal, .backwards]){
+                ranges.append(range)
+                endRange = range.lowerBound
+            } else {
+                break
+            }
+        }
+
+        return ranges
+    }
+
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
         selectedIndex = indexPath.row
@@ -183,22 +297,22 @@ class RuleListTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            
+
             let alertController = UIAlertController(title: "Delete Rule", message: nil, preferredStyle: .alert)
             let deleteAction = UIAlertAction(title: "Delete", style: .destructive, handler: { (_) in
-                
+
                 DispatchQueue.main.async {
                     self.selectedIndex = indexPath.row
                     self.ruleDeleted()
                 }
             })
             let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-            
+
             alertController.addAction(cancelAction)
             alertController.addAction(deleteAction)
-            
+
             self.present(alertController, animated: true, completion: nil)
-            
+
         }
     }
 
@@ -218,12 +332,23 @@ class RuleListTableViewController: UITableViewController {
             if let desti = segue.destination as? RuleDetailTableViewController {
                 if selectedIndex != -1 {
                     let item: [String]
-                    if selectedIndex < rewriteItems.count {
-                        item = rewriteItems[selectedIndex]
-                        desti.rewriteItem = item
+                    if searchController.isActive {
+                        if selectedIndex < filteredRewriteItems.count {
+                            item = filteredRewriteItems[selectedIndex]
+                            desti.rewriteItem = item
+                        } else {
+                            item = filteredRuleItems[selectedIndex - filteredRewriteItems.count]
+                            desti.ruleItem = item
+                        }
+
                     } else {
-                        item = ruleItems[selectedIndex - rewriteItems.count]
-                        desti.ruleItem = item
+                        if selectedIndex < rewriteItems.count {
+                            item = rewriteItems[selectedIndex]
+                            desti.rewriteItem = item
+                        } else {
+                            item = ruleItems[selectedIndex - rewriteItems.count]
+                            desti.ruleItem = item
+                        }
                     }
                     desti.showDelete = true
                 } else {
@@ -231,5 +356,14 @@ class RuleListTableViewController: UITableViewController {
                 }
             }
         }
+    }
+}
+
+
+extension String {
+    func toNSRange(from range: Range<String.Index>) -> NSRange {
+        let from = range.lowerBound.samePosition(in: utf16)
+        let to = range.upperBound.samePosition(in: utf16)
+        return NSRange.init(location: utf16.distance(from: utf16.startIndex, to: from), length: utf16.distance(from: from, to: to))
     }
 }

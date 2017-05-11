@@ -53,31 +53,53 @@ class LogViewController: UIViewController {
         }
     }
 
-    @IBAction func clearHistory(_ sender: UIBarButtonItem) {
+    @IBAction func actions(_ sender: UIBarButtonItem) {
 
-        let fileManager = FileManager.default
-        var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName)!
-        url.appendPathComponent(PacketTunnelProviderLogFolderName)
-
-        let logFileManager = DDLogFileManagerDefault(logsDirectory: url.path)
-        let fileLogger: DDFileLogger = DDFileLogger(logFileManager: logFileManager) // File Logger
-
-        fileLogger.rollLogFile {
-            do {
-                for filePath in fileLogger.logFileManager.sortedLogFilePaths {
-                    try fileManager.removeItem(atPath: filePath)
-                }
-                self.loadLog()
+        let listController = UIAlertController(title: "Log Actions", message: nil, preferredStyle: .actionSheet)
+        
+        for logLevel in logLevels {
+            let logLevelAction = UIAlertAction(title: "\(logLevel) Level", style: .default) { (_) in
+                let defaults = UserDefaults.init(suiteName: groupName)
+                defaults?.set(logLevel, forKey: klogLevel)
+                defaults?.synchronize()
             }
-            catch {
-                let alertController = UIAlertController(title: "Error", message: "\(error)", preferredStyle: .alert)
-                let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
-                
-                alertController.addAction(okAction)
-                
-                self.present(alertController, animated: true, completion: nil)
+            listController.addAction(logLevelAction)
+        }
+        
+        let clearLog = UIAlertAction(title: "Clear Log", style: .destructive) { (_) in
+            let fileManager = FileManager.default
+            var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName)!
+            url.appendPathComponent(PacketTunnelProviderLogFolderName)
+            
+            let logFileManager = DDLogFileManagerDefault(logsDirectory: url.path)
+            let fileLogger: DDFileLogger = DDFileLogger(logFileManager: logFileManager) // File Logger
+            
+            fileLogger.rollLogFile {
+                do {
+                    for filePath in fileLogger.logFileManager.sortedLogFilePaths {
+                        try fileManager.removeItem(atPath: filePath)
+                    }
+                    self.loadLog()
+                }
+                catch {
+                    let alertController = UIAlertController(title: "Error", message: "\(error)", preferredStyle: .alert)
+                    let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+                    
+                    alertController.addAction(okAction)
+                    
+                    self.present(alertController, animated: true, completion: nil)
+                }
             }
         }
+        
+        let cancelItem = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        
+        listController.addAction(clearLog)
+        listController.addAction(cancelItem)
+        
+        present(listController, animated: true, completion: nil)
+        
+    
     }
 
     /*

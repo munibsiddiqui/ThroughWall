@@ -328,7 +328,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         if let manager = currentVPNManager {
             if manager.connection.status != .disconnected {
 
-                let alertController = UIAlertController(title: "Ping is disabled now", message: "Ping is not accurate while connecting to a server", preferredStyle: .alert)
+                let alertController = UIAlertController(title: "Ping is disabled now", message: "Ping is not accurate while connected to a server", preferredStyle: .alert)
                 let okAction = UIAlertAction(title: "Done", style: .default, handler: { _ in
                     DispatchQueue.main.async {
                         self.tableView.refreshControl?.endRefreshing()

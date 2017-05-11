@@ -20,6 +20,9 @@ class RawRuleTXTViewController: UIViewController, UITextViewDelegate {
         // Do any additional setup after loading the view.
         let content = RuleFileUpdateController().readCurrentRuleFileContent()
         rawRuleTXTView.text = content
+    
+//        rawRuleTXTView.attributedText = makeAttributedText(withKeyText: "Proxy", inText: content, usingForegroundColor: UIColor.green)
+        
         rawRuleTXTView.delegate = self
         NotificationCenter.default.addObserver(self, selector: #selector(RawRuleTXTViewController.keyboardWillChangeFrame(notification:)), name: .UIKeyboardWillChangeFrame, object: nil)
     }
@@ -62,6 +65,34 @@ class RawRuleTXTViewController: UIViewController, UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
         textChanged = true
     }
+    
+    
+    func makeAttributedText(withKeyText keyText: String, inText text:String, usingForegroundColor fColor: UIColor) -> NSAttributedString {
+        let mutableAttText = NSMutableAttributedString(string: text)
+        
+        for range in searchRanges(ofKeytext: keyText, inString: text){
+            
+            mutableAttText.addAttribute(NSForegroundColorAttributeName, value: fColor, range: text.toNSRange(from: range))
+        }
+        return mutableAttText
+    }
+    
+    func searchRanges(ofKeytext keyText: String, inString str: String) -> [Range<String.Index>] {
+        var endRange = str.endIndex
+        var ranges = [Range<String.Index>]()
+        while true {
+            let subString = str.substring(to: endRange)
+            if let range = subString.range(of: keyText, options: [.literal, .backwards]){
+                ranges.append(range)
+                endRange = range.lowerBound
+            } else {
+                break
+            }
+        }
+        
+        return ranges
+    }
+
     
     /*
     // MARK: - Navigation

@@ -16,7 +16,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     @IBOutlet weak var operationAreaView: OperationView!
     @IBOutlet weak var tableViewTopConstraint: NSLayoutConstraint!
     @IBOutlet weak var currentVPNStatusLabel: UILabel!
-    
+
     var addedBackground = false
     var selectedServerIndex = 0
     var willEditServerIndex = -1
@@ -29,9 +29,6 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     var currentVPNManager: NETunnelProviderManager? {
         willSet {
-//            if let vpnManager = newValue {
-//                self.navigationItem.title = (vpnManager.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration!["description"] as? String
-//            }
         }
     }
 
@@ -40,7 +37,6 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
             setOperationArea()
         }
     }
-
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -65,21 +61,6 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        setOperationArea()
-        NotificationCenter.default.addObserver(self, selector: #selector(VPNStatusDidChange(_:)), name: NSNotification.Name.NEVPNStatusDidChange, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(animationResume), name: .UIApplicationWillEnterForeground, object: nil)
-    }
-
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.NEVPNStatusDidChange, object: nil)
-        NotificationCenter.default.removeObserver(self, name: .UIApplicationWillEnterForeground, object: nil)
-    }
-
 
     func animationResume() {
         setOperationArea()
@@ -129,6 +110,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     func setVPNStatusIndicator(withLabelText text: String, andLampImageName imageName: String) {
         currentVPNStatusLabel.text = text
         currentVPNStatusLamp.image = UIImage(named: imageName)
+        print(text)
     }
 
     func sleepToDelayWelcomePage() {
@@ -204,14 +186,87 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
 
     func registerNotificationWhenLoaded() {
+        NotificationCenter.default.addObserver(self, selector: #selector(VPNStatusDidChange(_:)), name: .NEVPNStatusDidChange, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(animationResume), name: .UIApplicationWillEnterForeground, object: nil)
+
         NotificationCenter.default.addObserver(self, selector: #selector(deleteEditingVPN), name: NSNotification.Name(rawValue: kDeleteEditingVPN), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(saveVPN(_:)), name: NSNotification.Name(rawValue: kSaveVPN), object: nil)
     }
 
     func removeNotificationObserver() {
+        NotificationCenter.default.removeObserver(self, name: .NEVPNStatusDidChange, object: nil)
+        NotificationCenter.default.removeObserver(self, name: .UIApplicationWillEnterForeground, object: nil)
+
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kDeleteEditingVPN), object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kSaveVPN), object: nil)
+//        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kQRCodeExtracted), object: nil)
+
     }
+
+    func didExtractedQRCode(notification: Notification) {
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kQRCodeExtracted), object: nil)
+        if var ss = notification.userInfo?["string"] as? String {
+            if let preRange = ss.range(of: "ss://") {
+                ss.removeSubrange(preRange)
+            }
+            if let poundsignIndex = ss.range(of: "#")?.lowerBound {
+                let removeRange = Range(uncheckedBounds: (lower: poundsignIndex, upper: ss.endIndex))
+                ss.removeSubrange(removeRange)
+            }
+            ss = ss.padding(toLength: ((ss.characters.count + 3) / 4) * 4, withPad: "=", startingAt: 0)
+            let decodeData = Data.init(base64Encoded: ss)
+            if let decodestring = String.init(data: decodeData ?? Data(), encoding: String.Encoding.utf8) {
+                let components = decodestring.components(separatedBy: ":")
+                if components.count == 3 {
+                    var method = components[0]
+                    let passwordHost = components[1]
+                    let port = components[2]
+
+                    let components2 = passwordHost.components(separatedBy: "@")
+                    if components2.count == 2 {
+                        let password = components2[0]
+                        let host = components2[1]
+
+                        if let range = method.range(of: "-auth") {
+                            method.removeSubrange(range)
+                        }
+
+                        //                        withUnsafePointer(to: &proxyConfig, { (p) in
+                        //                            print("proxyconfig \(p)")
+                        //                        })
+
+                        let proxyConfig = ProxyConfig()
+                        proxyConfig.currentProxy = "CUSTOM"
+                        proxyConfig.setValue(byItem: "description", value: "\(host):\(port)")
+                        proxyConfig.setValue(byItem: "server", value: host)
+                        proxyConfig.setValue(byItem: "port", value: port)
+                        proxyConfig.setValue(byItem: "password", value: password)
+                        proxyConfig.setValue(byItem: "method", value: method)
+                        
+                        DispatchQueue.main.async {
+                            self.addNewVPN(withNewConfig: proxyConfig)
+                        }                        
+                        return
+                    }
+                }
+            }
+        }
+
+        presentExtractQRFailed()
+        
+    }
+    
+    func presentExtractQRFailed() {
+        let alertController = UIAlertController(title: "Extract QRCode Failed", message: nil, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+        
+        alertController.addAction(okAction)
+        DispatchQueue.main.async {
+            self.present(alertController, animated: true, completion: nil)
+        }
+    }
+
+
 
     func image(fromColor color: UIColor) -> UIImage {
         let rect = CGRect(x: 0, y: 0, width: view.frame.size.width, height: view.frame.size.height)
@@ -231,6 +286,10 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         } else {
             print("!!!!!")
         }
+    }
+    @IBAction func scanQRCode(_ sender: UIBarButtonItem) {
+        NotificationCenter.default.addObserver(self, selector: #selector(didExtractedQRCode(notification:)), name: NSNotification.Name(rawValue: kQRCodeExtracted), object: nil)
+        performSegue(withIdentifier: "QRCodeScan", sender: nil)
     }
 
     @IBAction func operationViewTouched(_ sender: UITapGestureRecognizer) {
@@ -263,7 +322,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
                     }
                     manager.loadFromPreferences(completionHandler: { (_error) in
                         if let error = _error {
-                             self.showError(error, title: "load preferences 2")
+                            self.showError(error, title: "load preferences 2")
 
                         } else {
                             if self.setVPNManager(withManager: manager, shouldON: shouldOn) == false {
@@ -280,7 +339,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
                             self.currentVPNManager = manager
                             manager.loadFromPreferences(completionHandler: { (_error) in
                                 if let error = _error {
-                                     self.showError(error, title: "load preferences")
+                                    self.showError(error, title: "load preferences")
                                     return
                                 }
                                 if self.setVPNManager(withManager: manager, shouldON: shouldOn) == false {
@@ -293,14 +352,14 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
             }
         }
     }
-    
+
     func showError(_ error: Error, title: String) {
         DispatchQueue.main.async {
             let alertController = UIAlertController(title: "\(title) Error", message: "\(error)", preferredStyle: .alert)
             let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
-            
+
             alertController.addAction(okAction)
-            
+
             self.present(alertController, animated: true, completion: nil)
         }
     }
@@ -312,9 +371,9 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
                 try manger.connection.startVPNTunnel()
             } catch {
                 showError(error, title: "start vpn")
-                
+
                 result = false
-                
+
             }
         } else {
             manger.connection.stopVPNTunnel()
@@ -445,6 +504,10 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
 
+        if indexPath.row >= proxyConfigs.count {
+            return
+        }
+        
         if let currentManager = currentVPNManager {
             if currentManager.connection.status != .disconnected {
                 //pop a alert
@@ -475,7 +538,10 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
 
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return true
+        if indexPath.row < proxyConfigs.count {
+            return  true
+        }
+        return false
     }
 
 
@@ -514,9 +580,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         if willEditServerIndex == -1 {
             //add
             if let newConfig = notification.userInfo?["proxyConfig"] as? ProxyConfig {
-                proxyConfigs.append(newConfig)
-                SiteConfigController().writeIntoSiteConfigFile(withConfigs: proxyConfigs)
-                reloadTable()
+                addNewVPN(withNewConfig: newConfig)
             }
         } else {
             //save
@@ -524,6 +588,13 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
             reloadTable()
         }
     }
+    
+    func addNewVPN(withNewConfig newConfig: ProxyConfig) {
+        proxyConfigs.append(newConfig)
+        SiteConfigController().writeIntoSiteConfigFile(withConfigs: proxyConfigs)
+        reloadTable()
+    }
+    
 
     func deleteEditingVPN() {
         let selectedServer = proxyConfigs[selectedServerIndex]

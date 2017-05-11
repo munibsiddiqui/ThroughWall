@@ -20,6 +20,12 @@
 		3452C3481E763D80008CCC4E /* Tool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3452C3471E763D80008CCC4E /* Tool.swift */; };
 		345ECB861DF8F48800F70ACC /* rule.config in Resources */ = {isa = PBXBuildFile; fileRef = 345ECB851DF8F48800F70ACC /* rule.config */; };
 		345ECB871DF8F5C100F70ACC /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3439FA051DEEB7A000F8CE59 /* Rule.swift */; };
+		3464BF6A1EC49BDC00D81663 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3464BF691EC49BDC00D81663 /* NetworkExtension.framework */; };
+		3464BF6B1EC49BFC00D81663 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3464BF691EC49BDC00D81663 /* NetworkExtension.framework */; };
+		3464BF6C1EC49C0A00D81663 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3464BF691EC49BDC00D81663 /* NetworkExtension.framework */; };
+		3464BF6E1EC49F0400D81663 /* QRViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3464BF6D1EC49F0400D81663 /* QRViewController.swift */; };
+		3464BF701EC4A86300D81663 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3464BF6F1EC4A86300D81663 /* CoreImage.framework */; };
+		3464BF721EC4A88900D81663 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3464BF711EC4A88900D81663 /* AVFoundation.framework */; };
 		3469E9031EB9B9B20087DA38 /* VPNTableViewContTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3469E9021EB9B9B20087DA38 /* VPNTableViewContTableViewCell.swift */; };
 		346FBAF51EC2EEA2007E9B8D /* BackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 346FBAF41EC2EEA2007E9B8D /* BackgroundView.swift */; };
 		3474EC7B1DDC926C00EBF3C5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3474EC7A1DDC926C00EBF3C5 /* AppDelegate.swift */; };
@@ -212,7 +218,6 @@
 		34CC5FF21DDCA6750061AA44 /* HTTPProxyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34CC5FEE1DDCA6750061AA44 /* HTTPProxyManager.swift */; };
 		34CC5FF31DDCA6750061AA44 /* HTTPAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34CC5FEF1DDCA6750061AA44 /* HTTPAnalyzer.swift */; };
 		34CC5FF61DDCA9200061AA44 /* libresolv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 34CC5E7C1DDCA0EA0061AA44 /* libresolv.tbd */; };
-		34D154611E24AC7F00546B57 /* ScanQRCodeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34D154601E24AC7F00546B57 /* ScanQRCodeViewController.swift */; };
 		34D2E4991E88EF31009A07A0 /* RuleMainViewTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34D2E4981E88EF31009A07A0 /* RuleMainViewTableViewController.swift */; };
 		34E3F1FC1E11428600FAD65C /* RequestDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34E3F1FB1E11428600FAD65C /* RequestDetailTableViewController.swift */; };
 		34F0B8F01EB2DFED007A286B /* CommonTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34F0B8EF1EB2DFED007A286B /* CommonTool.swift */; };
@@ -291,6 +296,10 @@
 		344EF2C81EC345980055A049 /* LogViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogViewController.swift; sourceTree = "<group>"; };
 		3452C3471E763D80008CCC4E /* Tool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tool.swift; sourceTree = "<group>"; };
 		345ECB851DF8F48800F70ACC /* rule.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = rule.config; sourceTree = "<group>"; };
+		3464BF691EC49BDC00D81663 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
+		3464BF6D1EC49F0400D81663 /* QRViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRViewController.swift; sourceTree = "<group>"; };
+		3464BF6F1EC4A86300D81663 /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
+		3464BF711EC4A88900D81663 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		3469E9021EB9B9B20087DA38 /* VPNTableViewContTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VPNTableViewContTableViewCell.swift; sourceTree = "<group>"; };
 		346FBAF41EC2EEA2007E9B8D /* BackgroundView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackgroundView.swift; sourceTree = "<group>"; };
 		3474EC771DDC926C00EBF3C5 /* ThroughWall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ThroughWall.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -922,7 +931,6 @@
 		34CC5FEF1DDCA6750061AA44 /* HTTPAnalyzer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPAnalyzer.swift; sourceTree = "<group>"; };
 		34CC5FFD1DDCAE5F0061AA44 /* ThroughWall.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ThroughWall.entitlements; sourceTree = "<group>"; };
 		34CC5FFE1DDCAEF10061AA44 /* TodayEx.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TodayEx.entitlements; sourceTree = "<group>"; };
-		34D154601E24AC7F00546B57 /* ScanQRCodeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScanQRCodeViewController.swift; sourceTree = "<group>"; };
 		34D2E4981E88EF31009A07A0 /* RuleMainViewTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleMainViewTableViewController.swift; sourceTree = "<group>"; };
 		34E3F1FB1E11428600FAD65C /* RequestDetailTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestDetailTableViewController.swift; sourceTree = "<group>"; };
 		34F0B8EF1EB2DFED007A286B /* CommonTool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommonTool.swift; sourceTree = "<group>"; };
@@ -946,6 +954,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3464BF721EC4A88900D81663 /* AVFoundation.framework in Frameworks */,
+				3464BF701EC4A86300D81663 /* CoreImage.framework in Frameworks */,
+				3464BF6A1EC49BDC00D81663 /* NetworkExtension.framework in Frameworks */,
 				3474ECD41DDC951100EBF3C5 /* TunnelLib.framework in Frameworks */,
 				3474ECC21DDC950000EBF3C5 /* ShadowsocksLib.framework in Frameworks */,
 				1A278AF59DA185F024B942D2 /* Pods_ThroughWall.framework in Frameworks */,
@@ -959,6 +970,7 @@
 				34BD966D1DDD3932002442BF /* TunnelLib.framework in Frameworks */,
 				34BD966C1DDD392E002442BF /* ShadowsocksLib.framework in Frameworks */,
 				34CC5FF61DDCA9200061AA44 /* libresolv.tbd in Frameworks */,
+				3464BF6B1EC49BFC00D81663 /* NetworkExtension.framework in Frameworks */,
 				560A5FB41FCB850B8240A0EF /* Pods_TWPacketTunnelProvider.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -968,6 +980,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3474ECA81DDC92B900EBF3C5 /* NotificationCenter.framework in Frameworks */,
+				3464BF6C1EC49C0A00D81663 /* NetworkExtension.framework in Frameworks */,
 				8788255218AB66821DB5C29F /* Pods_TodayEx.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1087,6 +1100,9 @@
 		3474ECA61DDC92B900EBF3C5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3464BF711EC4A88900D81663 /* AVFoundation.framework */,
+				3464BF6F1EC4A86300D81663 /* CoreImage.framework */,
+				3464BF691EC49BDC00D81663 /* NetworkExtension.framework */,
 				34CC5FDE1DDCA4E90061AA44 /* libcrypto.a */,
 				34CC5FDF1DDCA4E90061AA44 /* libsodium.a */,
 				34CC5FE01DDCA4E90061AA44 /* libssl.a */,
@@ -1173,7 +1189,7 @@
 		349D235E1E84EF4200381DE1 /* ServerConfig */ = {
 			isa = PBXGroup;
 			children = (
-				34D154601E24AC7F00546B57 /* ScanQRCodeViewController.swift */,
+				3464BF6D1EC49F0400D81663 /* QRViewController.swift */,
 				34765C7F1E10D8810055C294 /* ConfigureViewController.swift */,
 				34765C871E10D8810055C294 /* SelectionFieldCell.swift */,
 				34765C821E10D8810055C294 /* InputTextFieldCell.swift */,
@@ -2740,6 +2756,7 @@
 				348AC2451E8A9C910072AB1B /* SimplePing.m in Sources */,
 				346FBAF51EC2EEA2007E9B8D /* BackgroundView.swift in Sources */,
 				3433528D1DF943D100CF7281 /* CoreDataController.swift in Sources */,
+				3464BF6E1EC49F0400D81663 /* QRViewController.swift in Sources */,
 				345ECB871DF8F5C100F70ACC /* Rule.swift in Sources */,
 				3474EC7B1DDC926C00EBF3C5 /* AppDelegate.swift in Sources */,
 				34765C8C1E10D8810055C294 /* InputTextFieldCell.swift in Sources */,
@@ -2757,7 +2774,6 @@
 				3445FB091E8D5F82001504E9 /* RuleDetailTableViewController.swift in Sources */,
 				34C7D5731E25C9300052CE78 /* ArchivedTrafficCountTableViewController.swift in Sources */,
 				34A26A6B1E13447400A8CC93 /* HistoryOptionTableViewController.swift in Sources */,
-				34D154611E24AC7F00546B57 /* ScanQRCodeViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

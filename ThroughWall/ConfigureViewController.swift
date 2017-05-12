@@ -57,6 +57,63 @@ class ConfigureViewController: UITableViewController {
         inputFields[3].becomeFirstResponder()
     }
 
+    func didExtractedQRCode(notification: Notification) {
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kQRCodeExtracted), object: nil)
+        if var ss = notification.userInfo?["string"] as? String {
+            if let preRange = ss.range(of: "ss://") {
+                ss.removeSubrange(preRange)
+            }
+            if let poundsignIndex = ss.range(of: "#")?.lowerBound {
+                let removeRange = Range(uncheckedBounds: (lower: poundsignIndex, upper: ss.endIndex))
+                ss.removeSubrange(removeRange)
+            }
+            ss = ss.padding(toLength: ((ss.characters.count + 3) / 4) * 4, withPad: "=", startingAt: 0)
+            let decodeData = Data.init(base64Encoded: ss)
+            if let decodestring = String.init(data: decodeData ?? Data(), encoding: String.Encoding.utf8) {
+                let components = decodestring.components(separatedBy: ":")
+                if components.count == 3 {
+                    var method = components[0]
+                    let passwordHost = components[1]
+                    let port = components[2]
+
+                    let components2 = passwordHost.components(separatedBy: "@")
+                    if components2.count == 2 {
+                        let password = components2[0]
+                        let host = components2[1]
+
+                        if let range = method.range(of: "-auth") {
+                            method.removeSubrange(range)
+                        }
+
+//                        withUnsafePointer(to: &proxyConfig, { (p) in
+//                            print("proxyconfig \(p)")
+//                        })
+
+//                        proxyConfig.currentProxy = "CUSTOM"
+                        proxyConfig.setValue(byItem: "description", value: "\(host):\(port)")
+                        proxyConfig.setValue(byItem: "server", value: host)
+                        proxyConfig.setValue(byItem: "port", value: port)
+                        proxyConfig.setValue(byItem: "password", value: password)
+                        proxyConfig.setValue(byItem: "method", value: method)
+
+                        DispatchQueue.main.async {
+                            self.tableView.reloadData()
+                        }
+                        return
+                    }
+                }
+            }
+        }
+
+        let alertController = UIAlertController(title: "Extract QRCode Failed", message: nil, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+
+        alertController.addAction(okAction)
+        DispatchQueue.main.async {
+            self.present(alertController, animated: true, completion: nil)
+        }
+    }
+
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -64,7 +121,7 @@ class ConfigureViewController: UITableViewController {
         if showDelete {
             return 2
         }
-        return 1
+        return 2
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -165,9 +222,7 @@ class ConfigureViewController: UITableViewController {
         if showDelete {
             let cell = tableView.dequeueReusableCell(withIdentifier: "deleteType", for: indexPath)
             return cell
-        }
-        //won't touch this code
-        else {
+        } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "importQRType", for: indexPath)
             return cell
         }
@@ -197,6 +252,10 @@ class ConfigureViewController: UITableViewController {
 
                 self.present(alertController, animated: true, completion: nil)
 
+            } else {
+                view.endEditing(true)
+                NotificationCenter.default.addObserver(self, selector: #selector(ConfigureViewController.didExtractedQRCode(notification:)), name: NSNotification.Name(rawValue: kQRCodeExtracted), object: nil)
+                performSegue(withIdentifier: "QRCodeScan", sender: nil)
             }
         }
     }

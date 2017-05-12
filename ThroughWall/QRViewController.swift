@@ -91,6 +91,10 @@ class QRViewController: UIViewController, UINavigationControllerDelegate, UIImag
     @IBAction func chooseFromGallery(_ sender: UIBarButtonItem) {
         imagePicker.sourceType = .photoLibrary
         imagePicker.allowsEditing = false
+        
+         //TODO change tint color
+        
+        
         present(imagePicker, animated: true, completion: nil)
     }
 
@@ -113,8 +117,11 @@ class QRViewController: UIViewController, UINavigationControllerDelegate, UIImag
         }
         
         for feature in features as! [CIQRCodeFeature] {
-            dismiss(animated: true, completion: nil)
             result = feature.messageString!
+            //TODO change tint color
+            
+            
+            dismiss(animated: true, completion: nil)
             return
         }
 

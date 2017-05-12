@@ -27,6 +27,10 @@ class RawRuleTXTViewController: UIViewController, UITextViewDelegate {
         NotificationCenter.default.addObserver(self, selector: #selector(RawRuleTXTViewController.keyboardWillChangeFrame(notification:)), name: .UIKeyboardWillChangeFrame, object: nil)
     }
     
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+    
     deinit {
         NotificationCenter.default.removeObserver(self)
     }

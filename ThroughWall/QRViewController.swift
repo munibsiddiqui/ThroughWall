@@ -12,7 +12,7 @@ import AVFoundation
 
 class QRViewController: UIViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate, AVCaptureMetadataOutputObjectsDelegate {
 
-    let imagePicker = UIImagePickerController()
+    let imagePicker = customizeUIImagePickerController()
     var captureSession: AVCaptureSession?
     var videoPreviewLayer: AVCaptureVideoPreviewLayer?
     var qrCodeFrameView: UIView?
@@ -28,6 +28,11 @@ class QRViewController: UIViewController, UINavigationControllerDelegate, UIImag
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        imagePicker.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
+        imagePicker.navigationBar.tintColor = UIColor.white
+        imagePicker.navigationBar.isTranslucent = false
+        imagePicker.navigationBar.setBackgroundImage(image(fromColor: topUIColor), for: .any, barMetrics: .default)
+        imagePicker.navigationBar.shadowImage = UIImage()
         imagePicker.delegate = self
 
         let captureDevice = AVCaptureDevice.defaultDevice(withMediaType: AVMediaTypeVideo)
@@ -86,16 +91,29 @@ class QRViewController: UIViewController, UINavigationControllerDelegate, UIImag
         let notifcation = Notification(name: Notification.Name(rawValue: kQRCodeExtracted), object: nil, userInfo: ["string" : result])
         NotificationCenter.default.post(notifcation)
     }
-    
 
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+    
+    func image(fromColor color: UIColor) -> UIImage {
+        let rect = CGRect(x: 0, y: 0, width: view.frame.size.width, height: view.frame.size.height)
+        UIGraphicsBeginImageContext(rect.size)
+        let context = UIGraphicsGetCurrentContext()
+        context?.setFillColor(color.cgColor)
+        context?.fill(rect)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsGetCurrentContext()
+        return image!
+    }
+    
+    
     @IBAction func chooseFromGallery(_ sender: UIBarButtonItem) {
         imagePicker.sourceType = .photoLibrary
         imagePicker.allowsEditing = false
         
-         //TODO change tint color
-        
-        
         present(imagePicker, animated: true, completion: nil)
+        
     }
 
 
@@ -118,7 +136,6 @@ class QRViewController: UIViewController, UINavigationControllerDelegate, UIImag
         
         for feature in features as! [CIQRCodeFeature] {
             result = feature.messageString!
-            //TODO change tint color
             
             
             dismiss(animated: true, completion: nil)
@@ -163,4 +180,12 @@ class QRViewController: UIViewController, UINavigationControllerDelegate, UIImag
     }
     */
 
+}
+
+class customizeUIImagePickerController: UIImagePickerController {
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+    
+    
 }

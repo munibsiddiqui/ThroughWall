@@ -116,7 +116,12 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     func sleepToDelayWelcomePage() {
         Thread.sleep(forTimeInterval: 1.0)
     }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
 
+    
     func setTopArea() {
         navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
         navigationController?.navigationBar.tintColor = UIColor.white
@@ -127,12 +132,16 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
 
     func setTabBarArea() {
-        self.tabBarController?.tabBar.tintColor = UIColor.init(red: 255.0 / 255.0, green: 88.0 / 255.0, blue: 24.0 / 255.0, alpha: 1.0)
+        tabBarController?.tabBar.tintColor = UIColor.init(red: 255.0 / 255.0, green: 88.0 / 255.0, blue: 24.0 / 255.0, alpha: 1.0)
+        tabBarController?.tabBar.backgroundImage = image(fromColor: UIColor.white)
+        tabBarController?.tabBar.clipsToBounds = true
+        tabBarController?.tabBar.shadowImage = UIImage()
     }
 
 
     func setupTableView() {
         tableView.tableFooterView = UIView()
+        tableView.backgroundColor = veryLightGrayUIColor
         tableView.delegate = self
         tableView.dataSource = self
         tableView.refreshControl = UIRefreshControl()
@@ -148,6 +157,12 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
                     self.view.layoutIfNeeded()
                     self.setOperationArea()
                 }
+                currentVPNManager?.removeFromPreferences(completionHandler: { (error) in
+                    if let error = error {
+                        self.showError(error, title: "Delete failed")
+                    }
+                    self.currentVPNManager = nil
+                })
             }
         } else {
             if tableViewTopConstraint.multiplier == 1.0 {
@@ -175,6 +190,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
                 self.currentVPNManager = newManager
                 self.currentVPNStatusIndicator = self.currentVPNManager!.connection.status
             }
+            
             self.proxyConfigs = SiteConfigController().readSiteConfigsFromConfigFile()
             if let index = SiteConfigController().getSelectedServerIndex() {
                 self.selectedServerIndex = index
@@ -444,6 +460,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         if indexPath.row == proxyConfigs.count {
             let cell = tableView.dequeueReusableCell(withIdentifier: "dragHint", for: indexPath)
             cell.separatorInset = UIEdgeInsetsMake(0.0, 0.0, 0.0, cell.bounds.size.width)
+            cell.backgroundColor = veryLightGrayUIColor
             return cell
         }
 
@@ -496,6 +513,8 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
             cell.imageView?.image = UIImage(named: "TSDot")
         }
 
+        cell.backgroundColor = veryLightGrayUIColor
+        
         return cell
     }
 
@@ -509,7 +528,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
         
         if let currentManager = currentVPNManager {
-            if currentManager.connection.status != .disconnected {
+            if currentManager.connection.status != .disconnected && selectedServerIndex != indexPath.row {
                 //pop a alert
                 let alertController = UIAlertController(title: "Error", message: "Please disconnect before changing server", preferredStyle: .alert)
                 let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
@@ -656,5 +675,14 @@ extension NSLayoutConstraint {
 
         NSLayoutConstraint.activate([newConstraint])
         return newConstraint
+    }
+}
+
+extension UINavigationController {
+    open override var preferredStatusBarStyle: UIStatusBarStyle {
+        if let style = topViewController?.preferredStatusBarStyle {
+            return style
+        }
+        return .lightContent
     }
 }

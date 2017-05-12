@@ -54,6 +54,10 @@ class RuleListTableViewController: UITableViewController, UISearchResultsUpdatin
         definesPresentationContext = true
     }
 
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+    
     deinit {
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kRuleSaved), object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kRuleDeleted), object: nil)

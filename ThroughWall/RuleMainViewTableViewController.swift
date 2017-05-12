@@ -38,6 +38,9 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         hiddenHitTimes = 0
     }
     
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

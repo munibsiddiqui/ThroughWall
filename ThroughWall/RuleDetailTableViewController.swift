@@ -47,6 +47,10 @@ class RuleDetailTableViewController: UITableViewController, UITextFieldDelegate 
         }
     }
     
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+    
     deinit {
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kNewRuleValueUpdate), object: nil)
     }

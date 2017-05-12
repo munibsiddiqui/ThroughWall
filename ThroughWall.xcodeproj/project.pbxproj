@@ -18,6 +18,7 @@
 		3445FB091E8D5F82001504E9 /* RuleDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3445FB081E8D5F82001504E9 /* RuleDetailTableViewController.swift */; };
 		344EF2C91EC345980055A049 /* LogViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 344EF2C81EC345980055A049 /* LogViewController.swift */; };
 		3452C3481E763D80008CCC4E /* Tool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3452C3471E763D80008CCC4E /* Tool.swift */; };
+		345E6B791EC5A0D60064B25E /* QRShowViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 345E6B781EC5A0D60064B25E /* QRShowViewController.swift */; };
 		345ECB861DF8F48800F70ACC /* rule.config in Resources */ = {isa = PBXBuildFile; fileRef = 345ECB851DF8F48800F70ACC /* rule.config */; };
 		345ECB871DF8F5C100F70ACC /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3439FA051DEEB7A000F8CE59 /* Rule.swift */; };
 		3464BF6A1EC49BDC00D81663 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3464BF691EC49BDC00D81663 /* NetworkExtension.framework */; };
@@ -295,6 +296,7 @@
 		3445FB081E8D5F82001504E9 /* RuleDetailTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleDetailTableViewController.swift; sourceTree = "<group>"; };
 		344EF2C81EC345980055A049 /* LogViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogViewController.swift; sourceTree = "<group>"; };
 		3452C3471E763D80008CCC4E /* Tool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tool.swift; sourceTree = "<group>"; };
+		345E6B781EC5A0D60064B25E /* QRShowViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRShowViewController.swift; sourceTree = "<group>"; };
 		345ECB851DF8F48800F70ACC /* rule.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = rule.config; sourceTree = "<group>"; };
 		3464BF691EC49BDC00D81663 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		3464BF6D1EC49F0400D81663 /* QRViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRViewController.swift; sourceTree = "<group>"; };
@@ -1194,6 +1196,7 @@
 				34765C871E10D8810055C294 /* SelectionFieldCell.swift */,
 				34765C821E10D8810055C294 /* InputTextFieldCell.swift */,
 				34765C861E10D8810055C294 /* SelectInputViewController.swift */,
+				345E6B781EC5A0D60064B25E /* QRShowViewController.swift */,
 			);
 			name = ServerConfig;
 			sourceTree = "<group>";
@@ -2769,6 +2772,7 @@
 				34A17DD51E8CF6F6005BC19B /* RuleListTableViewController.swift in Sources */,
 				344EF2C91EC345980055A049 /* LogViewController.swift in Sources */,
 				34765C8B1E10D8810055C294 /* HistoryFigureViewController.swift in Sources */,
+				345E6B791EC5A0D60064B25E /* QRShowViewController.swift in Sources */,
 				34765C951E1116780055C294 /* RequestListTableViewController.swift in Sources */,
 				348F61991E8E540000F6AF9A /* RawRuleTXTViewController.swift in Sources */,
 				3445FB091E8D5F82001504E9 /* RuleDetailTableViewController.swift in Sources */,

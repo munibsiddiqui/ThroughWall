@@ -35,17 +35,33 @@ class ConfigureViewController: UITableViewController {
         numberToolbar.barStyle = UIBarStyle.default
         numberToolbar.items = [
             UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.flexibleSpace, target: self, action: nil),
-            UIBarButtonItem(title: "Next", style: UIBarButtonItemStyle.plain, target: self, action: #selector(ConfigureViewController.nextTextFieldAfterPortField))
+            UIBarButtonItem(title: "Next", style: UIBarButtonItemStyle.plain, target: self, action: #selector(nextTextFieldAfterPortField))
         ]
 
         numberToolbar.sizeToFit()
 
         tableView.tableFooterView = UIView()
         tableView.backgroundColor = UIColor.groupTableViewBackground
+        tableView.rowHeight = UITableViewAutomaticDimension;
+        tableView.estimatedRowHeight = 44.0;
     }
 
-    deinit {
-        print("dafdsfaweg")
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        inputFields.sort() {
+            if $0.convert($0.bounds, to: nil).origin.y < $1.convert($1.bounds, to: nil).origin.y {
+                return true
+            }
+            return false
+        }
+        for inputField in inputFields {
+            print(inputField.convert(inputField.bounds, to: nil).origin.y)
+        }
+
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
     }
 
     override func didReceiveMemoryWarning() {
@@ -114,12 +130,71 @@ class ConfigureViewController: UITableViewController {
         }
     }
 
+    func getEncodedServerInfo() -> String {
+        var result = ""
+
+        if let value = proxyConfig.getValue(byItem: "method") {
+            result = value
+        } else {
+            return ""
+        }
+        if let value = proxyConfig.getValue(byItem: "password") {
+            result = result + ":" + value
+        } else {
+            return ""
+        }
+        if let value = proxyConfig.getValue(byItem: "server") {
+            result = result + "@" + value
+        } else {
+            return ""
+        }
+        if let value = proxyConfig.getValue(byItem: "port") {
+            result = result + ":" + value
+        } else {
+            return ""
+        }
+        let utf8Str = result.data(using: .utf8)
+        if let base64Encoded = utf8Str?.base64EncodedString(options: NSData.Base64EncodingOptions(rawValue: 0)) {
+            return base64Encoded
+        }
+        return result
+    }
+
+    func showQRImage() {
+        let str = getEncodedServerInfo()
+        let data = str.data(using: .isoLatin1)
+        let filter = CIFilter(name: "CIQRCodeGenerator")
+        filter?.setValue(data, forKey: "inputMessage")
+        let outputImage = filter?.outputImage
+
+        if let outputImg = outputImage {
+            let originalWidth = outputImg.extent.width
+            let transform = CGAffineTransform(scaleX: 300.0 / originalWidth, y: 300.0 / originalWidth)
+            let transformedImage = outputImg.applying(transform)
+
+            let context = CIContext(options: nil)
+            let imageRef = context.createCGImage(transformedImage, from: transformedImage.extent)
+            let QRCImage = UIImage(cgImage: imageRef!)
+
+            if let QRShow = storyboard?.instantiateViewController(withIdentifier: "QRCShowVC") as? QRShowViewController {
+
+                QRShow.QRCImage = QRCImage
+
+                present(QRShow, animated: true, completion: nil)
+            }
+        }
+
+
+        print(str)
+    }
+
+
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         if showDelete {
-            return 2
+            return 3
         }
         return 2
     }
@@ -192,16 +267,9 @@ class ConfigureViewController: UITableViewController {
                 if !inputFields.contains(cell.itemDetail) {
                     inputFields.append(cell.itemDetail)
                 }
-                inputFields.sort() {
 
-
-                    if $0.convert($0.bounds, to: nil).origin.y < $1.convert($1.bounds, to: nil).origin.y {
-                        return true
-                    }
-                    return false
-                }
 //                cell.itemDetail.placeholder = placeholder
-
+                
                 cell.valueChanged = {
                     self.proxyConfig.setValue(byItem: item, value: cell.itemDetail.text!)
                 }
@@ -218,12 +286,18 @@ class ConfigureViewController: UITableViewController {
 
                 return cell
             }
-        }
-        if showDelete {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "deleteType", for: indexPath)
-            return cell
+        } else if indexPath.section == 1 {
+            if showDelete {
+                let cell = tableView.dequeueReusableCell(withIdentifier: "deleteType", for: indexPath)
+                return cell
+            } else {
+                let cell = tableView.dequeueReusableCell(withIdentifier: "importQRType", for: indexPath)
+                return cell
+            }
         } else {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "importQRType", for: indexPath)
+            let cell = tableView.dequeueReusableCell(withIdentifier: "showQREx", for: indexPath)
+            cell.backgroundColor = UIColor.groupTableViewBackground
+            cell.separatorInset = UIEdgeInsetsMake(0.0, 0.0, 0.0, cell.bounds.size.width)
             return cell
         }
 
@@ -234,9 +308,8 @@ class ConfigureViewController: UITableViewController {
             let item = proxyConfig.containedItems[indexPath.row]
             if let _ = proxyConfig.getAvailableOptions(byItem: item) {
                 self.performSegue(withIdentifier: "selectInputDetail", sender: item)
-
             }
-        } else {
+        } else if indexPath.section == 1 {
             if showDelete {
                 let alertController = UIAlertController(title: "Delete Proxy Server?", message: nil, preferredStyle: .alert)
                 let deleteAction = UIAlertAction(title: "Delete", style: .destructive, handler: { (_) in
@@ -257,6 +330,8 @@ class ConfigureViewController: UITableViewController {
                 NotificationCenter.default.addObserver(self, selector: #selector(ConfigureViewController.didExtractedQRCode(notification:)), name: NSNotification.Name(rawValue: kQRCodeExtracted), object: nil)
                 performSegue(withIdentifier: "QRCodeScan", sender: nil)
             }
+        } else {
+            showQRImage()
         }
     }
 

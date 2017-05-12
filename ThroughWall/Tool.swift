@@ -11,7 +11,8 @@ import UIKit
 
 let topUIColor = UIColor(red: 255.0/255.0, green: 108.0 / 255.0, blue: 66.0 / 255.0, alpha: 1.0)
 let bottomUIColor = UIColor(red: 255.0/255.0, green: 139.0 / 255.0, blue: 71.0 / 255.0, alpha: 1.0)
-let darkGreenUIColor = UIColor.init(red: 0.24, green: 0.545, blue: 0.153, alpha: 1.0)
+let darkGreenUIColor = UIColor(red: 0.24, green: 0.545, blue: 0.153, alpha: 1.0)
+let veryLightGrayUIColor = UIColor(red: 245/255.0, green: 245/255.0, blue: 245/255.0, alpha: 1.0)
 
 class ICMPPing: NSObject, SimplePingDelegate {
     private var hostName: String

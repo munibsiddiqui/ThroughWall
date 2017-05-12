@@ -26,7 +26,7 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
                     <navigationItem key="navigationItem" title="Scan QRCode" id="aTa-TI-ZC6">
-                        <barButtonItem key="rightBarButtonItem" title="Gallery" id="16S-6p-wSc">
+                        <barButtonItem key="rightBarButtonItem" image="Gallery" id="16S-6p-wSc">
                             <connections>
                                 <action selector="chooseFromGallery:" destination="JeV-t4-dcr" id="TNc-T8-VxV"/>
                             </connections>
@@ -156,6 +156,28 @@
                                     <outlet property="item" destination="526-h8-eTK" id="Gt6-bD-uEV"/>
                                 </connections>
                             </tableViewCell>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="showQREx" rowHeight="126" id="E1I-Nz-ts3" customClass="SelectionFieldCell" customModule="ThroughWall" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="204" width="375" height="126"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="E1I-Nz-ts3" id="jqH-tt-cMF">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="126"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="QREx" translatesAutoresizingMaskIntoConstraints="NO" id="hmm-Ux-Cn5">
+                                            <rect key="frame" x="162" y="38" width="50" height="50"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="50" id="0p3-h7-hZ9"/>
+                                                <constraint firstAttribute="width" secondItem="hmm-Ux-Cn5" secondAttribute="height" multiplier="1:1" id="Knv-7B-nra"/>
+                                            </constraints>
+                                        </imageView>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="hmm-Ux-Cn5" firstAttribute="centerX" secondItem="jqH-tt-cMF" secondAttribute="centerX" id="ANW-3L-63e"/>
+                                        <constraint firstItem="hmm-Ux-Cn5" firstAttribute="centerY" secondItem="jqH-tt-cMF" secondAttribute="centerY" id="lSr-jj-JLU"/>
+                                        <constraint firstItem="hmm-Ux-Cn5" firstAttribute="top" secondItem="jqH-tt-cMF" secondAttribute="topMargin" constant="30" id="tuz-pb-8E2"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                            </tableViewCell>
                         </prototypes>
                         <connections>
                             <outlet property="dataSource" destination="Ptd-O0-ZbV" id="F1d-0o-4Ku"/>
@@ -176,7 +198,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="WW8-F4-RNr" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2174" y="183"/>
+            <point key="canvasLocation" x="2173.5999999999999" y="182.15892053973016"/>
         </scene>
         <!--Select-->
         <scene sceneID="oa8-VD-74f">
@@ -195,7 +217,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="3rV-66-N7b">
-                                            <rect key="frame" x="16" y="0.0" width="344" height="43.5"/>
+                                            <rect key="frame" x="15" y="0.0" width="345" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
@@ -235,7 +257,51 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="AOo-0y-IgX" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3001" y="182"/>
+            <point key="canvasLocation" x="3201" y="-547"/>
+        </scene>
+        <!--Show View Controller-->
+        <scene sceneID="yz2-3v-1o1">
+            <objects>
+                <viewController storyboardIdentifier="QRCShowVC" id="4ZN-pQ-blT" customClass="QRShowViewController" customModule="ThroughWall" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="r8g-KY-tNn"/>
+                        <viewControllerLayoutGuide type="bottom" id="Pql-Us-esp"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="pcD-3F-28U">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="1pq-Ef-0fc">
+                                <rect key="frame" x="37" y="183" width="300" height="300"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="1pq-Ef-0fc" secondAttribute="height" multiplier="1:1" id="ihU-S8-PKE"/>
+                                    <constraint firstAttribute="width" relation="lessThanOrEqual" constant="300" id="kTn-Ph-M66"/>
+                                </constraints>
+                            </imageView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ppk-SD-CbW">
+                                <rect key="frame" x="112" y="76.5" width="150" height="30"/>
+                                <state key="normal" title="Save To Photo Library"/>
+                                <connections>
+                                    <action selector="savePhoto:" destination="4ZN-pQ-blT" eventType="touchUpInside" id="CoK-Du-U6r"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="1pq-Ef-0fc" firstAttribute="centerY" secondItem="pcD-3F-28U" secondAttribute="centerY" id="SgL-PL-25I"/>
+                            <constraint firstItem="1pq-Ef-0fc" firstAttribute="width" secondItem="pcD-3F-28U" secondAttribute="width" multiplier="0.8" priority="750" id="ZCZ-7j-d5j"/>
+                            <constraint firstItem="ppk-SD-CbW" firstAttribute="centerX" secondItem="pcD-3F-28U" secondAttribute="centerX" id="cQ7-Wc-ofW"/>
+                            <constraint firstItem="1pq-Ef-0fc" firstAttribute="centerX" secondItem="pcD-3F-28U" secondAttribute="centerX" id="gVG-EL-txR"/>
+                            <constraint firstItem="ppk-SD-CbW" firstAttribute="centerY" secondItem="1pq-Ef-0fc" secondAttribute="top" multiplier="0.5" id="hRn-FW-QX9"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="imageView" destination="1pq-Ef-0fc" id="Q7r-D3-DGm"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="3KW-4M-pge" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3201" y="172"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="x0r-9O-vIy">
@@ -381,7 +447,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="9qC-f1-zY6">
-                                            <rect key="frame" x="16" y="0.0" width="344" height="43.5"/>
+                                            <rect key="frame" x="15" y="0.0" width="345" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
@@ -425,7 +491,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="eYe-jC-1H0">
-                                            <rect key="frame" x="16" y="0.0" width="344" height="43.5"/>
+                                            <rect key="frame" x="15" y="0.0" width="345" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
@@ -442,7 +508,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Clear" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="BNm-mB-lxY">
-                                            <rect key="frame" x="16" y="0.0" width="344" height="43.5"/>
+                                            <rect key="frame" x="15" y="0.0" width="345" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <color key="textColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
@@ -475,18 +541,18 @@
                                 <rect key="frame" x="0.0" y="28" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="6V4-cr-nzR" id="Ggv-uV-ZEc">
-                                    <rect key="frame" x="0.0" y="0.0" width="341" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="342" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="5Ik-6U-ydy">
-                                            <rect key="frame" x="16" y="5" width="33.5" height="20.5"/>
+                                            <rect key="frame" x="15" y="5" width="33.5" height="20.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Subtitle" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="1A0-oH-kh6">
-                                            <rect key="frame" x="16" y="25.5" width="44" height="14.5"/>
+                                            <rect key="frame" x="15" y="25.5" width="44" height="14.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="12"/>
                                             <nil key="textColor"/>
@@ -547,7 +613,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="8GB-pt-1SG">
-                                            <rect key="frame" x="16" y="12" width="33.5" height="20.5"/>
+                                            <rect key="frame" x="15" y="12" width="33.5" height="20.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
@@ -634,7 +700,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="d5r-aX-52C">
-                                            <rect key="frame" x="16" y="0.0" width="344" height="43.5"/>
+                                            <rect key="frame" x="15" y="0.0" width="345" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
@@ -676,14 +742,14 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="qoa-3b-dLo">
-                                            <rect key="frame" x="16" y="5" width="33.5" height="20.5"/>
+                                            <rect key="frame" x="15" y="5" width="33.5" height="20.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="MuV-zl-pJx">
-                                            <rect key="frame" x="16" y="25.5" width="44" height="14.5"/>
+                                            <rect key="frame" x="15" y="25.5" width="44" height="14.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                             <nil key="textColor"/>
@@ -906,7 +972,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="PHt-Ox-9ak">
-                                            <rect key="frame" x="16" y="0.0" width="344" height="43.5"/>
+                                            <rect key="frame" x="15" y="0.0" width="345" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
@@ -1113,7 +1179,7 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Chisel" id="7sG-vx-VfC">
-                        <barButtonItem key="leftBarButtonItem" title="QRcode" id="9kK-qa-2H4">
+                        <barButtonItem key="leftBarButtonItem" image="QR" id="9kK-qa-2H4">
                             <connections>
                                 <action selector="scanQRCode:" destination="EjS-Wh-yy3" id="yjH-so-z6Z"/>
                             </connections>
@@ -1190,7 +1256,10 @@
     </scenes>
     <resources>
         <image name="Config" width="33" height="32"/>
+        <image name="Gallery" width="20" height="20"/>
         <image name="Home" width="33" height="32"/>
+        <image name="QR" width="20" height="20"/>
+        <image name="QREx" width="140" height="140"/>
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="3XZ-k2-Q4g"/>

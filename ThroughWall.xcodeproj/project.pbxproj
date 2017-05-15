@@ -49,7 +49,6 @@
 		34765C891E10D8810055C294 /* ConfigureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C7F1E10D8810055C294 /* ConfigureViewController.swift */; };
 		34765C8B1E10D8810055C294 /* HistoryFigureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C811E10D8810055C294 /* HistoryFigureViewController.swift */; };
 		34765C8C1E10D8810055C294 /* InputTextFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C821E10D8810055C294 /* InputTextFieldCell.swift */; };
-		34765C8E1E10D8810055C294 /* RuleImportMethodTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C841E10D8810055C294 /* RuleImportMethodTableViewController.swift */; };
 		34765C901E10D8810055C294 /* SelectInputViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C861E10D8810055C294 /* SelectInputViewController.swift */; };
 		34765C911E10D8810055C294 /* SelectionFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C871E10D8810055C294 /* SelectionFieldCell.swift */; };
 		34765C921E10EB240055C294 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C7E1E10D8810055C294 /* Common.swift */; };
@@ -330,7 +329,6 @@
 		34765C7F1E10D8810055C294 /* ConfigureViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigureViewController.swift; sourceTree = "<group>"; };
 		34765C811E10D8810055C294 /* HistoryFigureViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryFigureViewController.swift; sourceTree = "<group>"; };
 		34765C821E10D8810055C294 /* InputTextFieldCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InputTextFieldCell.swift; sourceTree = "<group>"; };
-		34765C841E10D8810055C294 /* RuleImportMethodTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleImportMethodTableViewController.swift; sourceTree = "<group>"; };
 		34765C861E10D8810055C294 /* SelectInputViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectInputViewController.swift; sourceTree = "<group>"; };
 		34765C871E10D8810055C294 /* SelectionFieldCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectionFieldCell.swift; sourceTree = "<group>"; };
 		34765C941E1116780055C294 /* RequestListTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestListTableViewController.swift; sourceTree = "<group>"; };
@@ -1059,17 +1057,15 @@
 		3474EC791DDC926C00EBF3C5 /* ThroughWall */ = {
 			isa = PBXGroup;
 			children = (
+				34C2E6321EC76C04000CC2A1 /* Log */,
 				34F0B8F21EB2DFFA007A286B /* Common */,
 				349D235F1E8511E400381DE1 /* RuleConfig */,
 				349D235E1E84EF4200381DE1 /* ServerConfig */,
 				3452C3461E763D27008CCC4E /* MainView */,
 				34765C811E10D8810055C294 /* HistoryFigureViewController.swift */,
-				34A26A6A1E13447400A8CC93 /* HistoryOptionTableViewController.swift */,
 				34C7D5721E25C9300052CE78 /* ArchivedTrafficCountTableViewController.swift */,
-				34765C841E10D8810055C294 /* RuleImportMethodTableViewController.swift */,
 				34765C941E1116780055C294 /* RequestListTableViewController.swift */,
 				34E3F1FB1E11428600FAD65C /* RequestDetailTableViewController.swift */,
-				3474EC7E1DDC926C00EBF3C5 /* Main.storyboard */,
 				3433528B1DF943B700CF7281 /* Core Data */,
 				348CFFC91DEBF36400A2720E /* SupportingFiles */,
 			);
@@ -1176,6 +1172,7 @@
 		348CFFC91DEBF36400A2720E /* SupportingFiles */ = {
 			isa = PBXGroup;
 			children = (
+				3474EC7E1DDC926C00EBF3C5 /* Main.storyboard */,
 				345ECB851DF8F48800F70ACC /* rule.config */,
 				348AC2431E8A9C910072AB1B /* ThroughWall-Bridging-Header.h */,
 				3474EC7A1DDC926C00EBF3C5 /* AppDelegate.swift */,
@@ -1213,6 +1210,14 @@
 				344EF2C81EC345980055A049 /* LogViewController.swift */,
 			);
 			name = RuleConfig;
+			sourceTree = "<group>";
+		};
+		34C2E6321EC76C04000CC2A1 /* Log */ = {
+			isa = PBXGroup;
+			children = (
+				34A26A6A1E13447400A8CC93 /* HistoryOptionTableViewController.swift */,
+			);
+			name = Log;
 			sourceTree = "<group>";
 		};
 		34CC5B1F1DDC9B790061AA44 /* tun2socks-iOS */ = {
@@ -2415,7 +2420,7 @@
 						CreatedOnToolsVersion = 8.1;
 						DevelopmentTeam = JG7P2QYPN7;
 						LastSwiftMigration = 0830;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 1;
@@ -2432,7 +2437,7 @@
 						CreatedOnToolsVersion = 8.1;
 						DevelopmentTeam = JG7P2QYPN7;
 						LastSwiftMigration = 0810;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.iCloud = {
 								enabled = 0;
@@ -2443,7 +2448,7 @@
 						CreatedOnToolsVersion = 8.1;
 						DevelopmentTeam = JG7P2QYPN7;
 						LastSwiftMigration = 0810;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 1;
@@ -2748,7 +2753,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				34765C8E1E10D8810055C294 /* RuleImportMethodTableViewController.swift in Sources */,
 				34765C901E10D8810055C294 /* SelectInputViewController.swift in Sources */,
 				3482A2B11E9F0D9700A6B202 /* RuleProxySelectionTableViewController.swift in Sources */,
 				3452C3481E763D80008CCC4E /* Tool.swift in Sources */,
@@ -3115,15 +3119,16 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ThroughWall/ThroughWall.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = JG7P2QYPN7;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = ThroughWall/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Bingo.ThroughWall;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "267affdb-31e9-42a0-9d5a-0e8f83627602";
-				PROVISIONING_PROFILE_SPECIFIER = Dev.ThroughWall;
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "ThroughWall/ThroughWall-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
@@ -3137,15 +3142,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ThroughWall/ThroughWall.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				DEVELOPMENT_TEAM = JG7P2QYPN7;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = ThroughWall/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Bingo.ThroughWall;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "2db2c172-fa12-4204-b4e5-4fc043860216";
-				PROVISIONING_PROFILE_SPECIFIER = "XC iOS: Bingo.ThroughWall";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "ThroughWall/ThroughWall-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 			};
@@ -3157,14 +3162,15 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = TWPacketTunnelProvider/TWPacketTunnelProvider.entitlements;
-				DEVELOPMENT_TEAM = JG7P2QYPN7;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = TWPacketTunnelProvider/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Bingo.ThroughWall.TWPacketTunnelProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "02a7b6a5-4f23-494c-bf24-faa0667d8006";
-				PROVISIONING_PROFILE_SPECIFIER = Dev.TWPacketTunnelProvider;
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "TWPacketTunnelProvider/TWPacketTunnelProvider-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -3178,15 +3184,15 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = TWPacketTunnelProvider/TWPacketTunnelProvider.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				DEVELOPMENT_TEAM = JG7P2QYPN7;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = TWPacketTunnelProvider/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Bingo.ThroughWall.TWPacketTunnelProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "ac3c2040-5aaa-4f49-a3cf-4c7a63bc31e3";
-				PROVISIONING_PROFILE_SPECIFIER = "XC iOS: Bingo.ThroughWall.TWPacketTunnelProvider";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "TWPacketTunnelProvider/TWPacketTunnelProvider-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
@@ -3198,14 +3204,15 @@
 			baseConfigurationReference = 8A2F6B7412937B1814159223 /* Pods-TodayEx.debug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = TodayEx/TodayEx.entitlements;
-				DEVELOPMENT_TEAM = JG7P2QYPN7;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = TodayEx/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Bingo.ThroughWall.TodayEx;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "a8d9022a-b450-401f-9a00-2fdf6c6ba1b5";
-				PROVISIONING_PROFILE_SPECIFIER = Dev.TWTodayEx;
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 3.0;
 			};
@@ -3216,15 +3223,15 @@
 			baseConfigurationReference = A823D555ABAD2A9D06C0A955 /* Pods-TodayEx.release.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = TodayEx/TodayEx.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				DEVELOPMENT_TEAM = JG7P2QYPN7;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = TodayEx/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Bingo.ThroughWall.TodayEx;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "efd55b42-55c5-4515-aa21-f06727dd058f";
-				PROVISIONING_PROFILE_SPECIFIER = "XC iOS: Bingo.ThroughWall.TodayEx";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 3.0;
 			};

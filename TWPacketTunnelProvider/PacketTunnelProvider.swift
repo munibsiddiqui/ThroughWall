@@ -26,7 +26,64 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         // Add code here to start the process of connecting the tunnel.
         Fabric.with([Crashlytics.self])
 
-        DDLog.add(DDASLLogger.sharedInstance) // ASL = Apple System Logs
+        setupDDLog()
+        DDLogVerbose("Going to start VPN")
+        pendingStartCompletion = completionHandler
+
+        DDLogVerbose("\(Date().timeIntervalSince1970)")
+        Rule.sharedInstance.analyzeRuleFile()
+        DDLogVerbose("\(Date().timeIntervalSince1970)")
+
+        addObserver(self, forKeyPath: "defaultPath", options: NSKeyValueObservingOptions.initial, context: nil)
+
+        //Start shadowsocks_libev
+        startShodowsocksClient { (ShadowLibSocksPort, error) in
+            if error != nil {
+                self.pendingStartCompletion?(error)
+                return
+            }
+            DDLogVerbose("shadowsocks port: \(ShadowLibSocksPort)")
+            DDLogVerbose("\(Date().timeIntervalSince1970)")
+            NotificationCenter.default.addObserver(self, selector: #selector(PacketTunnelProvider.onShadowsocksClientClosed), name: NSNotification.Name(rawValue: Tun2SocksStoppedNotification), object: nil)
+
+            //HTTP/HTTPS Proxy Setting
+            HTTPProxyManager.shardInstance.startProxy(bindToPort: ShadowLibSocksPort, callback: { (httpProxyPort, error) in
+
+                if error != nil {
+                    self.pendingStartCompletion?(error)
+                    return
+                }
+                DDLogVerbose("http(s) port: \(httpProxyPort)")
+                DDLogVerbose("\(Date().timeIntervalSince1970)")
+                self.httpPort = httpProxyPort
+
+                //socksTohttp
+                Socks2HTTPS.sharedInstance.start(bindToPort: UInt16(httpProxyPort), callback: { (socksPortToHTTP, error) in
+                    DDLogVerbose("socksToHTTP port: \(socksPortToHTTP)")
+                    DDLogVerbose("\(Date().timeIntervalSince1970)")
+                    //TunnelSetting
+                    self.setupTunnelWith(proxyPort: httpProxyPort, completionHandle: { (error) in
+                        //Forward IP Packets
+                        let error = TunnelManager.sharedInterface().startTunnel(withShadowsocksPort: socksPortToHTTP as NSNumber!, packetTunnelFlow: self.packetFlow)
+                        //                        [weakSelf addObserver:weakSelf forKeyPath:@"defaultPath" options:NSKeyValueObservingOptionInitial context:nil];
+                        if let _error = error {
+                            DDLogVerbose("complete with \(_error)")
+                        } else {
+                            DDLogVerbose("complete")
+                        }
+                        DDLogVerbose("\(Date().timeIntervalSince1970)")
+                        self.pendingStartCompletion?(error)
+
+                    })
+
+                })
+
+            })
+        }
+    }
+
+    func setupDDLog() {
+        DDLog.add(DDASLLogger.sharedInstance, with: DDLogLevel.warning)// ASL = Apple System Logs
 
         let fileManager = FileManager.default
         var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName)!
@@ -39,7 +96,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         DDLog.add(fileLogger)
 
         DDLogInfo("------Log Start------")
-        
+
 
         let defaults = UserDefaults.init(suiteName: groupName)
         if let logLevel = defaults?.value(forKey: klogLevel) as? String {
@@ -68,56 +125,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         }
 
         DDLogVerbose("\(fileLogger.currentLogFileInfo)")
-        DDLogVerbose("Going to start VPN")
-
-        pendingStartCompletion = completionHandler
-
-        Rule.sharedInstance.analyzeRuleFile()
-
-        addObserver(self, forKeyPath: "defaultPath", options: NSKeyValueObservingOptions.initial, context: nil)
-
-        //Start shadowsocks_libev
-        startShodowsocksClient { (ShadowLibSocksPort, error) in
-            if error != nil {
-                self.pendingStartCompletion?(error)
-                return
-            }
-            DDLogVerbose("shadowsocks port: \(ShadowLibSocksPort)")
-
-            NotificationCenter.default.addObserver(self, selector: #selector(PacketTunnelProvider.onShadowsocksClientClosed), name: NSNotification.Name(rawValue: Tun2SocksStoppedNotification), object: nil)
-
-            //HTTP/HTTPS Proxy Setting
-            HTTPProxyManager.shardInstance.startProxy(bindToPort: ShadowLibSocksPort, callback: { (httpProxyPort, error) in
-
-                if error != nil {
-                    self.pendingStartCompletion?(error)
-                    return
-                }
-                DDLogVerbose("http(s) port: \(httpProxyPort)")
-                self.httpPort = httpProxyPort
-
-                //socksTohttp
-                Socks2HTTPS.sharedInstance.start(bindToPort: UInt16(httpProxyPort), callback: { (socksPortToHTTP, error) in
-                    DDLogVerbose("socksToHTTP port: \(socksPortToHTTP)")
-                    //TunnelSetting
-                    self.setupTunnelWith(proxyPort: httpProxyPort, completionHandle: { (error) in
-                        //Forward IP Packets
-                        let error = TunnelManager.sharedInterface().startTunnel(withShadowsocksPort: socksPortToHTTP as NSNumber!, packetTunnelFlow: self.packetFlow)
-                        //                        [weakSelf addObserver:weakSelf forKeyPath:@"defaultPath" options:NSKeyValueObservingOptionInitial context:nil];
-                        if let _error = error {
-                            DDLogVerbose("complete with \(_error)")
-                        }else{
-                            DDLogVerbose("complete")
-                        }
-                        self.pendingStartCompletion?(error)
-
-                    })
-
-                })
-
-            })
-        }
     }
+
 
 
     func startShodowsocksClient(callback: @escaping (Int, Error?) -> Void) {

@@ -226,7 +226,7 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
             switch indexPath.row {
             case 0:
                 hiddenHitTimes = hiddenHitTimes + 1
-                if hiddenHitTimes == 5 {
+                if hiddenHitTimes == 2 {
                     let storyboard = UIStoryboard(name: "Main", bundle: nil)
                     let vc = storyboard.instantiateViewController(withIdentifier: "LogTXTView") as! LogViewController
                     

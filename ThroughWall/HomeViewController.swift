@@ -9,35 +9,35 @@
 import UIKit
 import NetworkExtension
 
-class HomeViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-
+class HomeViewController: UIViewController {
+    
+    // MARK: - IBOutlet
     @IBOutlet weak var backgroundView: UIView!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var operationAreaView: OperationView!
     @IBOutlet weak var tableViewTopConstraint: NSLayoutConstraint!
     @IBOutlet weak var currentVPNStatusLabel: UILabel!
 
+    // MARK: - variable
     var addedBackground = false
     var selectedServerIndex = 0
     var willEditServerIndex = -1
     var proxyConfigs = [ProxyConfig]()
     var icmpPing: ICMPPing?
     var currentVPNStatusLamp = UIImageView()
-
-    let waveDuration: Double = 1.5
-    let waveStep: CGFloat = 30
-
-    var currentVPNManager: NETunnelProviderManager? {
-        willSet {
-        }
-    }
+    var currentVPNManager: NETunnelProviderManager?
 
     var currentVPNStatusIndicator: NEVPNStatus = .invalid {
         didSet {
             setOperationArea()
         }
     }
+    
+    // MARK: - constant
+    let waveDuration: Double = 1.5
+    let waveStep: CGFloat = 30
 
+    // MARK: - viewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -50,30 +50,121 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         tryUpdateRuleFile()
         convertToNewServerStyle()
         registerNotificationWhenLoaded()
-
+//        print(hardwareString())
     }
 
+//    func hardwareString() -> String {
+//        var name: [Int32] = [CTL_HW, HW_MACHINE]
+//        var size: Int = 2
+//        sysctl(&name, 2, nil, &size, &name, 0)
+//        var hw_machine = [CChar](repeating: 0, count: Int(size))
+//        sysctl(&name, 2, &hw_machine, &size, &name, 0)
+//        
+//        let hardware: String = String(cString: hw_machine)
+//        return hardware
+//    }
+    
+//    override func didReceiveMemoryWarning() {
+//        super.didReceiveMemoryWarning()
+//        // Dispose of any resources that can be recreated.
+//    }
+
+    // MARK: - deinit
     deinit {
         removeNotificationObserver()
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    func removeNotificationObserver() {
+        NotificationCenter.default.removeObserver(self, name: .NEVPNStatusDidChange, object: nil)
+        NotificationCenter.default.removeObserver(self, name: .UIApplicationWillEnterForeground, object: nil)
+
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kDeleteEditingVPN), object: nil)
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kSaveVPN), object: nil)
     }
 
-    func animationResume() {
-        setOperationArea()
+    // MARK: - set Status Bar color
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
     }
 
+    // MARK: - ViewDidLoad Setup session
+    func sleepToDelayWelcomePage() {
+        Thread.sleep(forTimeInterval: 1.0)
+    }
 
-    // MARK: - Tools
+    func setTopArea() {
+        navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
+        navigationController?.navigationBar.tintColor = UIColor.white
+        navigationController?.navigationBar.isTranslucent = false
+        navigationController?.navigationBar.setBackgroundImage(image(fromColor: topUIColor), for: .any, barMetrics: .default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        self.navigationItem.title = "Chisel"
+    }
+
+    func setTabBarArea() {
+        tabBarController?.tabBar.tintColor = UIColor.init(red: 255.0 / 255.0, green: 88.0 / 255.0, blue: 24.0 / 255.0, alpha: 1.0)
+        tabBarController?.tabBar.backgroundImage = image(fromColor: UIColor.white)
+        tabBarController?.tabBar.clipsToBounds = true
+        tabBarController?.tabBar.shadowImage = UIImage()
+    }
 
     func setupOperationArea() {
-//        operationAreaView.waveStep = waveStep
+        //        operationAreaView.waveStep = waveStep
         operationAreaView.waveDuration = waveDuration
     }
 
+    func setupTableView() {
+        tableView.tableFooterView = UIView()
+        tableView.backgroundColor = veryLightGrayUIColor
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.refreshControl = UIRefreshControl()
+        //        tableView.refreshControl?.attributedTitle = NSAttributedString(string: "Pull to ping servers")
+        tableView.refreshControl?.addTarget(self, action: #selector(testServerDelay(sender:)), for: UIControlEvents.valueChanged)
+    }
+
+    func tryUpdateRuleFile() {
+        RuleFileUpdateController().tryUpdateRuleFileFromBundleFile()
+    }
+
+    func convertToNewServerStyle() {
+        SiteConfigController().convertOldServer { newManager in
+            print("completed")
+            if newManager != nil {
+                self.currentVPNManager = newManager
+                self.currentVPNStatusIndicator = self.currentVPNManager!.connection.status
+            }
+
+            self.proxyConfigs = SiteConfigController().readSiteConfigsFromConfigFile()
+            if let index = SiteConfigController().getSelectedServerIndex() {
+                self.selectedServerIndex = index
+            }
+
+            self.reloadTable()
+            self.setOperationArea()
+        }
+    }
+
+    func registerNotificationWhenLoaded() {
+        NotificationCenter.default.addObserver(self, selector: #selector(VPNStatusDidChange(_:)), name: .NEVPNStatusDidChange, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(animationResume), name: .UIApplicationWillEnterForeground, object: nil)
+
+        NotificationCenter.default.addObserver(self, selector: #selector(deleteEditingVPN), name: NSNotification.Name(rawValue: kDeleteEditingVPN), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(saveVPN(_:)), name: NSNotification.Name(rawValue: kSaveVPN), object: nil)
+    }
+
+    func image(fromColor color: UIColor) -> UIImage {
+        let rect = CGRect(x: 0, y: 0, width: view.frame.size.width, height: view.frame.size.height)
+        UIGraphicsBeginImageContext(rect.size)
+        let context = UIGraphicsGetCurrentContext()
+        context?.setFillColor(color.cgColor)
+        context?.fill(rect)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsGetCurrentContext()
+        return image!
+    }
+
+    // MARK: - Tools
     func setOperationArea() {
         DispatchQueue.main.async {
             if self.proxyConfigs.count == 0 {
@@ -113,42 +204,6 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         print(text)
     }
 
-    func sleepToDelayWelcomePage() {
-        Thread.sleep(forTimeInterval: 1.0)
-    }
-    
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
-    }
-
-    
-    func setTopArea() {
-        navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
-        navigationController?.navigationBar.tintColor = UIColor.white
-        navigationController?.navigationBar.isTranslucent = false
-        navigationController?.navigationBar.setBackgroundImage(image(fromColor: topUIColor), for: .any, barMetrics: .default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        self.navigationItem.title = "Chisel"
-    }
-
-    func setTabBarArea() {
-        tabBarController?.tabBar.tintColor = UIColor.init(red: 255.0 / 255.0, green: 88.0 / 255.0, blue: 24.0 / 255.0, alpha: 1.0)
-        tabBarController?.tabBar.backgroundImage = image(fromColor: UIColor.white)
-        tabBarController?.tabBar.clipsToBounds = true
-        tabBarController?.tabBar.shadowImage = UIImage()
-    }
-
-
-    func setupTableView() {
-        tableView.tableFooterView = UIView()
-        tableView.backgroundColor = veryLightGrayUIColor
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.refreshControl = UIRefreshControl()
-        //        tableView.refreshControl?.attributedTitle = NSAttributedString(string: "Pull to ping servers")
-        tableView.refreshControl?.addTarget(self, action: #selector(testServerDelay(sender:)), for: UIControlEvents.valueChanged)
-    }
-
     func reloadTable() {
         if proxyConfigs.count == 0 {
             if tableViewTopConstraint.multiplier != 1.0 {
@@ -179,46 +234,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
     }
 
-    func tryUpdateRuleFile() {
-        RuleFileUpdateController().tryUpdateRuleFileFromBundleFile()
-    }
-
-    func convertToNewServerStyle() {
-        SiteConfigController().convertOldServer { newManager in
-            print("completed")
-            if newManager != nil {
-                self.currentVPNManager = newManager
-                self.currentVPNStatusIndicator = self.currentVPNManager!.connection.status
-            }
-            
-            self.proxyConfigs = SiteConfigController().readSiteConfigsFromConfigFile()
-            if let index = SiteConfigController().getSelectedServerIndex() {
-                self.selectedServerIndex = index
-            }
-
-            self.reloadTable()
-            self.setOperationArea()
-        }
-    }
-
-    func registerNotificationWhenLoaded() {
-        NotificationCenter.default.addObserver(self, selector: #selector(VPNStatusDidChange(_:)), name: .NEVPNStatusDidChange, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(animationResume), name: .UIApplicationWillEnterForeground, object: nil)
-
-        NotificationCenter.default.addObserver(self, selector: #selector(deleteEditingVPN), name: NSNotification.Name(rawValue: kDeleteEditingVPN), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(saveVPN(_:)), name: NSNotification.Name(rawValue: kSaveVPN), object: nil)
-    }
-
-    func removeNotificationObserver() {
-        NotificationCenter.default.removeObserver(self, name: .NEVPNStatusDidChange, object: nil)
-        NotificationCenter.default.removeObserver(self, name: .UIApplicationWillEnterForeground, object: nil)
-
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kDeleteEditingVPN), object: nil)
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kSaveVPN), object: nil)
-//        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kQRCodeExtracted), object: nil)
-
-    }
-
+    // MARK: - kQRCodeExtracted notification
     func didExtractedQRCode(notification: Notification) {
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kQRCodeExtracted), object: nil)
         if var ss = notification.userInfo?["string"] as? String {
@@ -258,44 +274,29 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
                         proxyConfig.setValue(byItem: "port", value: port)
                         proxyConfig.setValue(byItem: "password", value: password)
                         proxyConfig.setValue(byItem: "method", value: method)
-                        
+
                         DispatchQueue.main.async {
                             self.addNewVPN(withNewConfig: proxyConfig)
-                        }                        
+                        }
                         return
                     }
                 }
             }
         }
-
         presentExtractQRFailed()
-        
     }
-    
+
     func presentExtractQRFailed() {
         let alertController = UIAlertController(title: "Extract QRCode Failed", message: nil, preferredStyle: .alert)
         let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
-        
+
         alertController.addAction(okAction)
         DispatchQueue.main.async {
             self.present(alertController, animated: true, completion: nil)
         }
     }
 
-
-
-    func image(fromColor color: UIColor) -> UIImage {
-        let rect = CGRect(x: 0, y: 0, width: view.frame.size.width, height: view.frame.size.height)
-        UIGraphicsBeginImageContext(rect.size)
-        let context = UIGraphicsGetCurrentContext()
-        context?.setFillColor(color.cgColor)
-        context?.fill(rect)
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsGetCurrentContext()
-        return image!
-    }
-
-
+    // MARK: - NEVPNStatusDidChange notification
     func VPNStatusDidChange(_ notification: Notification?) {
         if let currentVPNManager = self.currentVPNManager {
             currentVPNStatusIndicator = currentVPNManager.connection.status
@@ -303,11 +304,20 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
             print("!!!!!")
         }
     }
+
+    // MARK: - UIApplicationWillEnterForeground notification
+    func animationResume() {
+        setOperationArea()
+    }
+
+
+    // MARK: - Scan QRCode Action
     @IBAction func scanQRCode(_ sender: UIBarButtonItem) {
         NotificationCenter.default.addObserver(self, selector: #selector(didExtractedQRCode(notification:)), name: NSNotification.Name(rawValue: kQRCodeExtracted), object: nil)
         performSegue(withIdentifier: "QRCodeScan", sender: nil)
     }
 
+    // MARK: - Switch Button Action
     @IBAction func operationViewTouched(_ sender: UITapGestureRecognizer) {
         if proxyConfigs.count == 0 {
             addConfigure()
@@ -398,7 +408,6 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
 
     // MARK: - Test Server Dalay
-
     func testServerDelay(sender: AnyObject) {
         if let manager = currentVPNManager {
             if manager.connection.status != .disconnected {
@@ -442,18 +451,78 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
     }
 
+    // MARK: - Server List Configure
+    @IBAction func addConfigure(_ sender: UIBarButtonItem) {
+        addConfigure()
+    }
 
+    func addConfigure() {
+        willEditServerIndex = -1
+        self.performSegue(withIdentifier: "configure", sender: nil)
+    }
+
+    func saveVPN(_ notification: NSNotification) {
+        if willEditServerIndex == -1 {
+            //add
+            if let newConfig = notification.userInfo?["proxyConfig"] as? ProxyConfig {
+                addNewVPN(withNewConfig: newConfig)
+            }
+        } else {
+            //save
+            SiteConfigController().writeIntoSiteConfigFile(withConfigs: proxyConfigs)
+            reloadTable()
+        }
+    }
+
+    func addNewVPN(withNewConfig newConfig: ProxyConfig) {
+        proxyConfigs.append(newConfig)
+        SiteConfigController().writeIntoSiteConfigFile(withConfigs: proxyConfigs)
+        reloadTable()
+    }
+
+    func deleteEditingVPN() {
+        let selectedServer = proxyConfigs[selectedServerIndex]
+        proxyConfigs.remove(at: willEditServerIndex)
+        if let newSelectedServerIndex = proxyConfigs.index(of: selectedServer) {
+            selectedServerIndex = newSelectedServerIndex
+            SiteConfigController().setSelectedServerIndex(withValue: selectedServerIndex)
+        } else {
+            selectedServerIndex = 0
+            SiteConfigController().setSelectedServerIndex(withValue: selectedServerIndex)
+        }
+        SiteConfigController().writeIntoSiteConfigFile(withConfigs: proxyConfigs)
+        reloadTable()
+
+        //TODO check table cell count
+    }
+
+
+    // MARK: - Navigation
+
+    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        // Get the new view controller using segue.destinationViewController.
+        // Pass the selected object to the new view controller.
+        if segue.identifier == "configure" {
+            let destination = segue.destination as! ConfigureViewController
+            if willEditServerIndex != -1 {
+                destination.proxyConfig = proxyConfigs[willEditServerIndex]
+            }
+        }
+    }
+}
+
+
+extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
+    
     // MARK: - Table view data source
-
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
 
-
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return proxyConfigs.count + 1
     }
-
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 
@@ -508,25 +577,49 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
                 cell.imageView?.image = UIImage(named: "GrayDot")
             }
             currentVPNStatusLamp = cell.imageView!
-//            self.navigationItem.title = textLabel.text
+            //            self.navigationItem.title = textLabel.text
         } else {
             cell.imageView?.image = UIImage(named: "TSDot")
         }
 
         cell.backgroundColor = veryLightGrayUIColor
-        
+
         return cell
     }
 
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        if indexPath.row < proxyConfigs.count {
+            return true
+        }
+        return false
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            
+            let alertController = UIAlertController(title: "Delete Proxy Server?", message: nil, preferredStyle: .alert)
+            let deleteAction = UIAlertAction(title: "Delete", style: .destructive, handler: { (_) in
+                self.willEditServerIndex = indexPath.row
+                self.deleteEditingVPN()
+            })
+            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+            
+            alertController.addAction(cancelAction)
+            alertController.addAction(deleteAction)
+            
+            self.present(alertController, animated: true, completion: nil)
+            
+        }
+    }
+    
     // MARK: - Table view delegate
-
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
 
         if indexPath.row >= proxyConfigs.count {
             return
         }
-        
+
         if let currentManager = currentVPNManager {
             if currentManager.connection.status != .disconnected && selectedServerIndex != indexPath.row {
                 //pop a alert
@@ -537,16 +630,15 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
                 return
             } else {
                 SiteConfigController().save(withConfig: proxyConfigs[indexPath.row], intoManager: currentManager, completionHander: {
-//                    DispatchQueue.main.async {
-//                        self.navigationItem.title = (currentManager.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration!["description"] as? String
-//                    }
+                    //                    DispatchQueue.main.async {
+                    //                        self.navigationItem.title = (currentManager.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration!["description"] as? String
+                    //                    }
                 })
             }
         }
         self.selectedServerIndex = indexPath.row
         SiteConfigController().setSelectedServerIndex(withValue: indexPath.row)
         reloadTable()
-
     }
 
     func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
@@ -555,99 +647,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
             self.performSegue(withIdentifier: "configure", sender: nil)
         }
     }
-
-    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        if indexPath.row < proxyConfigs.count {
-            return  true
-        }
-        return false
-    }
-
-
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-
-            let alertController = UIAlertController(title: "Delete Proxy Server?", message: nil, preferredStyle: .alert)
-            let deleteAction = UIAlertAction(title: "Delete", style: .destructive, handler: { (_) in
-                self.willEditServerIndex = indexPath.row
-                self.deleteEditingVPN()
-            })
-            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-
-            alertController.addAction(cancelAction)
-            alertController.addAction(deleteAction)
-
-            self.present(alertController, animated: true, completion: nil)
-
-        }
-    }
-
-
-    // MARK: - Server List Configure
-
-    @IBAction func addConfigure(_ sender: UIBarButtonItem) {
-        addConfigure()
-    }
-
-    func addConfigure() {
-        willEditServerIndex = -1
-        self.performSegue(withIdentifier: "configure", sender: nil)
-    }
-
-
-    func saveVPN(_ notification: NSNotification) {
-        if willEditServerIndex == -1 {
-            //add
-            if let newConfig = notification.userInfo?["proxyConfig"] as? ProxyConfig {
-                addNewVPN(withNewConfig: newConfig)
-            }
-        } else {
-            //save
-            SiteConfigController().writeIntoSiteConfigFile(withConfigs: proxyConfigs)
-            reloadTable()
-        }
-    }
-    
-    func addNewVPN(withNewConfig newConfig: ProxyConfig) {
-        proxyConfigs.append(newConfig)
-        SiteConfigController().writeIntoSiteConfigFile(withConfigs: proxyConfigs)
-        reloadTable()
-    }
-    
-
-    func deleteEditingVPN() {
-        let selectedServer = proxyConfigs[selectedServerIndex]
-        proxyConfigs.remove(at: willEditServerIndex)
-        if let newSelectedServerIndex = proxyConfigs.index(of: selectedServer) {
-            selectedServerIndex = newSelectedServerIndex
-            SiteConfigController().setSelectedServerIndex(withValue: selectedServerIndex)
-        } else {
-            selectedServerIndex = 0
-            SiteConfigController().setSelectedServerIndex(withValue: selectedServerIndex)
-        }
-        SiteConfigController().writeIntoSiteConfigFile(withConfigs: proxyConfigs)
-        reloadTable()
-
-        //TODO check table cell count
-    }
-
-
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-        if segue.identifier == "configure" {
-            let destination = segue.destination as! ConfigureViewController
-            if willEditServerIndex != -1 {
-                destination.proxyConfig = proxyConfigs[willEditServerIndex]
-            }
-        }
-    }
-
 }
-
 
 extension NSLayoutConstraint {
     /**

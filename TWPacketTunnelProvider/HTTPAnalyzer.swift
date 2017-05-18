@@ -36,8 +36,8 @@ let ST_READ_LEFT_RESPONSE_HEAD_FROM_SERVER = 2
 let ST_READ_RESPONSE_BODY_FROM_SERVER = 3
 
 enum ConnectionError: Error {
-    case UnReadableData
-    case NoHostInRequest
+    case UnReadableDataError
+    case NoHostInRequestError
     case RequestHeaderAnalysisError
     case URLComponentAnalysisError
     case IPV6AnalysisError
@@ -99,6 +99,13 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         intTag = tag
     }
     
+    func readStoredKey() {
+        let defaults = UserDefaults.init(suiteName: groupName)
+        if let keyValue = defaults?.value(forKey: shouldParseTrafficKey) as? Bool {
+            shouldParseTraffic = keyValue
+        }
+    }
+    
     func setSocket(clientSocket socket: GCDAsyncSocket, socksServerPort port: Int) {
         socket.delegate = self
         socket.delegateQueue = DispatchQueue.global()
@@ -106,15 +113,6 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         bindToPort = port
 
         clientSocket?.readData(to: crlfData, withTimeout: TimeInterval(10), tag: TAG_READ_REQUEST_HEAD_FROM_CLIENT)
-    }
-    
-    
-    func readStoredKey() {
-        let defaults = UserDefaults.init(suiteName: groupName)
-        if let keyValue = defaults?.value(forKey: shouldParseTrafficKey) as? Bool {
-            shouldParseTraffic = keyValue
-        }
-        
     }
     
     func getIntTag() -> Int {
@@ -195,18 +193,20 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     func didReadClientRequestHead(withData data: Data) {
 
         guard let clientRequestString = String(data: data, encoding: String.Encoding.utf8) else {
-            let error = ConnectionError.UnReadableData
+            let error = ConnectionError.UnReadableDataError
             DDLogError("H\(intTag)H didReadClientRequest: \(error)")
             return
         }
         
-        DDLogVerbose("H\(intTag)H head \(data.count)")
-        DDLogVerbose("H\(intTag)H " + clientRequestString)
+        DDLogVerbose("H\(intTag)H head length \(data.count); \(clientRequestString)")
+//        DDLogVerbose("H\(intTag)H " + clientRequestString)
         
         if isCONNECTRequest(clientRequestString) {
+            DDLogVerbose("H\(intTag)H HTTPS")
             isConnectRequest = true
             handleHTTPSRequest(withRequest: clientRequestString)
         }else{
+            DDLogVerbose("H\(intTag)H HTTP")
             isConnectRequest = false
             handleHTTPRequestHead(withRequest: clientRequestString)
         }
@@ -681,7 +681,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         }
         
         guard let serverResponseString = String(data: headData, encoding: String.Encoding.utf8) else {
-            let error = ConnectionError.UnReadableData
+            let error = ConnectionError.UnReadableDataError
             DDLogError("H\(intTag)H parseHttpResponse: \(error)")
             return
         }
@@ -731,7 +731,7 @@ class HTTPAnalyzer:NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
                 self.hostTraffic.addToBodies(pieceBody)
                 
                 CoreDataController.sharedInstance.saveContext()
-                CoreDataController.sharedInstance.getContext().refresh(pieceBody, mergeChanges: false)
+                context.refresh(pieceBody, mergeChanges: false)
                 
             }
         }

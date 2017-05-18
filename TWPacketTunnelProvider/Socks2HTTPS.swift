@@ -10,7 +10,7 @@ import CocoaAsyncSocket
 import CocoaLumberjack
 
 
-protocol Socks2HTTPSConverterDelegate {
+protocol Socks2HTTPSConverterDelegate: class {
     func socketDidDisconnect(_ sock: Socks2HTTPSConverter)
 }
 
@@ -93,7 +93,7 @@ class Socks2HTTPS: NSObject, GCDAsyncSocketDelegate, Socks2HTTPSConverterDelegat
 class Socks2HTTPSConverter: NSObject, GCDAsyncSocketDelegate{
     private var socksConnection: GCDAsyncSocket?
     private var outGoing: GCDAsyncSocket?
-    private var delegate: Socks2HTTPSConverterDelegate?
+    private weak var delegate: Socks2HTTPSConverterDelegate?
     private var httpPort: UInt16!
     private var host: String?
     private var port: UInt16!

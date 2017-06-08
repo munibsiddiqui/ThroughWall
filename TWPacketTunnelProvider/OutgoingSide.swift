@@ -245,5 +245,14 @@ class OutgoingSide: NSObject, GCDAsyncSocketDelegate {
             delegate?.outgoingSocket(didWriteDataWithTag: tag)
         }
     }
+    
+    func progress() -> (progress: Float?, tag: Int, bytesDone: UInt, total: UInt){
+        var tag: Int = 0
+        var bytesDone: UInt = 0
+        var total: UInt = 0
+        let result = socket?.progress(ofReadReturningTag: &tag, bytesDone: &bytesDone, total: &total)
+        return( result, tag, bytesDone, total)
+    }
+    
 }
 

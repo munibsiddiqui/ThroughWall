@@ -25,7 +25,7 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
 
         tableView.tableFooterView = UIView()
-        tableView.backgroundColor = UIColor.groupTableViewBackground
+        tableView.backgroundColor = veryLightGrayUIColor
 
         readSettings()
         globalModeSwitch.addTarget(self, action: #selector(globalModeSwitchDidChange(_:)), for: .valueChanged)

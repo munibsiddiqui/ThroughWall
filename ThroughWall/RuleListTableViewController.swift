@@ -57,7 +57,7 @@ class RuleListTableViewController: UITableViewController, UISearchResultsUpdatin
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
-    
+
     deinit {
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kRuleSaved), object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kRuleDeleted), object: nil)
@@ -72,7 +72,7 @@ class RuleListTableViewController: UITableViewController, UISearchResultsUpdatin
     func reloadItemsFromDisk() {
         ruleItems = Rule.sharedInstance.getCurrentRuleItems()
         rewriteItems = Rule.sharedInstance.getCurrentRewriteItems()
-
+        applyFilter(withText: filterText)
         tableView.reloadData()
     }
 
@@ -119,7 +119,6 @@ class RuleListTableViewController: UITableViewController, UISearchResultsUpdatin
         let content = makeRulesIntoContent()
         RuleFileUpdateController().saveToCustomRuleFile(withContent: content)
         reloadItemsFromDisk()
-
     }
 
     func makeRulesIntoContent() -> String {
@@ -211,7 +210,7 @@ class RuleListTableViewController: UITableViewController, UISearchResultsUpdatin
                 let item = filteredRuleItems[indexPath.row - filteredRewriteItems.count]
 
                 cell.textLabel?.attributedText = usingFilterTextTohightlight(item[1])
-                
+
                 //In fact, usingFilterTextTohightlight doesn't work now
                 cell.detailTextLabel?.attributedText = usingFilterTextTohightlight(attributedText: makeAttributeDescription(withMatchRule: item[0], andProxyRule: item[2]))
             }
@@ -266,7 +265,7 @@ class RuleListTableViewController: UITableViewController, UISearchResultsUpdatin
         let text = attributeText.string
 
         for range in searchRangesOfFilterText(inString: text) {
-            
+
             mutableAttText.addAttribute(NSBackgroundColorAttributeName, value: UIColor.yellow, range: text.toNSRange(from: range))
         }
         return mutableAttText
@@ -277,7 +276,7 @@ class RuleListTableViewController: UITableViewController, UISearchResultsUpdatin
         var ranges = [Range<String.Index>]()
         while true {
             let subString = str.substring(to: endRange)
-            if let range = subString.range(of: filterText, options: [.literal, .backwards]){
+            if let range = subString.range(of: filterText, options: [.literal, .backwards]) {
                 ranges.append(range)
                 endRange = range.lowerBound
             } else {
@@ -306,7 +305,23 @@ class RuleListTableViewController: UITableViewController, UISearchResultsUpdatin
             let deleteAction = UIAlertAction(title: "Delete", style: .destructive, handler: { (_) in
 
                 DispatchQueue.main.async {
-                    self.selectedIndex = indexPath.row
+                    if self.searchController.isActive {
+                        if indexPath.row < self.filteredRewriteItems.count {
+                            let item = self.filteredRewriteItems[indexPath.row]
+                            let index = self.rewriteItems.index(where: { strs -> Bool in
+                                return strs == item
+                            })
+                            self.selectedIndex = index!
+                        } else {
+                            let item = self.filteredRuleItems[indexPath.row - self.filteredRewriteItems.count]
+                            let index = self.ruleItems.index(where: { strs -> Bool in
+                                return strs == item
+                            })
+                            self.selectedIndex = index! + self.rewriteItems.count
+                        }
+                    } else {
+                        self.selectedIndex = indexPath.row
+                    }
                     self.ruleDeleted()
                 }
             })

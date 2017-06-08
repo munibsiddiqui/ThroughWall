@@ -29,6 +29,11 @@ class SelectInputViewController: UITableViewController,UITextFieldDelegate {
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
         tableView.tableFooterView = UIView()
         tableView.backgroundColor = UIColor.groupTableViewBackground
+        let temp = presetSelections + customSelection
+        if let index = temp.index(of: selected) {
+            selectedIndex = index
+        }
+        
     }
     
     
@@ -68,9 +73,10 @@ class SelectInputViewController: UITableViewController,UITextFieldDelegate {
             //preset
             let cell = tableView.dequeueReusableCell(withIdentifier: "selectionCell", for: indexPath)
             cell.textLabel?.text = presetSelections[indexPath.row]
-            if selected == presetSelections[indexPath.row] {
+            if selectedIndex == indexPath.row {
                 cell.accessoryType = .checkmark
-                selectedIndex = indexPath.row
+            }else{
+                cell.accessoryType = .none
             }
             return cell
         }else{
@@ -82,6 +88,8 @@ class SelectInputViewController: UITableViewController,UITextFieldDelegate {
             if selected == textField.text {
                 cell.accessoryType = .checkmark
                 selectedIndex = indexPath.row
+            }else{
+                cell.accessoryType = .none
             }
             return cell
         }

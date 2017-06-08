@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="12141" systemVersion="16F73" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="HistoryTraffic" representedClassName="HistoryTraffic" syncable="YES" codeGenerationType="class">
+        <attribute name="hisType" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="inCount" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="outCount" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="pathType" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="proxyType" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="timestamp" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+    </entity>
+    <entity name="HostInfo" representedClassName="HostInfo" syncable="YES" codeGenerationType="class">
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="port" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="requestTime" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="rule" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="belongToHost" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="HostTraffic" inverseName="hostConnectInfo" inverseEntity="HostTraffic" syncable="YES"/>
+    </entity>
+    <entity name="HostTraffic" representedClassName="HostTraffic" syncable="YES" codeGenerationType="class">
+        <attribute name="disconnectTime" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="forceDisconnect" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="inCount" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="inProcessing" optional="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="outCount" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <relationship name="hostConnectInfo" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="HostInfo" inverseName="belongToHost" inverseEntity="HostInfo" syncable="YES"/>
+        <relationship name="requestBodies" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="RequestBodyPiece" inverseName="belongToTraffic" inverseEntity="RequestBodyPiece" syncable="YES"/>
+        <relationship name="requestHead" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="RequestHead" inverseName="belongToHost" inverseEntity="RequestHead" syncable="YES"/>
+        <relationship name="requestWholeBody" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="RequestBody" inverseName="belongToHost" inverseEntity="RequestBody" syncable="YES"/>
+        <relationship name="responseBodies" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ResponseBodyPiece" inverseName="belongToTraffic" inverseEntity="ResponseBodyPiece" syncable="YES"/>
+        <relationship name="responseHead" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="ResponseHead" inverseName="belongToHost" inverseEntity="ResponseHead" syncable="YES"/>
+        <relationship name="responseWholeBody" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="ResponseBody" inverseName="belongToHost" inverseEntity="ResponseBody" syncable="YES"/>
+    </entity>
+    <entity name="RequestBody" representedClassName="RequestBody" syncable="YES" codeGenerationType="class">
+        <attribute name="body" optional="YES" attributeType="Binary" syncable="YES"/>
+        <attribute name="fileType" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="belongToHost" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="HostTraffic" inverseName="requestWholeBody" inverseEntity="HostTraffic" syncable="YES"/>
+        <relationship name="hasTimeStamps" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="RequestBodyStamp" inverseName="belongToRequestBody" inverseEntity="RequestBodyStamp" syncable="YES"/>
+    </entity>
+    <entity name="RequestBodyPiece" representedClassName="RequestBodyPiece" syncable="YES" codeGenerationType="class">
+        <attribute name="fileName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="timeStamp" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <relationship name="belongToTraffic" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="HostTraffic" inverseName="requestBodies" inverseEntity="HostTraffic" syncable="YES"/>
+    </entity>
+    <entity name="RequestBodyStamp" representedClassName="RequestBodyStamp" syncable="YES" codeGenerationType="class">
+        <attribute name="size" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="timeStamp" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <relationship name="belongToRequestBody" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="RequestBody" inverseName="hasTimeStamps" inverseEntity="RequestBody" syncable="YES"/>
+    </entity>
+    <entity name="RequestHead" representedClassName="RequestHead" syncable="YES" codeGenerationType="class">
+        <attribute name="head" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="belongToHost" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="HostTraffic" inverseName="requestHead" inverseEntity="HostTraffic" syncable="YES"/>
+    </entity>
+    <entity name="ResponseBody" representedClassName="ResponseBody" syncable="YES" codeGenerationType="class">
+        <attribute name="body" optional="YES" attributeType="Binary" syncable="YES"/>
+        <attribute name="fileType" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="belongToHost" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="HostTraffic" inverseName="responseWholeBody" inverseEntity="HostTraffic" syncable="YES"/>
+        <relationship name="hasTimeStamps" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ResponseBodyStamp" inverseName="belongToResponseBody" inverseEntity="ResponseBodyStamp" syncable="YES"/>
+    </entity>
+    <entity name="ResponseBodyPiece" representedClassName="ResponseBodyPiece" syncable="YES" codeGenerationType="class">
+        <attribute name="fileName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="timeStamp" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <relationship name="belongToTraffic" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="HostTraffic" inverseName="responseBodies" inverseEntity="HostTraffic" syncable="YES"/>
+    </entity>
+    <entity name="ResponseBodyStamp" representedClassName="ResponseBodyStamp" syncable="YES" codeGenerationType="class">
+        <attribute name="size" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="timeStamp" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <relationship name="belongToResponseBody" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ResponseBody" inverseName="hasTimeStamps" inverseEntity="ResponseBody" syncable="YES"/>
+    </entity>
+    <entity name="ResponseHead" representedClassName="ResponseHead" syncable="YES" codeGenerationType="class">
+        <attribute name="head" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="time" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <relationship name="belongToHost" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="HostTraffic" inverseName="responseHead" inverseEntity="HostTraffic" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="HistoryTraffic" positionX="-522" positionY="-63" width="128" height="133"/>
+        <element name="HostInfo" positionX="-72" positionY="-351" width="128" height="118"/>
+        <element name="HostTraffic" positionX="-252" positionY="-54" width="128" height="223"/>
+        <element name="RequestBody" positionX="36" positionY="-27" width="128" height="103"/>
+        <element name="RequestBodyPiece" positionX="-27" positionY="-214" width="128" height="88"/>
+        <element name="RequestHead" positionX="18" positionY="-117" width="128" height="73"/>
+        <element name="ResponseBody" positionX="-18" positionY="351" width="128" height="103"/>
+        <element name="ResponseBodyPiece" positionX="43" positionY="108" width="128" height="88"/>
+        <element name="ResponseHead" positionX="25" positionY="234" width="128" height="88"/>
+        <element name="ResponseBodyStamp" positionX="178" positionY="351" width="128" height="88"/>
+        <element name="RequestBodyStamp" positionX="234" positionY="2" width="128" height="88"/>
+    </elements>
+</model>

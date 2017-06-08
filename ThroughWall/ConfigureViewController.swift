@@ -54,10 +54,6 @@ class ConfigureViewController: UITableViewController {
             }
             return false
         }
-        for inputField in inputFields {
-            print(inputField.convert(inputField.bounds, to: nil).origin.y)
-        }
-
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -161,7 +157,9 @@ class ConfigureViewController: UITableViewController {
     }
 
     func showQRImage() {
-        let str = getEncodedServerInfo()
+        var str = getEncodedServerInfo()
+        str = str.padding(toLength: ((str.characters.count + 3) / 4) * 4, withPad: "=", startingAt: 0)
+        str = "ss://" + str
         let data = str.data(using: .isoLatin1)
         let filter = CIFilter(name: "CIQRCodeGenerator")
         filter?.setValue(data, forKey: "inputMessage")
@@ -183,9 +181,6 @@ class ConfigureViewController: UITableViewController {
                 present(QRShow, animated: true, completion: nil)
             }
         }
-
-
-        print(str)
     }
 
 

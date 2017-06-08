@@ -8,9 +8,10 @@
 
 import UIKit
 import NetworkExtension
+import CocoaLumberjack
 
 class HomeViewController: UIViewController {
-    
+
     // MARK: - IBOutlet
     @IBOutlet weak var backgroundView: UIView!
     @IBOutlet weak var tableView: UITableView!
@@ -32,9 +33,9 @@ class HomeViewController: UIViewController {
             setOperationArea()
         }
     }
-    
+
     // MARK: - constant
-    let waveDuration: Double = 1.5
+    let waveDuration: Double = 2
     let waveStep: CGFloat = 30
 
     // MARK: - viewDidLoad
@@ -43,6 +44,7 @@ class HomeViewController: UIViewController {
 
         // Do any additional setup after loading the view.
         sleepToDelayWelcomePage()
+        setupDDLog()
         setTopArea()
         setTabBarArea()
         setupOperationArea()
@@ -59,15 +61,25 @@ class HomeViewController: UIViewController {
 //        sysctl(&name, 2, nil, &size, &name, 0)
 //        var hw_machine = [CChar](repeating: 0, count: Int(size))
 //        sysctl(&name, 2, &hw_machine, &size, &name, 0)
-//        
+//
 //        let hardware: String = String(cString: hw_machine)
 //        return hardware
 //    }
-    
+
 //    override func didReceiveMemoryWarning() {
 //        super.didReceiveMemoryWarning()
 //        // Dispose of any resources that can be recreated.
 //    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        animationResume()
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        operationAreaView.forceStopAnimation()
+    }
 
     // MARK: - deinit
     deinit {
@@ -91,6 +103,12 @@ class HomeViewController: UIViewController {
     func sleepToDelayWelcomePage() {
         Thread.sleep(forTimeInterval: 1.0)
     }
+
+    func setupDDLog() {
+        DDLog.add(DDASLLogger.sharedInstance, with: DDLogLevel.debug)// ASL = Apple System Logs
+        DDLogInfo("------Log Start------")
+    }
+
 
     func setTopArea() {
         navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
@@ -129,7 +147,7 @@ class HomeViewController: UIViewController {
 
     func convertToNewServerStyle() {
         SiteConfigController().convertOldServer { newManager in
-            print("completed")
+            DDLogDebug("completed")
             if newManager != nil {
                 self.currentVPNManager = newManager
                 self.currentVPNStatusIndicator = self.currentVPNManager!.connection.status
@@ -201,7 +219,10 @@ class HomeViewController: UIViewController {
     func setVPNStatusIndicator(withLabelText text: String, andLampImageName imageName: String) {
         currentVPNStatusLabel.text = text
         currentVPNStatusLamp.image = UIImage(named: imageName)
-        print(text)
+        let defaults = UserDefaults()
+        defaults.set(text, forKey: kCurrentManagerStatus)
+        defaults.synchronize()
+        DDLogInfo(text)
     }
 
     func reloadTable() {
@@ -221,7 +242,6 @@ class HomeViewController: UIViewController {
             }
         } else {
             if tableViewTopConstraint.multiplier == 1.0 {
-                print(tableViewTopConstraint.multiplier)
                 tableViewTopConstraint = tableViewTopConstraint.setMultiplier(multiplier: 0.64)
                 DispatchQueue.main.async {
                     self.view.layoutIfNeeded()
@@ -263,10 +283,6 @@ class HomeViewController: UIViewController {
                             method.removeSubrange(range)
                         }
 
-                        //                        withUnsafePointer(to: &proxyConfig, { (p) in
-                        //                            print("proxyconfig \(p)")
-                        //                        })
-
                         let proxyConfig = ProxyConfig()
                         proxyConfig.currentProxy = "CUSTOM"
                         proxyConfig.setValue(byItem: "description", value: "\(host):\(port)")
@@ -301,7 +317,7 @@ class HomeViewController: UIViewController {
         if let currentVPNManager = self.currentVPNManager {
             currentVPNStatusIndicator = currentVPNManager.connection.status
         } else {
-            print("!!!!!")
+            DDLogError("empty manager. This should not happen!")
         }
     }
 
@@ -349,7 +365,6 @@ class HomeViewController: UIViewController {
                     manager.loadFromPreferences(completionHandler: { (_error) in
                         if let error = _error {
                             self.showError(error, title: "load preferences 2")
-
                         } else {
                             if self.setVPNManager(withManager: manager, shouldON: shouldOn) == false {
 
@@ -514,7 +529,7 @@ class HomeViewController: UIViewController {
 
 
 extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
-    
+
     // MARK: - Table view data source
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
@@ -593,25 +608,25 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
         }
         return false
     }
-    
+
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            
+
             let alertController = UIAlertController(title: "Delete Proxy Server?", message: nil, preferredStyle: .alert)
             let deleteAction = UIAlertAction(title: "Delete", style: .destructive, handler: { (_) in
                 self.willEditServerIndex = indexPath.row
                 self.deleteEditingVPN()
             })
             let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-            
+
             alertController.addAction(cancelAction)
             alertController.addAction(deleteAction)
-            
+
             self.present(alertController, animated: true, completion: nil)
-            
+
         }
     }
-    
+
     // MARK: - Table view delegate
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)

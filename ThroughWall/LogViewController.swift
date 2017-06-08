@@ -70,6 +70,14 @@ class LogViewController: UIViewController {
             listController.addAction(logLevelAction)
         }
         
+        let shareAction = UIAlertAction(title: "Share", style: .default) { (_) in
+            let activityViewController = UIActivityViewController(activityItems: [self.logTextView.text], applicationActivities: nil)
+            self.present(activityViewController, animated: true, completion: nil)
+            print("share")
+        }
+        listController.addAction(shareAction)
+        
+        
         let clearLog = UIAlertAction(title: "Clear Log", style: .destructive) { (_) in
             let fileManager = FileManager.default
             var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName)!

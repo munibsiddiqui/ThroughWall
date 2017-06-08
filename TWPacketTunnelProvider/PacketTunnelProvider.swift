@@ -30,6 +30,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         DDLogVerbose("Going to start VPN")
         pendingStartCompletion = completionHandler
 
+        CoreDataController.sharedInstance.closeCrashLogs()
+        
         DDLogVerbose("\(Date().timeIntervalSince1970)")
         Rule.sharedInstance.analyzeRuleFile()
         DDLogVerbose("\(Date().timeIntervalSince1970)")
@@ -81,7 +83,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             })
         }
     }
-
+    
     func setupDDLog() {
         DDLog.add(DDASLLogger.sharedInstance, with: DDLogLevel.warning)// ASL = Apple System Logs
 

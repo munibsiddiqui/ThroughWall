@@ -317,15 +317,16 @@ class SiteConfigController {
             manager.protocolConfiguration = providerProtocol
             manager.protocolConfiguration?.serverAddress = "10.0.0.0"
             manager.localizedDescription = "Chisel"
-            manager.saveToPreferences() { error in
-                if error != nil {
-                    print("save new manager \(error!)")
-                    completionHandler(nil)
-                } else {
-                    print("saved new manager")
-                    completionHandler(manager)
-                }
-            }
+//            manager.saveToPreferences() { error in
+//                if error != nil {
+//                    print("save new manager \(error!)")
+//                    completionHandler(nil)
+//                } else {
+//                    print("saved new manager")
+//                    completionHandler(manager)
+//                }
+//            }
+            completionHandler(manager)
         }
     }
     
@@ -415,7 +416,10 @@ class SiteConfigController {
         self.setConfig(fromProxyConfig: config, toManager: manager)
         
         manager.isEnabled = true
-        manager.saveToPreferences(completionHandler: { (error) in
+        manager.saveToPreferences(completionHandler: { (_error) in
+            if let error = _error {
+                print("save failed: \(error)")
+            }
             completion()
         })
     }

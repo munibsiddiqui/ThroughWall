@@ -94,7 +94,7 @@ class ICMPPing: NSObject, SimplePingDelegate {
     }
 
     func simplePing(_ pinger: SimplePing, didReceiveUnexpectedPacket packet: Data) {
-        print("received unepected packet")
+        print("received unexpected packet")
     }
 
     func simplePing(_ pinger: SimplePing, didFailWithError error: Error) {

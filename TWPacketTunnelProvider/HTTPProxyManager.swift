@@ -97,7 +97,7 @@ class HTTPProxyManager: NSObject {
     func prepareTimelyUpdate() {
         repeatlySaveTraffic(withInterval: 1)
         repeatlyDeleteOldHistory(before: 12 * 3600, withRepeatPeriod: 100)
-        repeatlyDisconnectOutgoing(withMaxKeepAliveTime: 6 * 60, checkPeriod: 60)
+        repeatlyDisconnectOutgoing(withMaxKeepAliveTime: 60, checkPeriod: 10)
     }
 
     // MARK: - repeatlySaveTraffic
@@ -138,6 +138,8 @@ class HTTPProxyManager: NSObject {
                 defaults?.set(currentDate, forKey: recordingDateKey)
             }
 
+            defaults?.set(Date(), forKey: currentTime)
+            
             defaults?.synchronize()
 
             let traffic = downUpTraffic(proxyDownload: proxyDownload, directDownload: directDownload, proxyUpload: proxyUpload, directUpload: directUpload)

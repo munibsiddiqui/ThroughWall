@@ -25,6 +25,9 @@ class HistoryOptionTableViewController: UITableViewController {
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
         
+        tableView.tableFooterView = UIView()
+        tableView.backgroundColor = veryLightGrayUIColor
+        
         logRequestSwitch.addTarget(self, action: #selector(HistoryOptionTableViewController.trigerLogFunction), for: .valueChanged)
         
         let defaults = UserDefaults.init(suiteName: groupName)
@@ -169,7 +172,7 @@ class HistoryOptionTableViewController: UITableViewController {
         var newUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
         newUrl.appendPathComponent(PacketTunnelProviderLogFolderName)
         newUrl.appendPathComponent(databaseFolderName)
-        newUrl.appendPathComponent(databaseFileName)
+//        newUrl.appendPathComponent(databaseFileName)
         CoreDataController.sharedInstance.mergerPieceBody(atURL: newUrl)
     }
     

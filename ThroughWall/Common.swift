@@ -24,9 +24,11 @@ let kConfigureVersion = "Bingo.TW.ConfigureVersion"
 let currentConfigureVersion = 1
 let kSelectedServerIndex = "Bingo.TW.SelectedServerIndex"
 
+let kCurrentManagerStatus = "Bingo.TW.ManagerStatus"
 
 let databaseFolderName = "DataBase"
 let databaseFileName = "Record.sqlite"
+let parseFolderName = "Parse"
 
 let groupName = "group.Bingo.ThroughWall"
 let ruleFileName = "rule.conf"
@@ -51,6 +53,7 @@ let proxyDownloadCountKey = "count.proxyDownload"
 let proxyUploadCountKey = "count.proxyUpload"
 let adjustCountKey = "count.adjust"
 let recordingDateKey = "Bingo.recordingDate"
+let currentTime = "Bingo.currentTime"
 
 let saveContextNotification = "Bingo.TWPacketTunnelProvider.saveContext"
 

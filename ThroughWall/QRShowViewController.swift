@@ -31,7 +31,6 @@ class QRShowViewController: UIViewController {
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        print("touched")
         dismiss(animated: true, completion: nil)
     }
     

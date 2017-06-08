@@ -17,6 +17,8 @@
 		3444AB861DF164B600FD3B9F /* Socks2HTTPS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3444AB851DF164B600FD3B9F /* Socks2HTTPS.swift */; };
 		3445FB091E8D5F82001504E9 /* RuleDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3445FB081E8D5F82001504E9 /* RuleDetailTableViewController.swift */; };
 		344EF2C91EC345980055A049 /* LogViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 344EF2C81EC345980055A049 /* LogViewController.swift */; };
+		3450CA791EDC685E004E4A09 /* TimelineCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3450CA781EDC685E004E4A09 /* TimelineCellView.xib */; };
+		3450CA7B1EDC6871004E4A09 /* TimelineCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3450CA7A1EDC6871004E4A09 /* TimelineCellView.swift */; };
 		3452C3481E763D80008CCC4E /* Tool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3452C3471E763D80008CCC4E /* Tool.swift */; };
 		345E6B791EC5A0D60064B25E /* QRShowViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 345E6B781EC5A0D60064B25E /* QRShowViewController.swift */; };
 		345ECB861DF8F48800F70ACC /* rule.config in Resources */ = {isa = PBXBuildFile; fileRef = 345ECB851DF8F48800F70ACC /* rule.config */; };
@@ -66,6 +68,7 @@
 		34A26A6B1E13447400A8CC93 /* HistoryOptionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A26A6A1E13447400A8CC93 /* HistoryOptionTableViewController.swift */; };
 		34BD966C1DDD392E002442BF /* ShadowsocksLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3474ECBB1DDC950000EBF3C5 /* ShadowsocksLib.framework */; };
 		34BD966D1DDD3932002442BF /* TunnelLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3474ECCD1DDC951100EBF3C5 /* TunnelLib.framework */; };
+		34C59BFA1EDC1F9C00CD77CB /* RequestsInTimelineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34C59BF91EDC1F9C00CD77CB /* RequestsInTimelineViewController.swift */; };
 		34C7D5731E25C9300052CE78 /* ArchivedTrafficCountTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34C7D5721E25C9300052CE78 /* ArchivedTrafficCountTableViewController.swift */; };
 		34CC5CDB1DDC9B7A0061AA44 /* BLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 34CC5B221DDC9B790061AA44 /* BLog.m */; };
 		34CC5CDC1DDC9B7A0061AA44 /* BLog_syslog.c in Sources */ = {isa = PBXBuildFile; fileRef = 34CC5B231DDC9B790061AA44 /* BLog_syslog.c */; };
@@ -288,12 +291,15 @@
 /* Begin PBXFileReference section */
 		0D54040D7632C1761B2803BD /* Pods_TWPacketTunnelProvider.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TWPacketTunnelProvider.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		172477E3A4C2AE264451794D /* Pods-ThroughWall.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThroughWall.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ThroughWall/Pods-ThroughWall.debug.xcconfig"; sourceTree = "<group>"; };
+		340329CD1ECD8AAA00651955 /* ThroughWall 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "ThroughWall 2.xcdatamodel"; sourceTree = "<group>"; };
 		3423C7641DF00C60002B5AE8 /* OutgoingSide.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutgoingSide.swift; sourceTree = "<group>"; };
 		3433528C1DF943D100CF7281 /* CoreDataController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataController.swift; sourceTree = "<group>"; };
 		3439FA051DEEB7A000F8CE59 /* Rule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Rule.swift; sourceTree = "<group>"; };
 		3444AB851DF164B600FD3B9F /* Socks2HTTPS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Socks2HTTPS.swift; sourceTree = "<group>"; };
 		3445FB081E8D5F82001504E9 /* RuleDetailTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleDetailTableViewController.swift; sourceTree = "<group>"; };
 		344EF2C81EC345980055A049 /* LogViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogViewController.swift; sourceTree = "<group>"; };
+		3450CA781EDC685E004E4A09 /* TimelineCellView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TimelineCellView.xib; sourceTree = "<group>"; };
+		3450CA7A1EDC6871004E4A09 /* TimelineCellView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimelineCellView.swift; sourceTree = "<group>"; };
 		3452C3471E763D80008CCC4E /* Tool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tool.swift; sourceTree = "<group>"; };
 		345E6B781EC5A0D60064B25E /* QRShowViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRShowViewController.swift; sourceTree = "<group>"; };
 		345ECB851DF8F48800F70ACC /* rule.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = rule.config; sourceTree = "<group>"; };
@@ -342,6 +348,7 @@
 		348F61981E8E540000F6AF9A /* RawRuleTXTViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RawRuleTXTViewController.swift; sourceTree = "<group>"; };
 		34A17DD41E8CF6F6005BC19B /* RuleListTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleListTableViewController.swift; sourceTree = "<group>"; };
 		34A26A6A1E13447400A8CC93 /* HistoryOptionTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryOptionTableViewController.swift; sourceTree = "<group>"; };
+		34C59BF91EDC1F9C00CD77CB /* RequestsInTimelineViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestsInTimelineViewController.swift; sourceTree = "<group>"; };
 		34C7D5721E25C9300052CE78 /* ArchivedTrafficCountTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArchivedTrafficCountTableViewController.swift; sourceTree = "<group>"; };
 		34CC5B211DDC9B790061AA44 /* BLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLog.h; sourceTree = "<group>"; };
 		34CC5B221DDC9B790061AA44 /* BLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BLog.m; sourceTree = "<group>"; };
@@ -1064,7 +1071,6 @@
 				3452C3461E763D27008CCC4E /* MainView */,
 				34765C811E10D8810055C294 /* HistoryFigureViewController.swift */,
 				34C7D5721E25C9300052CE78 /* ArchivedTrafficCountTableViewController.swift */,
-				34765C941E1116780055C294 /* RequestListTableViewController.swift */,
 				34E3F1FB1E11428600FAD65C /* RequestDetailTableViewController.swift */,
 				3433528B1DF943B700CF7281 /* Core Data */,
 				348CFFC91DEBF36400A2720E /* SupportingFiles */,
@@ -1216,6 +1222,10 @@
 			isa = PBXGroup;
 			children = (
 				34A26A6A1E13447400A8CC93 /* HistoryOptionTableViewController.swift */,
+				34C59BF91EDC1F9C00CD77CB /* RequestsInTimelineViewController.swift */,
+				34765C941E1116780055C294 /* RequestListTableViewController.swift */,
+				3450CA7A1EDC6871004E4A09 /* TimelineCellView.swift */,
+				3450CA781EDC685E004E4A09 /* TimelineCellView.xib */,
 			);
 			name = Log;
 			sourceTree = "<group>";
@@ -2499,6 +2509,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3474EC881DDC926C00EBF3C5 /* LaunchScreen.storyboard in Resources */,
+				3450CA791EDC685E004E4A09 /* TimelineCellView.xib in Resources */,
 				3474EC851DDC926C00EBF3C5 /* Assets.xcassets in Resources */,
 				345ECB861DF8F48800F70ACC /* rule.config in Resources */,
 				348E850A1E10CCAB00E55F64 /* Main.storyboard in Resources */,
@@ -2753,6 +2764,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				34C59BFA1EDC1F9C00CD77CB /* RequestsInTimelineViewController.swift in Sources */,
 				34765C901E10D8810055C294 /* SelectInputViewController.swift in Sources */,
 				3482A2B11E9F0D9700A6B202 /* RuleProxySelectionTableViewController.swift in Sources */,
 				3452C3481E763D80008CCC4E /* Tool.swift in Sources */,
@@ -2780,6 +2792,7 @@
 				34765C951E1116780055C294 /* RequestListTableViewController.swift in Sources */,
 				348F61991E8E540000F6AF9A /* RawRuleTXTViewController.swift in Sources */,
 				3445FB091E8D5F82001504E9 /* RuleDetailTableViewController.swift in Sources */,
+				3450CA7B1EDC6871004E4A09 /* TimelineCellView.swift in Sources */,
 				34C7D5731E25C9300052CE78 /* ArchivedTrafficCountTableViewController.swift in Sources */,
 				34A26A6B1E13447400A8CC93 /* HistoryOptionTableViewController.swift in Sources */,
 			);
@@ -3132,6 +3145,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "ThroughWall/ThroughWall-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -3153,6 +3167,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "ThroughWall/ThroughWall-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -3471,9 +3486,10 @@
 		3474EC811DDC926C00EBF3C5 /* ThroughWall.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				340329CD1ECD8AAA00651955 /* ThroughWall 2.xcdatamodel */,
 				3474EC821DDC926C00EBF3C5 /* ThroughWall.xcdatamodel */,
 			);
-			currentVersion = 3474EC821DDC926C00EBF3C5 /* ThroughWall.xcdatamodel */;
+			currentVersion = 340329CD1ECD8AAA00651955 /* ThroughWall 2.xcdatamodel */;
 			path = ThroughWall.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

@@ -246,15 +246,23 @@ class Rule {
 
             if let realSuffixRules = suffixRules {
                 for suffixRule in realSuffixRules {
-                    if domain.hasSuffix(suffixRule.key) {
-                        return suffixRule.value
+                    var pieceDomains = domain.components(separatedBy: ".")
+                    
+                    while !pieceDomains.isEmpty {
+                        let madeDomain = pieceDomains.joined(separator: ".")
+                        if madeDomain == suffixRule.key {
+                            return suffixRule.value
+                        }
+                        pieceDomains.removeFirst()
                     }
                 }
             }
 
             if let realContainRules = containRules {
                 for containRule in realContainRules {
-                    if domain.contains(containRule.key) {
+                    let pieceDomains = domain.components(separatedBy: ".")
+                    
+                    if pieceDomains.contains(containRule.key) {
                         return containRule.value
                     }
                 }

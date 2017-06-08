@@ -157,12 +157,12 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
             label.text = header
             label.textColor = UIColor.gray
             label.font = UIFont.boldSystemFont(ofSize: 16)
-            view.backgroundColor = UIColor.groupTableViewBackground
+            view.backgroundColor = veryLightGrayUIColor
             view.addSubview(label)
             return view
         } else {
             let view = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: 18))
-            view.backgroundColor = UIColor.groupTableViewBackground
+            view.backgroundColor = veryLightGrayUIColor
             return view
         }
     }

@@ -70,5 +70,19 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>twitter</string>
+		<string>tweetbot</string>
+		<string>echofon</string>
+		<string>twit</string>
+		<string>x-seesmic</string>
+		<string>x-birdfeed</string>
+		<string>tweetings</string>
+		<string>simplytweet</string>
+		<string>icebird</string>
+		<string>fluttr</string>
+		<string>tg</string>
+	</array>
 </dict>
 </plist>

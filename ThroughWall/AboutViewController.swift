@@ -1,4 +1,4 @@
-//
+
 //  AboutViewController.swift
 //  ThroughWall
 //
@@ -10,35 +10,23 @@ import UIKit
 
 class AboutViewController: UIViewController {
 
-    @IBOutlet weak var labelVersion: UILabel!
-    @IBOutlet weak var infoContnet: UITextView!
-    
+    @IBOutlet weak var tableView: UITableView!
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
         view.backgroundColor = veryLightGrayUIColor
-        labelVersion.text = ""
-//        infoContnet.text = ""
-        infoContnet.backgroundColor = veryLightGrayUIColor
-        infoContnet.isHidden = true
-        setTopArear()
-        
-        if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
-            labelVersion.text = "V" + version
-        }
-        if let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String {
-            let tmpStr = labelVersion.text ?? ""
-            labelVersion.text = tmpStr + " Build:" + build
-        }
 
+        setTopArear()
+        tableView.tableFooterView = UIView()
+        tableView.backgroundColor = veryLightGrayUIColor
     }
-    
-    
+
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
-    
+
     func setTopArear() {
         navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
         navigationController?.navigationBar.tintColor = UIColor.white
@@ -47,7 +35,7 @@ class AboutViewController: UIViewController {
         navigationController?.navigationBar.shadowImage = UIImage()
         self.navigationItem.title = "About"
     }
-    
+
     func image(fromColor color: UIColor) -> UIImage {
         let rect = CGRect(x: 0, y: 0, width: view.frame.size.width, height: view.frame.size.height)
         UIGraphicsBeginImageContext(rect.size)
@@ -58,12 +46,12 @@ class AboutViewController: UIViewController {
         UIGraphicsGetCurrentContext()
         return image!
     }
-    
+
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
+
 
     /*
     // MARK: - Navigation
@@ -75,4 +63,86 @@ class AboutViewController: UIViewController {
     }
     */
 
+}
+
+
+extension AboutViewController: UITableViewDelegate, UITableViewDataSource {
+    // MARK: - Table view data source
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 3
+    }
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if section == 2 {
+            return 0
+        }
+        return 2
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        switch indexPath.section {
+        case 0:
+            return getCellforVersionSection(withIndexPath: indexPath)
+        default:
+            return getFollowMeSection(withIndexPath: indexPath)
+        }
+    }
+
+    func getCellforVersionSection(withIndexPath indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "detailCell", for: indexPath)
+
+        if indexPath.row == 0 {
+            cell.textLabel?.text = "Version"
+            if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
+                cell.detailTextLabel?.text = version
+            }
+        } else {
+            cell.textLabel?.text = "Build"
+            if let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String {
+                cell.detailTextLabel?.text = build
+            }
+        }
+        return cell
+
+    }
+
+    func getFollowMeSection(withIndexPath indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "basicCell", for: indexPath)
+
+        if indexPath.row == 0 {
+            cell.textLabel?.text = "Follow on Twitter"
+            cell.imageView?.image = UIImage(named: "Twitter")
+        } else {
+            cell.textLabel?.text = "Telegram"
+            cell.imageView?.image = UIImage(named: "Telegram")
+        }
+
+        return cell
+    }
+
+
+    // MARK: - UITableViewDelegate
+
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 60
+    }
+
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: 18))
+        view.backgroundColor = veryLightGrayUIColor
+        return view
+    }
+    
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        if indexPath.section == 1 {
+            if indexPath.row == 0 {
+                FollowOnSocial.followOnTwitter(withAccount: "ChiselProxy")
+            }else {
+                FollowOnSocial.chatOnTelegram(withAccount: "FatalEr")
+            }
+        }
+    }
+    
 }

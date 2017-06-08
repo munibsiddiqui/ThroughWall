@@ -9,10 +9,10 @@
 import Foundation
 import UIKit
 
-let topUIColor = UIColor(red: 255.0/255.0, green: 108.0 / 255.0, blue: 66.0 / 255.0, alpha: 1.0)
-let bottomUIColor = UIColor(red: 255.0/255.0, green: 139.0 / 255.0, blue: 71.0 / 255.0, alpha: 1.0)
+let topUIColor = UIColor(red: 255.0 / 255.0, green: 108.0 / 255.0, blue: 66.0 / 255.0, alpha: 1.0)
+let bottomUIColor = UIColor(red: 255.0 / 255.0, green: 139.0 / 255.0, blue: 71.0 / 255.0, alpha: 1.0)
 let darkGreenUIColor = UIColor(red: 0.24, green: 0.545, blue: 0.153, alpha: 1.0)
-let veryLightGrayUIColor = UIColor(red: 245/255.0, green: 245/255.0, blue: 245/255.0, alpha: 1.0)
+let veryLightGrayUIColor = UIColor(red: 245 / 255.0, green: 245 / 255.0, blue: 245 / 255.0, alpha: 1.0)
 
 class ICMPPing: NSObject, SimplePingDelegate {
     private var hostName: String
@@ -107,4 +107,50 @@ class ICMPPing: NSObject, SimplePingDelegate {
         handleResult()
     }
 
+}
+
+
+class FollowOnSocial {
+    static func followOnTwitter(withAccount account: String) {
+        let urls = [
+            "twitter://user?screen_name=", // Twitter
+            "tweetbot:///user_profile/", // TweetBot
+            "echofon:///user_timeline?", // Echofon
+            "twit:///user?screen_name=", // Twittelator Pro
+            "x-seesmic://twitter_profile?twitter_screen_name=", // Seesmic
+            "x-birdfeed://user?screen_name=", // Birdfeed
+            "tweetings:///user?screen_name=", // Tweetings
+            "simplytweet:?link=http://twitter.com/", // SimplyTweet
+            "icebird://user?screen_name=", // IceBird
+            "fluttr://user/", // Fluttr
+            "http://twitter.com/"]
+
+        let application = UIApplication.shared
+        
+        for url in urls {
+            if let candidate = URL(string: url + account) {
+                if application.canOpenURL(candidate) {
+                    application.open(candidate, options: [:], completionHandler: nil)
+                    return
+                }
+            }
+        }
+    }
+
+    static func chatOnTelegram(withAccount account: String) {
+        let urls = [
+            "tg://resolve?domain=", // Telegram
+            "https://t.me/"]
+        
+        let application = UIApplication.shared
+        
+        for url in urls {
+            if let candidate = URL(string: url + account) {
+                if application.canOpenURL(candidate) {
+                    application.open(candidate, options: [:], completionHandler: nil)
+                    return
+                }
+            }
+        }
+    }
 }

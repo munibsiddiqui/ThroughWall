@@ -14,6 +14,7 @@
 		3433528D1DF943D100CF7281 /* CoreDataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3433528C1DF943D100CF7281 /* CoreDataController.swift */; };
 		3433528E1DF943D500CF7281 /* CoreDataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3433528C1DF943D100CF7281 /* CoreDataController.swift */; };
 		3439FA061DEEB7A000F8CE59 /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3439FA051DEEB7A000F8CE59 /* Rule.swift */; };
+		343B9E7A1EE8EC88003B7320 /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 343B9E791EE8EC88003B7320 /* AboutViewController.swift */; };
 		3444AB861DF164B600FD3B9F /* Socks2HTTPS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3444AB851DF164B600FD3B9F /* Socks2HTTPS.swift */; };
 		3445FB091E8D5F82001504E9 /* RuleDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3445FB081E8D5F82001504E9 /* RuleDetailTableViewController.swift */; };
 		344EF2C91EC345980055A049 /* LogViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 344EF2C81EC345980055A049 /* LogViewController.swift */; };
@@ -295,6 +296,7 @@
 		3423C7641DF00C60002B5AE8 /* OutgoingSide.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutgoingSide.swift; sourceTree = "<group>"; };
 		3433528C1DF943D100CF7281 /* CoreDataController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataController.swift; sourceTree = "<group>"; };
 		3439FA051DEEB7A000F8CE59 /* Rule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Rule.swift; sourceTree = "<group>"; };
+		343B9E791EE8EC88003B7320 /* AboutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
 		3444AB851DF164B600FD3B9F /* Socks2HTTPS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Socks2HTTPS.swift; sourceTree = "<group>"; };
 		3445FB081E8D5F82001504E9 /* RuleDetailTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleDetailTableViewController.swift; sourceTree = "<group>"; };
 		344EF2C81EC345980055A049 /* LogViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogViewController.swift; sourceTree = "<group>"; };
@@ -1024,6 +1026,14 @@
 			name = "Core Data";
 			sourceTree = "<group>";
 		};
+		343B9E781EE8EC6E003B7320 /* About */ = {
+			isa = PBXGroup;
+			children = (
+				343B9E791EE8EC88003B7320 /* AboutViewController.swift */,
+			);
+			name = About;
+			sourceTree = "<group>";
+		};
 		3452C3461E763D27008CCC4E /* MainView */ = {
 			isa = PBXGroup;
 			children = (
@@ -1064,6 +1074,7 @@
 		3474EC791DDC926C00EBF3C5 /* ThroughWall */ = {
 			isa = PBXGroup;
 			children = (
+				343B9E781EE8EC6E003B7320 /* About */,
 				34C2E6321EC76C04000CC2A1 /* Log */,
 				34F0B8F21EB2DFFA007A286B /* Common */,
 				349D235F1E8511E400381DE1 /* RuleConfig */,
@@ -1213,7 +1224,6 @@
 				3482A2B01E9F0D9700A6B202 /* RuleProxySelectionTableViewController.swift */,
 				348F61961E8E4D0D00F6AF9A /* TestRuleViewController.swift */,
 				348F61981E8E540000F6AF9A /* RawRuleTXTViewController.swift */,
-				344EF2C81EC345980055A049 /* LogViewController.swift */,
 			);
 			name = RuleConfig;
 			sourceTree = "<group>";
@@ -1222,6 +1232,7 @@
 			isa = PBXGroup;
 			children = (
 				34A26A6A1E13447400A8CC93 /* HistoryOptionTableViewController.swift */,
+				344EF2C81EC345980055A049 /* LogViewController.swift */,
 				34C59BF91EDC1F9C00CD77CB /* RequestsInTimelineViewController.swift */,
 				34765C941E1116780055C294 /* RequestListTableViewController.swift */,
 				3450CA7A1EDC6871004E4A09 /* TimelineCellView.swift */,
@@ -2778,6 +2789,7 @@
 				3464BF6E1EC49F0400D81663 /* QRViewController.swift in Sources */,
 				345ECB871DF8F5C100F70ACC /* Rule.swift in Sources */,
 				3474EC7B1DDC926C00EBF3C5 /* AppDelegate.swift in Sources */,
+				343B9E7A1EE8EC88003B7320 /* AboutViewController.swift in Sources */,
 				34765C8C1E10D8810055C294 /* InputTextFieldCell.swift in Sources */,
 				348F61971E8E4D0D00F6AF9A /* TestRuleViewController.swift in Sources */,
 				3479D0001EC1D61200AD3458 /* OperationView.swift in Sources */,

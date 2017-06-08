@@ -15,7 +15,7 @@ class HistoryOptionTableViewController: UITableViewController {
     var totalCount = 0
     var date = ""
     let logRequestSwitch = UISwitch()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -24,36 +24,62 @@ class HistoryOptionTableViewController: UITableViewController {
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
-        
+
         tableView.tableFooterView = UIView()
         tableView.backgroundColor = veryLightGrayUIColor
-        
+
+        setTopArear()
+
         logRequestSwitch.addTarget(self, action: #selector(HistoryOptionTableViewController.trigerLogFunction), for: .valueChanged)
-        
+
         let defaults = UserDefaults.init(suiteName: groupName)
         if let keyValue = defaults?.value(forKey: shouldParseTrafficKey) as? Bool {
             logRequestSwitch.isOn = keyValue
-        }else{
+        } else {
             logRequestSwitch.isOn = false
             defaults?.set(false, forKey: shouldParseTrafficKey)
             defaults?.synchronize()
         }
-        
+
         readProxyTrafficCount()
-        
+
         observer = UnsafeRawPointer(Unmanaged.passUnretained(self).toOpaque())
         let name = DarwinNotifications.updateWidget.rawValue
-        
+
         CFNotificationCenterAddObserver(notificaiton, observer, { (_, observer, name, _, _) in
             if let observer = observer, let name = name {
-                
+
                 // Extract pointer to `self` from void pointer:
                 let mySelf = Unmanaged<HistoryOptionTableViewController>.fromOpaque(observer).takeUnretainedValue()
                 // Call instance method:
                 mySelf.darwinNotification(name: name.rawValue as String)
             }
         }, name as CFString, nil, .deliverImmediately)
-        
+
+    }
+
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+
+    func setTopArear() {
+        navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
+        navigationController?.navigationBar.tintColor = UIColor.white
+        navigationController?.navigationBar.isTranslucent = false
+        navigationController?.navigationBar.setBackgroundImage(image(fromColor: topUIColor), for: .any, barMetrics: .default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        self.navigationItem.title = "History"
+    }
+
+    func image(fromColor color: UIColor) -> UIImage {
+        let rect = CGRect(x: 0, y: 0, width: view.frame.size.width, height: view.frame.size.height)
+        UIGraphicsBeginImageContext(rect.size)
+        let context = UIGraphicsGetCurrentContext()
+        context?.setFillColor(color.cgColor)
+        context?.fill(rect)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsGetCurrentContext()
+        return image!
     }
 
     override func didReceiveMemoryWarning() {
@@ -61,7 +87,7 @@ class HistoryOptionTableViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
 
-    
+
     func darwinNotification(name: String) {
         switch name {
         case DarwinNotifications.updateWidget.rawValue:
@@ -70,7 +96,7 @@ class HistoryOptionTableViewController: UITableViewController {
             break
         }
     }
-    
+
     func readProxyTrafficCount() {
         let defaults = UserDefaults(suiteName: groupName)
         if let downloadCount = defaults?.value(forKey: proxyDownloadCountKey) as? Int {
@@ -82,7 +108,7 @@ class HistoryOptionTableViewController: UITableViewController {
             date = recordingDate
         }
     }
-    
+
     func updateCell() {
         readProxyTrafficCount()
         DispatchQueue.main.async {
@@ -90,13 +116,25 @@ class HistoryOptionTableViewController: UITableViewController {
             self.tableView.reloadRows(at: [indexPath], with: .none)
         }
     }
-    
+
     func trigerLogFunction() {
+        if logRequestSwitch.isOn {
+            let alertController = UIAlertController(title: "Caution", message: "This function may cause network issue", preferredStyle: .alert)
+            
+            let dismissAction = UIAlertAction(title: "Dismmiss", style: .default, handler: { (_) in
+                
+            })
+
+            alertController.addAction(dismissAction)
+            
+            self.present(alertController, animated: true, completion: nil)
+        }
+        
         let defaults = UserDefaults(suiteName: groupName)
         defaults?.set(logRequestSwitch.isOn, forKey: shouldParseTrafficKey)
         defaults?.synchronize()
     }
-    
+
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -112,7 +150,7 @@ class HistoryOptionTableViewController: UITableViewController {
         case 1:
             return 2
         case 2:
-            return 3
+            return 1
         default:
             break
         }
@@ -120,11 +158,12 @@ class HistoryOptionTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
         switch indexPath.section {
         case 0:
             if indexPath.row == 1 {
                 performSegue(withIdentifier: "showHistoryFigure", sender: nil)
-            }else if indexPath.row == 2 {
+            } else if indexPath.row == 2 {
                 performSegue(withIdentifier: "showArchivedHistory", sender: nil)
             }
         case 1:
@@ -133,8 +172,13 @@ class HistoryOptionTableViewController: UITableViewController {
             }
         case 2:
             if indexPath.row == 0 {
+                let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                let vc = storyboard.instantiateViewController(withIdentifier: "LogTXTView") as! LogViewController
+
+                self.navigationController?.pushViewController(vc, animated: true)
+            } else if indexPath.row == -1 {
                 copyPacketTunnelProviderLogToDocument()
-            }else if indexPath.row == 1 {
+            } else if indexPath.row == 1 {
                 copyPacketTunnelProviderLogToDocument()
                 mergePieceBody()
             }
@@ -142,31 +186,31 @@ class HistoryOptionTableViewController: UITableViewController {
             break
         }
     }
-    
+
     func copyPacketTunnelProviderLogToDocument() {
         let fileManager = FileManager.default
         var logUrl = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName)!
         logUrl.appendPathComponent(PacketTunnelProviderLogFolderName)
         var newUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
         newUrl.appendPathComponent(PacketTunnelProviderLogFolderName)
-        
+
         do {
-            if fileManager.fileExists(atPath: newUrl.path){
+            if fileManager.fileExists(atPath: newUrl.path) {
                 try fileManager.removeItem(at: newUrl)
             }
             try fileManager.copyItem(at: logUrl, to: newUrl)
-            
+
             newUrl.appendPathComponent(databaseFolderName)
 
             let databaseUrl = CoreDataController.sharedInstance.getDatabaseUrl()
-            
+
             try fileManager.copyItem(at: databaseUrl, to: newUrl)
 //            CoreDataController.sharedInstance.backupDatabase(toURL: newUrl)
-        }catch{
+        } catch {
             print(error)
         }
     }
-    
+
     func mergePieceBody() {
         let fileManager = FileManager.default
         var newUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
@@ -175,8 +219,8 @@ class HistoryOptionTableViewController: UITableViewController {
 //        newUrl.appendPathComponent(databaseFileName)
         CoreDataController.sharedInstance.mergerPieceBody(atURL: newUrl)
     }
-    
-    
+
+
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch section {
         case 0:
@@ -184,12 +228,37 @@ class HistoryOptionTableViewController: UITableViewController {
         case 1:
             return "HTTP(S) Requests"
         case 2:
-            return "Export Logs"
+            return "Logs"
         default:
             return nil
         }
     }
-    
+
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if let _ = self.tableView(tableView, titleForHeaderInSection: section) {
+            return 60
+        }
+        return 40
+    }
+
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        if let header = self.tableView(tableView, titleForHeaderInSection: section) {
+            //global mode section
+            let view = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: 18))
+            let label = UILabel(frame: CGRect(x: 10, y: 35, width: tableView.frame.width, height: 20))
+            label.text = header
+            label.textColor = UIColor.gray
+            label.font = UIFont.boldSystemFont(ofSize: 16)
+            view.backgroundColor = UIColor.groupTableViewBackground
+            view.addSubview(label)
+            return view
+        } else {
+            let view = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: 18))
+            view.backgroundColor = UIColor.groupTableViewBackground
+            return view
+        }
+    }
+
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "basicCell", for: indexPath)
 
@@ -198,43 +267,43 @@ class HistoryOptionTableViewController: UITableViewController {
         switch indexPath.section {
         case 0:
             if indexPath.row == 0 {
-                let (scale,unit) = autoFitRange(maxValue: totalCount)
+                let (scale, unit) = autoFitRange(maxValue: totalCount)
                 if date == "" {
                     cell.textLabel?.text = "No traffic record now"
-                }else{
-                    cell.textLabel?.text = "\(date):  \(totalCount/scale)\(unit)"
+                } else {
+                    cell.textLabel?.text = "\(date):  \(totalCount / scale)\(unit)"
                 }
-                
-            }else if indexPath.row == 1{
+
+            } else if indexPath.row == 1 {
                 cell.textLabel?.text = "Traffic Figure"
                 cell.accessoryType = .disclosureIndicator
-            }else {
+            } else {
                 cell.textLabel?.text = "Archive"
                 cell.accessoryType = .disclosureIndicator
             }
         case 1:
             if indexPath.row == 0 {
-                cell.textLabel?.text = "Enable Logging Requset"
+                cell.textLabel?.text = "Enable Logging (Experimental)"
                 cell.accessoryView = logRequestSwitch
-            }else {
-                cell.textLabel?.text = "Request Logs"
+            } else {
+                cell.textLabel?.text = "Requests' Log (Experimental)"
                 cell.accessoryType = .disclosureIndicator
             }
         case 2:
             if indexPath.row == 0 {
-                cell.textLabel?.text = "Copy to Document"
-            }else if indexPath.row == 1 {
+                cell.textLabel?.text = "Extension's Log"
+            } else if indexPath.row == 1 {
                 cell.textLabel?.text = "Merge to Document"
-            }else if indexPath.row   == 2 {
+            } else if indexPath.row == 2 {
                 cell.textLabel?.text = "AirDrop"
             }
         default:
             break
         }
-        
+
         return cell
     }
-    
+
 
     func autoFitRange(maxValue: Int) -> (Int, String) {
         var scale = 1
@@ -242,19 +311,19 @@ class HistoryOptionTableViewController: UITableViewController {
         switch maxValue {
         case 0 ..< 1024:
             break
-        case 1024 ..< 1024*1024:
+        case 1024 ..< 1024 * 1024:
             scale = 1024
             unit = "KB"
-        case 1024*1024 ..< 1024*1024*1024:
-            scale = 1024*1024
+        case 1024 * 1024 ..< 1024 * 1024 * 1024:
+            scale = 1024 * 1024
             unit = "MB"
         default:
-            scale = 1024*1024*1024
+            scale = 1024 * 1024 * 1024
             unit = "GB"
         }
         return (scale, unit)
     }
-    
+
     /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {

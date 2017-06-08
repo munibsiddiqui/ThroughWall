@@ -23,6 +23,10 @@ class ArchivedTrafficCountTableViewController: UITableViewController {
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+        
+        tableView.tableFooterView = UIView()
+        tableView.backgroundColor = veryLightGrayUIColor
+
         let fetchData: NSFetchRequest<HistoryTraffic> = HistoryTraffic.fetchRequest()
         fetchData.predicate = NSPredicate(format: "hisType == %@", "month")
         fetchData.sortDescriptors = [NSSortDescriptor.init(key: "timestamp", ascending: true)]

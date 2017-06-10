@@ -7,12 +7,15 @@
 //
 
 import UIKit
+import CocoaLumberjack
 
 class RuleMainViewTableViewController: UITableViewController, URLSessionDownloadDelegate {
     var globalModeSwitch = UISwitch()
     var downloadTask: URLSessionDownloadTask!
     let downloadFilePath = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)[0] + "/" + configFileName
-
+    var backgroundView = UIView()
+//    var downloadProgress = UITextField()
+    var downloadIndicator = UIActivityIndicatorView()
 //    var hiddenHitTimes = 0
 
     override func viewDidLoad() {
@@ -31,13 +34,32 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         globalModeSwitch.addTarget(self, action: #selector(globalModeSwitchDidChange(_:)), for: .valueChanged)
 
         setTopArear()
+
+        backgroundView = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+        backgroundView.center = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
+        backgroundView.backgroundColor = UIColor.darkGray
+        view.addSubview(backgroundView)
+
+        downloadIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
+        downloadIndicator.center = CGPoint(x: 50, y: 50)
+        downloadIndicator.activityIndicatorViewStyle = .whiteLarge
+        backgroundView.addSubview(downloadIndicator)
+        downloadIndicator.startAnimating()
+
+        backgroundView.isHidden = true
+
+//        downloadProgress = UITextField(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
+//        downloadProgress.center = CGPoint(x: 50, y: 80)
+//        downloadProgress.textAlignment = .center
+//        backgroundView.addSubview(downloadProgress)
+
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-//        hiddenHitTimes = 0
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        backgroundView.center = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
     }
-    
+
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
@@ -55,7 +77,7 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         navigationController?.navigationBar.shadowImage = UIImage()
         self.navigationItem.title = "Config"
     }
-    
+
     func image(fromColor color: UIColor) -> UIImage {
         let rect = CGRect(x: 0, y: 0, width: view.frame.size.width, height: view.frame.size.height)
         UIGraphicsBeginImageContext(rect.size)
@@ -66,7 +88,7 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         UIGraphicsGetCurrentContext()
         return image!
     }
-    
+
 
     func globalModeSwitchDidChange(_ sender: UISwitch) {
         let defaults = UserDefaults.init(suiteName: groupName)
@@ -224,15 +246,6 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         switch indexPath.section {
         case 0:
             switch indexPath.row {
-//            case 0:
-//                hiddenHitTimes = hiddenHitTimes + 1
-//                if hiddenHitTimes == 2 {
-//                    let storyboard = UIStoryboard(name: "Main", bundle: nil)
-//                    let vc = storyboard.instantiateViewController(withIdentifier: "LogTXTView") as! LogViewController
-//                    
-//                    self.navigationController?.pushViewController(vc, animated: true)
-//                }
-                
             case 1:
                 performSegue(withIdentifier: "showTestRule", sender: nil)
             default:
@@ -243,7 +256,8 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
             case 0:
                 popTextFieldForURLInput()
             case 1:
-                popFileListInLocalFile()
+                let rect = tableView.rectForRow(at: indexPath)
+                popFileListInLocalFile(withSourceRect: rect)
             case 2:
                 useDefaultRule()
             default:
@@ -256,7 +270,7 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
             case 1:
                 let storyboard = UIStoryboard(name: "Main", bundle: nil)
                 let vc = storyboard.instantiateViewController(withIdentifier: "rawRuleTXTView") as! RawRuleTXTViewController
-                
+
                 self.navigationController?.pushViewController(vc, animated: true)
 //                performSegue(withIdentifier: "showRawTXT", sender: nil)
             default:
@@ -269,7 +283,7 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
 
     // MARK: - Import Rule File
 
-    func popFileListInLocalFile() {
+    func popFileListInLocalFile(withSourceRect sourceRect: CGRect) {
         //        let alertController = UIAlertController(title: "Input URL", message: nil, preferredStyle: .alert)
         let listController = UIAlertController(title: "Files in Document", message: nil, preferredStyle: .actionSheet)
         let fileURLs = listConfigFilesInDocument()
@@ -287,6 +301,12 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
 
         let cancelItem = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         listController.addAction(cancelItem)
+
+        if let popoverPresentationController = listController.popoverPresentationController {
+            popoverPresentationController.sourceView = view
+            popoverPresentationController.sourceRect = sourceRect
+        }
+
         present(listController, animated: true, completion: nil)
     }
 
@@ -297,16 +317,16 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         do {
             // Get the directory contents urls (including subfolders urls)
             let directoryContents = try FileManager.default.contentsOfDirectory(at: documentsUrl, includingPropertiesForKeys: nil, options: [])
-            print(directoryContents)
+//            print(directoryContents)
 
             // if you want to filter the directory contents you can do like this:
             let ruleFiles = directoryContents.filter { $0.pathExtension == "config" }
-            print("rule urls:", ruleFiles)
-            let ruleFileNames = ruleFiles.map { $0.deletingPathExtension().lastPathComponent }
-            print("rule list:", ruleFileNames)
+//            print("rule urls:", ruleFiles)
+//            let ruleFileNames = ruleFiles.map { $0.deletingPathExtension().lastPathComponent }
+//            print("rule list:", ruleFileNames)
             return ruleFiles
-        } catch let error as NSError {
-            print(error.localizedDescription)
+        } catch {
+             DDLogError("\(error)")
         }
         return []
     }
@@ -370,6 +390,7 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
 //                self.downloadIndicator.startAnimating()
 //                self.downloadProgress.text = "0 %"
 //                self.downloadProgress.isHidden = false
+                self.backgroundView.isHidden = false
             }
 
             downloadTask.resume()
@@ -390,9 +411,10 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
             saveToConfigFile(content)
             RuleFileUpdateController().updateRuleFileFromImportedFile(downloadFilePath)
         } catch {
-            print(error)
+             DDLogError("\(error)")
         }
         DispatchQueue.main.async {
+            self.backgroundView.isHidden = true
 //            self.downloadIndicator.stopAnimating()
 //            self.downloadProgress.text = "Done"
 //            UIView.animate(withDuration: 1, animations: {
@@ -410,13 +432,13 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
             DispatchQueue.main.async {
 //                self.downloadProgress.isHidden = true
 //                self.downloadIndicator.stopAnimating()
-
+                self.backgroundView.isHidden = true
             }
         } else {
 //            let percent = Int(totalBytesWritten * 100 / totalBytesExpectedToWrite)
-            DispatchQueue.main.async {
+//            DispatchQueue.main.async {
 //                self.downloadProgress.text = "\(percent) %"
-            }
+//            }
         }
     }
 

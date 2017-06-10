@@ -8,30 +8,30 @@
 
 import Foundation
 import NetworkExtension
-
+import CocoaLumberjack
 
 let CustomizeOption = "Custom"
 
 class ProxyConfig: NSObject {
-    
+
     private let proxies = ["CUSTOM", "HTTP", "SOCKS5"]
-    
+
     private let items = [
         "CUSTOM": ["proxy", "description", "server", "port", "password", "method"],
         "HTTP": ["proxy", "description", "server", "port", "user", "password"],
         "SOCKS5": ["proxy", "description", "server", "port", "user", "password"]
     ]
-    
+
     private let hiddenItems = [
         "CUSTOM": ["delay"],
-        ]
-    
+    ]
+
     private let defaults = [
         "CUSTOM": ["proxy": "CUSTOM", "method": "aes-256-cfb", "dns": "System Default"],
         "HTTP": ["proxy": "HTTP"],
         "SOCKS5": ["proxy": "SOCKS5"]
     ]
-    
+
     private let availables = [
         "CUSTOM": [
             "proxy": [
@@ -68,8 +68,8 @@ class ProxyConfig: NSObject {
             ]
         ]
     ]
-    
-    private let keyboadType  = [
+
+    private let keyboadType = [
         "CUSTOM": [
             "description": ["default", "next"],
             "server": ["url", "next"],
@@ -77,7 +77,7 @@ class ProxyConfig: NSObject {
             "password": ["default", "secure", "done"]
         ]
     ]
-    
+
     let shownName = [
         "proxy": "ProxyType",
         "description": "Description",
@@ -88,7 +88,7 @@ class ProxyConfig: NSObject {
         "method": "Method",
         //        "dns": "DNS"
     ]
-    
+
     private var _currentProxy = ""
     private var _containedItems = [String]()
     private var _containedHiddenItems = [String]()
@@ -123,25 +123,25 @@ class ProxyConfig: NSObject {
             return _currentProxy
         }
     }
-    
+
     var containedItems: [String] {
         return _containedItems
     }
-    
+
     var containedHiddenItems: [String] {
         return _containedHiddenItems
     }
-    
+
     func setValue(byItem item: String, value: String) {
         _values[item] = value
     }
-    
+
     func getValue(byItem item: String) -> String? {
         return _values[item]
     }
-    
+
     func getAvailableOptions(byItem item: String) -> ([String], [String])? {
-        
+
         if let itemOptions = _availableOptions[item] {
             var preset = [String]()
             var customize = [String]()
@@ -152,20 +152,20 @@ class ProxyConfig: NSObject {
                 customize = cust
             }
             return (preset, customize)
-            
+
         } else {
             return nil
         }
     }
-    
+
     func getKeyboardType(byItem item: String) -> [String]? {
         return _keyboardType[item]
     }
-    
+
     func setCustomOption(byItem item: String, option: String) {
         _availableOptions[item]?["customize"] = [option]
     }
-    
+
     func setSelection(_ item: String, selected value: String) {
         //        print("\(item) \(selected)")
         if item == "proxy" {
@@ -177,18 +177,18 @@ class ProxyConfig: NSObject {
             setCustomOption(byItem: item, option: value)
         }
     }
-    
+
 }
 
 class SiteConfigController {
-    
+
     enum ServerVersionStatus {
         case ERROR
         case EMPTY
         case CONVERTED
         case NOTCONVERTED
     }
-    
+
     private func isContainConvertedVPN(amongManagers managers: [NETunnelProviderManager]) -> Bool {
         for vpnManager in managers {
             if let providerProtocol = vpnManager.protocolConfiguration as? NETunnelProviderProtocol {
@@ -199,7 +199,7 @@ class SiteConfigController {
         }
         return false
     }
-    
+
     private func checkServerStatus(withCompletionHandler completion: @escaping (ServerVersionStatus, [NETunnelProviderManager]) -> Void) {
         NETunnelProviderManager.loadAllFromPreferences() { newManagers, error in
             if error == nil {
@@ -207,33 +207,33 @@ class SiteConfigController {
                     completion(ServerVersionStatus.EMPTY, [NETunnelProviderManager]())
                     return
                 }
-                
+
                 if vpnManagers.count < 1 {
                     completion(ServerVersionStatus.EMPTY, [NETunnelProviderManager]())
                     return
                 }
-                
+
                 if self.isContainConvertedVPN(amongManagers: vpnManagers) {
                     completion(ServerVersionStatus.CONVERTED, vpnManagers)
                 } else {
                     completion(ServerVersionStatus.NOTCONVERTED, vpnManagers)
                 }
             } else {
-                print(error!)
+                DDLogError("\(error!)")
                 completion(ServerVersionStatus.ERROR, [NETunnelProviderManager]())
             }
         }
     }
-    
+
     private func getConfig(fromManager mamager: NETunnelProviderManager) -> ProxyConfig? {
-        
+
         if var proxy = (mamager.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration!["proxy"] as? String {
             if proxy == "SHADOWSOCKS" {
                 proxy = "CUSTOM"
             }
             let proxyConfig = ProxyConfig()
             proxyConfig.currentProxy = proxy
-            
+
             for item in proxyConfig.containedItems {
                 if var value = (mamager.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration![item] as? String {
                     if value == "SHADOWSOCKS" {
@@ -246,21 +246,21 @@ class SiteConfigController {
         }
         return nil
     }
-    
+
     private func setConfig(fromProxyConfig config: ProxyConfig, toManager manager: NETunnelProviderManager) {
-        
+
         var configuration = [String: AnyObject]()
-        
+
         let items = config.containedItems
-        
+
         for item in items {
             configuration[item] = config.getValue(byItem: item) as AnyObject?
         }
         configuration[kConfigureVersion] = currentConfigureVersion as AnyObject?
         (manager.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration = configuration
     }
-    
-    
+
+
     private func saveConfigFile(fromOldVPNManagers managers: [NETunnelProviderManager]) {
         var proxyConfigs = [ProxyConfig]()
         var index = 0
@@ -280,10 +280,10 @@ class SiteConfigController {
         }
         if proxyConfigs.count > 0 {
             self.writeIntoSiteConfigFile(withConfigs: proxyConfigs)
-            print("save config file")
+            DDLogInfo("save config file")
         }
     }
-    
+
     private func deleteOldServer(fromVPNManagers managers: [NETunnelProviderManager]) -> NETunnelProviderManager? {
         var newVersionManager: NETunnelProviderManager? = nil
         for manager in managers {
@@ -293,24 +293,24 @@ class SiteConfigController {
                 } else {
                     //delete old
                     manager.removeFromPreferences(completionHandler: nil)
-                    print("delete old")
+                    DDLogInfo("delete old")
                 }
             }
         }
         return newVersionManager
     }
-    
+
     private func createNewTypeServer(withCompeletionHandler completionHandler: @escaping (NETunnelProviderManager?) -> Void) {
         //no saved. create one
         let manager = NETunnelProviderManager()
         manager.loadFromPreferences { error in
-            
+
             if error != nil {
-                print("loadFromPreferences \(error!)")
+                DDLogError("loadFromPreferences \(error!)")
                 completionHandler(nil)
                 return
             }
-            
+
             let providerProtocol = NETunnelProviderProtocol()
             providerProtocol.providerBundleIdentifier = kTunnelProviderBundle
             providerProtocol.providerConfiguration = [kConfigureVersion: currentConfigureVersion]
@@ -329,26 +329,26 @@ class SiteConfigController {
             completionHandler(manager)
         }
     }
-    
+
     func writeIntoSiteConfigFile(withConfigs configs: [ProxyConfig]) {
         let fileManager = FileManager.default
-        
+
         guard var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName) else {
             return
         }
         url.appendPathComponent(siteFileName)
-        
+
         do {
-            
+
             if fileManager.fileExists(atPath: url.path) {
                 try fileManager.removeItem(at: url)
             }
-            
+
             fileManager.createFile(atPath: url.path, contents: nil, attributes: nil)
             let filehandle = try FileHandle(forWritingTo: url)
-            
+
             for config in configs {
-                
+
                 var items = config.containedItems
                 //the first item should be proxy !!!
                 for item in items {
@@ -356,41 +356,41 @@ class SiteConfigController {
                         filehandle.write("\(item):\(value)\n".data(using: String.Encoding.utf8)!)
                     }
                 }
-                
+
                 items = config.containedHiddenItems
                 for item in items {
                     if let value = config.getValue(byItem: item) {
                         filehandle.write("\(item):\(value)\n".data(using: String.Encoding.utf8)!)
                     }
                 }
-                
-                
+
+
                 filehandle.write("#\n".data(using: String.Encoding.utf8)!)
             }
-            
+
             filehandle.synchronizeFile()
-            
+
         } catch {
-            print(error)
+            DDLogError("\(error)")
             return
         }
     }
-    
+
     func convertOldServer(withCompletionHandler completion: @escaping (NETunnelProviderManager?) -> Void) {
         checkServerStatus { (currentStatus, vpnManagers) in
             switch currentStatus {
             case .ERROR:
-                print("Unknow")
+                DDLogError("Unknow")
                 completion(nil)
             case .EMPTY:
-                print("empty")
+                DDLogInfo("empty")
                 completion(nil)
             case .CONVERTED:
-                print("converted")
+                DDLogInfo("converted")
                 let newVersionManager = self.deleteOldServer(fromVPNManagers: vpnManagers)
                 completion(newVersionManager)
             case .NOTCONVERTED:
-                print("not converted")
+                DDLogInfo("not converted")
                 self.saveConfigFile(fromOldVPNManagers: vpnManagers)
                 self.createNewTypeServer { _newManager in
                     let _ = self.deleteOldServer(fromVPNManagers: vpnManagers)
@@ -406,24 +406,24 @@ class SiteConfigController {
                             })
                         }
                     }
-                    
+
                 }
             }
         }
     }
-    
+
     func save(withConfig config: ProxyConfig, intoManager manager: NETunnelProviderManager, completionHander completion: @escaping (Void) -> Void) {
         self.setConfig(fromProxyConfig: config, toManager: manager)
-        
+
         manager.isEnabled = true
         manager.saveToPreferences(completionHandler: { (_error) in
             if let error = _error {
-                print("save failed: \(error)")
+                DDLogError("save failed: \(error)")
             }
             completion()
         })
     }
-    
+
     func forceSaveToManager(withConfig config: ProxyConfig, withCompletionHandler completion: @escaping (NETunnelProviderManager?) -> Void) {
         checkServerStatus { (status, vpnManagers) in
             switch status {
@@ -450,48 +450,48 @@ class SiteConfigController {
             }
         }
     }
-    
+
     func readSiteConfigsFromConfigFile() -> [ProxyConfig] {
         var proxyConfigs = [ProxyConfig]()
-        
+
         let fileManager = FileManager.default
-        
+
         guard var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName) else {
             return proxyConfigs
         }
-        
+
         url.appendPathComponent(siteFileName)
         if !fileManager.fileExists(atPath: url.path) {
             return proxyConfigs
         }
-        
+
         do {
-            
+
             let content = try String(contentsOf: url, encoding: String.Encoding.utf8)
             let sites = content.components(separatedBy: "#\n")
             for site in sites {
                 var items = site.components(separatedBy: "\n")
                 let config = ProxyConfig()
-                
+
                 let firstItem = items[0]
-                
+
                 if firstItem.hasPrefix("proxy:") {
                     config.currentProxy = firstItem.substring(from: firstItem.index(firstItem.startIndex, offsetBy: 6))
                     items.removeFirst()
                     items.removeLast()
-                    
+
                     for item in items {
                         let temp = item.components(separatedBy: ":")
                         let name = temp[0]
                         // let option = temp.count > 2 ? temp.dropFirst().joined(separator: ":") : temp[1]
                         let option: String
-                        
+
                         if temp.count > 2 {
                             option = temp.dropFirst().joined(separator: ":")
                         } else {
                             option = temp[1]
                         }
-                        
+
                         if config.containedItems.contains(name) || config.containedHiddenItems.contains(name) {
                             config.setValue(byItem: name, value: option)
                         }
@@ -500,32 +500,32 @@ class SiteConfigController {
                 }
             }
         } catch {
-            print(error)
+            DDLogError("\(error)")
         }
-        
+
         return proxyConfigs
     }
-    
-    
+
+
     func getSelectedServerIndex() -> Int? {
         let defaults = UserDefaults.init(suiteName: groupName)
-        
+
         if let index = defaults?.value(forKey: kSelectedServerIndex) as? Int {
             return index
         }
         return nil
     }
-    
+
     func setSelectedServerIndex(withValue value: Int) {
         let defaults = UserDefaults.init(suiteName: groupName)
-        
+
         defaults?.set(value, forKey: kSelectedServerIndex)
     }
-    
+
 }
 
 class RuleFileUpdateController: NSObject {
-    
+
     func tryUpdateRuleFileFromBundleFile() {
         if getCurrentFileSource() == defaultFileSource {
             if isBundleRuleFileNewer() {
@@ -533,75 +533,75 @@ class RuleFileUpdateController: NSObject {
             }
         }
     }
-    
+
     func forceUpdateRuleFileFromBundleFile() {
         updateRuleFileFromBundleFile()
     }
-    
-    
+
+
     func updateRuleFileFromImportedFile(_ path: String) {
         saveToRuleFile(fromURLString: path)
         let defaults = UserDefaults.init(suiteName: groupName)
         defaults?.set(userImportFileSource, forKey: currentFileSource)
         defaults?.synchronize()
     }
-    
-    
+
+
     func readCurrentRuleFileContent() -> String {
         //if default, return file in bundle. if custom, return file in downlaod position
         var content = ""
-        
+
         if getCurrentFileSource() == defaultFileSource {
             if let path = Bundle.main.path(forResource: "rule", ofType: "config") {
                 do {
                     content = try String(contentsOfFile: path, encoding: String.Encoding.utf8)
                 } catch {
-                    print(error)
+                    DDLogError("\(error)")
                 }
             }
         } else {
             let customPath = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)[0] + "/" + configFileName
             let fileManager = FileManager.default
-            
+
             if fileManager.fileExists(atPath: customPath) {
                 do {
                     content = try String(contentsOfFile: customPath, encoding: String.Encoding.utf8)
                 } catch {
-                    print(error)
+                    DDLogError("\(error)")
                 }
             }
         }
         return content
     }
-    
+
     func saveToCustomRuleFile(withContent content: String) {
         let customPath = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)[0] + "/" + configFileName
         let fileManager = FileManager.default
-        
+
         fileManager.createFile(atPath: customPath, contents: nil, attributes: nil)
-        
+
         do {
             let filehandle = try FileHandle(forWritingTo: URL(fileURLWithPath: customPath))
             filehandle.write(content.data(using: String.Encoding.utf8)!)
             filehandle.synchronizeFile()
             filehandle.closeFile()
         } catch {
-            print(error)
+            DDLogError("\(error)")
             return
         }
-        
+
         saveToRuleFile(withContent: content)
-        
+
         let defaults = UserDefaults.init(suiteName: groupName)
         defaults?.set(userImportFileSource, forKey: currentFileSource)
         defaults?.synchronize()
-        
+
     }
-    
+
     private func getCurrentFileSource() -> String {
         let defaults = UserDefaults(suiteName: groupName)
         var source = ""
-        
+
         if let fileSource = defaults?.value(forKey: currentFileSource) as? String {
             source = fileSource
         } else {
@@ -611,11 +611,11 @@ class RuleFileUpdateController: NSObject {
         }
         return source
     }
-    
+
     private func isBundleRuleFileNewer() -> Bool {
         let defaults = UserDefaults.init(suiteName: groupName)
         var bundleRuleFileNewer = false
-        
+
         if let savedRuleFileVersion = defaults?.value(forKey: savedFileVersion) as? Int {
             if bundlefileVersion > savedRuleFileVersion {
                 bundleRuleFileNewer = true
@@ -625,7 +625,7 @@ class RuleFileUpdateController: NSObject {
         }
         return bundleRuleFileNewer
     }
-    
+
     private func updateRuleFileFromBundleFile() {
         if let path = Bundle.main.path(forResource: "rule", ofType: "config") {
             saveToRuleFile(fromURLString: path)
@@ -635,91 +635,90 @@ class RuleFileUpdateController: NSObject {
             defaults?.synchronize()
         }
     }
-    
+
     private func saveToRuleFile(fromURLString urlString: String) {
         do {
             let fileString = try String(contentsOfFile: urlString, encoding: String.Encoding.utf8)
             saveToRuleFile(withContent: fileString)
         } catch {
-            NSLog("\(error))")
+            DDLogError("\(error))")
         }
     }
-    
+
     private func saveToRuleFile(withContent content: String) {
         let fileManager = FileManager.default
-        
-        let classifications = content.components(separatedBy: "[")
-        
-        for classification in classifications {
-            
-            let components = classification.components(separatedBy: "]")
-            
-            if components.count == 2 {
-                let name = components[0]
-                let value = components[1]
-                
-                var returnKey = "\r\n"
-                
-                if !value.contains(returnKey) {
-                    returnKey = "\n"
-                    if !value.contains(returnKey) {
-                        returnKey = ""
-                    }
+        var returnKey = "\r\n"
+
+        if !content.contains(returnKey) {
+            returnKey = "\n"
+        }
+
+        let items = content.components(separatedBy: returnKey)
+        var currentClass = ""
+        var ruleItems = [String]()
+        var rewriteItems = [String]()
+
+        for item in items {
+            if item.hasPrefix("[") {
+                if item == "[Rule]" {
+                    currentClass = "Rule"
+                } else if item == "[URL Rewrite]" {
+                    currentClass = "URL Rewrite"
+                } else {
+                    currentClass = ""
                 }
-                
-                var items = value.components(separatedBy: returnKey)
-                
-                for (index, item) in items.enumerated().reversed() {
-                    if item.hasPrefix("#") || item == "" {
-                        items.remove(at: index)
-                    }
-                }
-                
-                if name == "Rule" {
-                    //store rule into file
-                    guard var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName) else {
-                        return
-                    }
-                    url.appendPathComponent(ruleFileName)
-                    
-                    fileManager.createFile(atPath: url.path, contents: nil, attributes: nil)
-                    
-                    do {
-                        let filehandle = try FileHandle(forWritingTo: url)
-                        for item in items {
-                            filehandle.seekToEndOfFile()
-                            filehandle.write("\(item)\n".data(using: String.Encoding.utf8)!)
-                        }
-                        filehandle.synchronizeFile()
-                        filehandle.closeFile()
-                    } catch {
-                        print(error)
-                        return
-                    }
-                } else if name == "URL Rewrite" {
-                    //store rule into file
-                    guard var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName) else {
-                        return
-                    }
-                    url.appendPathComponent(rewriteFileName)
-                    
-                    fileManager.createFile(atPath: url.path, contents: nil, attributes: nil)
-                    
-                    do {
-                        let filehandle = try FileHandle(forWritingTo: url)
-                        for item in items {
-                            filehandle.seekToEndOfFile()
-                            filehandle.write("\(item)\n".data(using: String.Encoding.utf8)!)
-                        }
-                        filehandle.synchronizeFile()
-                        filehandle.closeFile()
-                    } catch {
-                        print(error)
-                        return
-                    }
-                }
+                continue
+            }
+
+            if item.hasPrefix("#") || item == "" {
+                continue
+            }
+
+            switch currentClass {
+            case "Rule":
+                ruleItems.append(item)
+            case "URL Rewrite":
+                rewriteItems.append(item)
+            default:
+                break
             }
         }
+
+        guard let url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName) else {
+            return
+        }
+
+        // rule
+        let ruleURL = url.appendingPathComponent(ruleFileName)
+        fileManager.createFile(atPath: ruleURL.path, contents: nil, attributes: nil)
+        do {
+            let filehandle = try FileHandle(forWritingTo: ruleURL)
+            for item in ruleItems {
+                filehandle.seekToEndOfFile()
+                filehandle.write("\(item)\n".data(using: String.Encoding.utf8)!)
+            }
+            filehandle.synchronizeFile()
+            filehandle.closeFile()
+        } catch {
+            DDLogError("\(error)")
+            return
+        }
+
+        //rewrite
+        let rewriteURL = url.appendingPathComponent(rewriteFileName)
+        fileManager.createFile(atPath: rewriteURL.path, contents: nil, attributes: nil)
+        do {
+            let filehandle = try FileHandle(forWritingTo: rewriteURL)
+            for item in rewriteItems {
+                filehandle.seekToEndOfFile()
+                filehandle.write("\(item)\n".data(using: String.Encoding.utf8)!)
+            }
+            filehandle.synchronizeFile()
+            filehandle.closeFile()
+        } catch {
+            DDLogError("\(error)")
+            return
+        }
     }
-    
+
 }

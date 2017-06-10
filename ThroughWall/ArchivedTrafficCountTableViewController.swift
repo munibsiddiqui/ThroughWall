@@ -8,7 +8,7 @@
 
 import UIKit
 import CoreData
-
+import CocoaLumberjack
 
 class ArchivedTrafficCountTableViewController: UITableViewController {
 
@@ -45,7 +45,7 @@ class ArchivedTrafficCountTableViewController: UITableViewController {
                 }
             }
         }catch{
-            print(error)
+            DDLogError("\(error)")
         }
     }
 
@@ -130,7 +130,7 @@ class ArchivedTrafficCountTableViewController: UITableViewController {
                         tableView.reloadData()
                     }
                 }catch{
-                    print(error)
+                    DDLogError("\(error)")
                 }
                 
             })

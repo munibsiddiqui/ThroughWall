@@ -118,7 +118,7 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
                 return true
             })
         } catch {
-            print(error)
+             DDLogError("\(error)")
         }
     }
 
@@ -264,7 +264,7 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
                 CoreDataController.sharedInstance.getContext().refresh(piece, mergeChanges: false)
             }
         } catch {
-            print(error)
+             DDLogError("\(error)")
         }
     }
 

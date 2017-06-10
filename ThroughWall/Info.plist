@@ -17,9 +17,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.2.0</string>
+	<string>1.2.1</string>
 	<key>CFBundleVersion</key>
-	<string>16</string>
+	<string>17</string>
 	<key>Fabric</key>
 	<dict>
 		<key>APIKey</key>
@@ -34,6 +34,20 @@
 			</dict>
 		</array>
 	</dict>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>twitter</string>
+		<string>tweetbot</string>
+		<string>echofon</string>
+		<string>twit</string>
+		<string>x-seesmic</string>
+		<string>x-birdfeed</string>
+		<string>tweetings</string>
+		<string>simplytweet</string>
+		<string>icebird</string>
+		<string>fluttr</string>
+		<string>tg</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -70,19 +84,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-		<string>twitter</string>
-		<string>tweetbot</string>
-		<string>echofon</string>
-		<string>twit</string>
-		<string>x-seesmic</string>
-		<string>x-birdfeed</string>
-		<string>tweetings</string>
-		<string>simplytweet</string>
-		<string>icebird</string>
-		<string>fluttr</string>
-		<string>tg</string>
-	</array>
 </dict>
 </plist>

@@ -19,9 +19,9 @@ enum DomainRule: CustomStringConvertible {
         case .Proxy:
             return "Proxy"
         case .Direct:
-            return "Direct"
+            return "DIRECT"
         case .Reject:
-            return "Reject"
+            return "REJECT"
         default:
             return "Unknow"
         }
@@ -37,7 +37,8 @@ class Rule {
     private var containRules: [String: DomainRule]?
     private var ipRules: [String: DomainRule]?
     private var rewriteRules: [[String]]?
-    private var blockAD = false
+    private var geoIPRule: (String, DomainRule)?
+    private var finalRule: DomainRule?
     private var globalMode = false
 
     private func trasnlateRule(fromString value: String) -> DomainRule {
@@ -72,14 +73,14 @@ class Rule {
         items.removeLast()
         return items
     }
-    
+
     private func itemsInRewriteFile() -> [String] {
         let fileManager = FileManager.default
         guard var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName) else {
             return []
         }
         url.appendPathComponent(rewriteFileName)
-        
+
         var fileString = ""
         do {
             fileString = try String(contentsOf: url, encoding: String.Encoding.utf8)
@@ -87,12 +88,12 @@ class Rule {
             DDLogDebug("\(error)")
             return []
         }
-        
+
         var items = fileString.components(separatedBy: "\n")
         items.removeLast()
         return items
     }
-    
+
 
     private func translateToBinary(fromIP ip: String) -> String {
         var ipParts = ip.components(separatedBy: ".")
@@ -127,7 +128,9 @@ class Rule {
 
         for item in items {
             let components = item.components(separatedBy: ",")
-            result.append(components)
+            if components.count == 3  && components[0] != "GEOIP"{
+                result.append(components)
+            }
         }
         return result
     }
@@ -135,12 +138,11 @@ class Rule {
     func getCurrentRewriteItems() -> [[String]] {
         var result = [[String]]()
         let items = itemsInRewriteFile()
-        
+
         for item in items {
             let components = item.components(separatedBy: " ")
-            if components.count >= 2 {
-                 result.append(components)
-            }
+            result.append(components)
+
         }
         return result
     }
@@ -153,7 +155,7 @@ class Rule {
         suffixRules = [String: DomainRule]()
         containRules = [String: DomainRule]()
         ipRules = [String: DomainRule]()
-        
+
         for item in items {
 //            DDLogVerbose(item)
             let components = item.components(separatedBy: ",")
@@ -171,20 +173,27 @@ class Rule {
                     containRules?[components[1]] = rule
                 case "IP-CIDR":
                     ipRules?[translateToBinary(fromIPRange: components[1])] = rule
+                case "GEOIP":
+                    geoIPRule = (components[1], rule)
                 default:
                     break
                 }
+            } else if components.count == 2 {
+                let rule = trasnlateRule(fromString: components[1])
+                if components[0] == "FINAL" {
+                    finalRule = rule
+                }
             }
         }
-        
+
         rewriteRules = getCurrentRewriteItems()
 
         let defaults = UserDefaults.init(suiteName: groupName)
 
-        if let block = defaults?.value(forKey: blockADSetting) as? Bool {
-            blockAD = block
+//        if let block = defaults?.value(forKey: blockADSetting) as? Bool {
+//            blockAD = block
 //            DDLogVerbose("Block AD \(blockAD)")
-        }
+//        }
         if let global = defaults?.value(forKey: globalModeSetting) as? Bool {
             globalMode = global
 //            DDLogVerbose("Global Mode \(globalMode)")
@@ -247,7 +256,7 @@ class Rule {
             if let realSuffixRules = suffixRules {
                 for suffixRule in realSuffixRules {
                     var pieceDomains = domain.components(separatedBy: ".")
-                    
+
                     while !pieceDomains.isEmpty {
                         let madeDomain = pieceDomains.joined(separator: ".")
                         if madeDomain == suffixRule.key {
@@ -261,7 +270,7 @@ class Rule {
             if let realContainRules = containRules {
                 for containRule in realContainRules {
                     let pieceDomains = domain.components(separatedBy: ".")
-                    
+
                     if pieceDomains.contains(containRule.key) {
                         return containRule.value
                     }
@@ -273,42 +282,50 @@ class Rule {
 
     func ruleForDomain(_ domain: String) -> DomainRule {
         var rule = _ruleForDomain(domain)
-        switch rule {
-        case .Direct:
-            if globalMode {
-                rule = .Proxy
-            }
-        case .Reject:
-            if !blockAD && globalMode {
-                rule = .Direct
-            }
-        default:
-            break
+//        switch rule {
+//        case .Direct:
+//            if globalMode {
+//                rule = .Proxy
+//            }
+//        case .Reject:
+//            if !blockAD && globalMode {
+//                rule = .Direct
+//            }
+//        default:
+//            break
+//        }
+        if rule == .Direct && globalMode {
+            rule = .Proxy
         }
         return rule
     }
-    
-    
+
+
     private func replace(_ url: String, byString bString: String, withPattern pattern: String) -> String {
-        let regex = try! NSRegularExpression(pattern: pattern, options: NSRegularExpression.Options(rawValue:0))
+        let regex = try! NSRegularExpression(pattern: pattern, options: NSRegularExpression.Options(rawValue: 0))
         //    let matches = regex.matches(in: url, options: NSRegularExpression.MatchingOptions(rawValue:0), range: NSMakeRange(0, url.characters.count))
-        
+
         let result = regex.stringByReplacingMatches(in: url, range: NSMakeRange(0, url.characters.count), withTemplate: bString)
-        
-        
+
+
         return result
     }
-    
+
     func tryRewriteURL(withURLString urlString: String) -> String {
         if let realRewriteRules = rewriteRules {
             for rewrite in realRewriteRules {
                 let result = replace(urlString, byString: rewrite[1], withPattern: rewrite[0])
                 if result != urlString {
+                    if rewrite.count == 3 {
+                        if rewrite[2].lowercased() == "reject" {
+                            return ""
+                        }
+                    }
                     return result
                 }
             }
         }
         return urlString
     }
-    
+
 }

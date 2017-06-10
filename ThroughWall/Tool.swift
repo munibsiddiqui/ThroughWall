@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import CocoaLumberjack
 
 let topUIColor = UIColor(red: 255.0 / 255.0, green: 108.0 / 255.0, blue: 66.0 / 255.0, alpha: 1.0)
 let bottomUIColor = UIColor(red: 255.0 / 255.0, green: 139.0 / 255.0, blue: 71.0 / 255.0, alpha: 1.0)
@@ -94,16 +95,16 @@ class ICMPPing: NSObject, SimplePingDelegate {
     }
 
     func simplePing(_ pinger: SimplePing, didReceiveUnexpectedPacket packet: Data) {
-        print("received unexpected packet")
+        DDLogDebug("received unexpected packet")
     }
 
     func simplePing(_ pinger: SimplePing, didFailWithError error: Error) {
-        print(error)
+        DDLogError("\(error)")
         handleResult()
     }
 
     func simplePing(_ pinger: SimplePing, didFailToSendPacket packet: Data, sequenceNumber: UInt16, error: Error) {
-        print(error)
+        DDLogError("\(error)")
         handleResult()
     }
 
@@ -126,7 +127,7 @@ class FollowOnSocial {
             "http://twitter.com/"]
 
         let application = UIApplication.shared
-        
+
         for url in urls {
             if let candidate = URL(string: url + account) {
                 if application.canOpenURL(candidate) {
@@ -141,9 +142,9 @@ class FollowOnSocial {
         let urls = [
             "tg://resolve?domain=", // Telegram
             "https://t.me/"]
-        
+
         let application = UIApplication.shared
-        
+
         for url in urls {
             if let candidate = URL(string: url + account) {
                 if application.canOpenURL(candidate) {

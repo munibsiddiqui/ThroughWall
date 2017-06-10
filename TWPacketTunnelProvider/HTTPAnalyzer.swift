@@ -143,7 +143,7 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
             DDLogVerbose("H\(intTag)H OLDSTAG \(result?.tag)")
             if result?.tag != TAG_READ_FROM_SERVER {
                 outGoing?.readData(withTimeout: -1, tag: TAG_READ_FROM_SERVER)
-            }else{
+            } else {
                 DDLogVerbose("H\(intTag)H Not read again")
             }
         } else if tag == TAG_WRITE_RESPONSE_TO_CLIENT {
@@ -282,6 +282,12 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     func handleHTTPRequestHead(withRequest request: String) {
         var (host, port) = getHostAndPort(fromHostComponentOfRequest: request)
         var (hostName, replaced, portNumber, repostRequest) = extractHostAndPortWithRepost(fromRequest: request)
+
+        if repostRequest == nil {
+            Thread.sleep(forTimeInterval: 1.0)
+            forceDisconnect()
+            return
+        }
 
         if host == nil {
             host = hostName
@@ -428,6 +434,9 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
             replaced = false
         } else {
             replaced = true
+            if newDestiReqComponent == "" {
+                return (nil, replaced, nil, nil)
+            }
         }
         var destiComponents = newDestiReqComponent.components(separatedBy: "/")
         if destiComponents.count < 3 {
@@ -593,12 +602,12 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
             responseFromServerstate = ST_READ_RESPONSE_HEAD_FROM_SERVER
 
             let result = outGoing?.progress()
-            
+
             DDLogVerbose("H\(intTag)H OLDTAG \(result?.tag)")
-            
+
             if result?.tag != TAG_READ_RESPONSE_FROM_SERVER {
                 outGoing?.readData(withTimeout: -1, tag: TAG_READ_RESPONSE_FROM_SERVER)
-            }else{
+            } else {
                 DDLogVerbose("H\(intTag)H Not read again")
             }
         }

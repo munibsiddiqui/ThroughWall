@@ -7,7 +7,7 @@
 //
 
 import UIKit
-
+import CocoaLumberjack
 class HistoryOptionTableViewController: UITableViewController {
 
     let notificaiton = CFNotificationCenterGetDarwinNotifyCenter()
@@ -150,7 +150,7 @@ class HistoryOptionTableViewController: UITableViewController {
         case 1:
             return 2
         case 2:
-            return 1
+            return 2
         default:
             break
         }
@@ -174,11 +174,29 @@ class HistoryOptionTableViewController: UITableViewController {
             if indexPath.row == 0 {
                 let storyboard = UIStoryboard(name: "Main", bundle: nil)
                 let vc = storyboard.instantiateViewController(withIdentifier: "LogTXTView") as! LogViewController
-
+                
+                let fileManager = FileManager.default
+                var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName)!
+                url.appendPathComponent(PacketTunnelProviderLogFolderName)
+                
+                let logFileManager = DDLogFileManagerDefault(logsDirectory: url.path)
+                let fileLogger: DDFileLogger = DDFileLogger(logFileManager: logFileManager) // File Logger
+                vc.filePaths =  fileLogger.logFileManager.sortedLogFilePaths
+                vc.shouldAddLogLevelAction = true
+                vc.fileLogger = fileLogger
+                
                 self.navigationController?.pushViewController(vc, animated: true)
-            } else if indexPath.row == -1 {
+            }else if indexPath.row == 1 {
+                let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                let vc = storyboard.instantiateViewController(withIdentifier: "LogTXTView") as! LogViewController
+                
+                vc.filePaths =  DDFileLogger().logFileManager.sortedLogFilePaths
+                vc.shouldAddLogLevelAction = false
+                
+                self.navigationController?.pushViewController(vc, animated: true)
+            }else if indexPath.row == -1 {
                 copyPacketTunnelProviderLogToDocument()
-            } else if indexPath.row == 1 {
+            } else if indexPath.row == -2 {
                 copyPacketTunnelProviderLogToDocument()
                 mergePieceBody()
             }
@@ -207,7 +225,7 @@ class HistoryOptionTableViewController: UITableViewController {
             try fileManager.copyItem(at: databaseUrl, to: newUrl)
 //            CoreDataController.sharedInstance.backupDatabase(toURL: newUrl)
         } catch {
-            print(error)
+             DDLogError("\(error)")
         }
     }
 
@@ -291,8 +309,10 @@ class HistoryOptionTableViewController: UITableViewController {
             }
         case 2:
             if indexPath.row == 0 {
-                cell.textLabel?.text = "Extension's Log"
-            } else if indexPath.row == 1 {
+                cell.textLabel?.text = "Network's Log"
+            }else if indexPath.row == 1 {
+                cell.textLabel?.text = "App's Log"
+            }else if indexPath.row == 3 {
                 cell.textLabel?.text = "Merge to Document"
             } else if indexPath.row == 2 {
                 cell.textLabel?.text = "AirDrop"

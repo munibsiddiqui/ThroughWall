@@ -97,13 +97,13 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         fileLogger.logFileManager.maximumNumberOfLogFiles = 2
         DDLog.add(fileLogger)
 
-        DDLogInfo("------Log Start------")
+        DDLogInfo("------Extension Log Start------")
 
 
         let defaults = UserDefaults.init(suiteName: groupName)
         if let logLevel = defaults?.value(forKey: klogLevel) as? String {
             DDLogError("Current Log Level: \(logLevel)")
-            switch logLevel {
+            switch logLevel.lowercased() {
             case "off":
             defaultDebugLevel = DDLogLevel.off
             case "error":

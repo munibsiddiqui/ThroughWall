@@ -9,6 +9,7 @@
 import UIKit
 import Charts
 import CoreData
+import CocoaLumberjack
 
 class HistoryFigureViewController: UIViewController {
     @IBOutlet weak var downloadChartView: LineChartView!
@@ -87,7 +88,7 @@ class HistoryFigureViewController: UIViewController {
             let histories = try CoreDataController.sharedInstance.getContext().fetch(fetch)
             return histories
         }catch{
-            print(error)
+            DDLogError("\(error)")
             return [HistoryTraffic]()
         }
     }

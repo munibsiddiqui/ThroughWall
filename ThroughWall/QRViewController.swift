@@ -9,6 +9,7 @@
 import UIKit
 import CoreImage
 import AVFoundation
+import CocoaLumberjack
 
 class QRViewController: UIViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate, AVCaptureMetadataOutputObjectsDelegate {
 
@@ -44,7 +45,7 @@ class QRViewController: UIViewController, UINavigationControllerDelegate, UIImag
             // Set the input device on the capture session.
             captureSession?.addInput(input)
         } catch {
-            print("\(error.localizedDescription)")
+             DDLogError("\(error.localizedDescription)")
             return
         }
 

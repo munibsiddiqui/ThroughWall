@@ -105,8 +105,25 @@ class HomeViewController: UIViewController {
     }
 
     func setupDDLog() {
-        DDLog.add(DDASLLogger.sharedInstance, with: DDLogLevel.debug)// ASL = Apple System Logs
-        DDLogInfo("------Log Start------")
+        DDLog.add(DDTTYLogger.sharedInstance)// TTY = Xcode console
+//        DDLog.add(DDASLLogger.sharedInstance) // ASL = Apple System Logs
+
+        let fileLogger: DDFileLogger = DDFileLogger() // File Logger
+        fileLogger.rollingFrequency = TimeInterval(60 * 60) // 24 hours
+        fileLogger.logFileManager.maximumNumberOfLogFiles = 7
+        DDLog.add(fileLogger)
+
+        DDLogInfo("------App Log Start------")
+
+        #if DEBUG
+            defaultDebugLevel = DDLogLevel.verbose
+            DDLogDebug("Current Log Level: verbose")
+        #else
+            defaultDebugLevel = DDLogLevel.debug
+            DDLogDebug("Current Log Level: debug")
+        #endif
+
+//        DDLogVerbose("\(fileLogger.currentLogFileInfo)")
     }
 
 

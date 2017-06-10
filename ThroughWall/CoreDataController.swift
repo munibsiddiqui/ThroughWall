@@ -134,13 +134,13 @@ class CoreDataController: NSObject {
 
         let psc = NSPersistentStoreCoordinator(managedObjectModel: persistentContainer.managedObjectModel)
         let oldURL = getDatabaseUrl()
-        print(oldURL)
-        print(url)
+        DDLogDebug("\(oldURL)")
+        DDLogDebug("\(url)")
         do {
             let oldStore = try psc.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: oldURL, options: nil)
             try psc.migratePersistentStore(oldStore, to: url, options: nil, withType: NSSQLiteStoreType)
         } catch {
-            print(error)
+            DDLogError("\(error)")
         }
     }
 
@@ -227,7 +227,7 @@ class CoreDataController: NSObject {
                 }
             }
         } catch {
-            print(error)
+             DDLogError("\(error)")
         }
     }
 
@@ -271,7 +271,7 @@ class CoreDataController: NSObject {
             do {
                 try context.save()
             } catch {
-                print(error)
+                 DDLogError("\(error)")
             }
         }
     }

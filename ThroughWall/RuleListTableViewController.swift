@@ -225,8 +225,13 @@ class RuleListTableViewController: UITableViewController, UISearchResultsUpdatin
                 let item = ruleItems[indexPath.row - rewriteItems.count]
                 cell.textLabel?.attributedText = nil
                 cell.detailTextLabel?.attributedText = nil
-                cell.textLabel?.text = item[1]
-                cell.detailTextLabel?.attributedText = makeAttributeDescription(withMatchRule: item[0], andProxyRule: item[2])
+                if item.count == 3 {
+                    cell.textLabel?.text = item[1]
+                    cell.detailTextLabel?.attributedText = makeAttributeDescription(withMatchRule: item[0], andProxyRule: item[2])
+                } else {
+                    cell.textLabel?.text = ""
+                    cell.detailTextLabel?.attributedText = makeAttributeDescription(withMatchRule: item[0], andProxyRule: item[1])
+                }
             }
         }
 

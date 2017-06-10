@@ -19,8 +19,8 @@ class RuleDetailTableViewController: UITableViewController, UITextFieldDelegate 
     var selectedRow  = -1
     
     let options = ["URL Rewrite", "Rule"]
-    let types = ["DOMAIN-SUFFIX", "DOMAIN", "DOMAIN-KEYWORD", "IP-CIDR"]
-    let policy = ["Proxy", "Direct", "Reject"]
+    let types = ["DOMAIN-SUFFIX", "DOMAIN", "DOMAIN-KEYWORD", "IP-CIDR", "GEOIP", "FINAL"]
+    let policy = ["Proxy", "DIRECT", "REJECT"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -87,7 +87,11 @@ class RuleDetailTableViewController: UITableViewController, UITextFieldDelegate 
             case 1:
                 ruleItem[0] = newValue
             case 2:
-                ruleItem[2] = newValue
+                if ruleItem.count == 3{
+                    ruleItem[2] = newValue
+                }else{
+                    ruleItem[1] = newValue
+                }
             default:
                 break
             }
@@ -213,9 +217,15 @@ class RuleDetailTableViewController: UITableViewController, UITextFieldDelegate 
                 let label = cell.viewWithTag(1) as! UILabel
                 label.text = "Policy"
                 let detailLabel = cell.viewWithTag(2) as! UILabel
-                detailLabel.text = ruleItem[2]
+                let policy: String
+                if ruleItem.count == 3 {
+                    policy = ruleItem[2]
+                }else{
+                    policy = ruleItem[1]
+                }
+                detailLabel.text = policy
 
-                switch ruleItem[2].lowercased() {
+                switch policy.lowercased() {
                 case "direct":
                     detailLabel.textColor = UIColor.init(red: 0.24, green: 0.545, blue: 0.153, alpha: 1.0)
                 case "proxy":
@@ -228,9 +238,15 @@ class RuleDetailTableViewController: UITableViewController, UITextFieldDelegate 
             case 3:
                 let cell = tableView.dequeueReusableCell(withIdentifier: "ipdomainCell", for: indexPath)
                 ipDomainLabel = cell.viewWithTag(2) as? UITextField
-                ipDomainLabel?.text = ruleItem[1]
-                ipDomainLabel?.placeholder = "IP or Domain"
-                ipDomainLabel?.delegate = self
+                if ruleItem.count == 3 {
+                    ipDomainLabel?.text = ruleItem[1]
+                    ipDomainLabel?.placeholder = "IP or Domain"
+                    ipDomainLabel?.delegate = self
+                }else{
+                    ipDomainLabel?.isEnabled = false
+                    ipDomainLabel?.placeholder = ""
+                }
+                
                 return cell
             default:
                 let cell = tableView.dequeueReusableCell(withIdentifier: "deleteCell", for: indexPath)
@@ -294,7 +310,18 @@ class RuleDetailTableViewController: UITableViewController, UITextFieldDelegate 
                 desti.oriSelectedIndex =  types.index(of: ruleItem[0])!
             default:
                 desti.availableOptions = policy
-                desti.oriSelectedIndex =  policy.index(of: ruleItem[2])!
+                let itemPolicy: String
+                if ruleItem.count == 3 {
+                    itemPolicy = ruleItem[2].lowercased()
+                }else{
+                    itemPolicy = ruleItem[1].lowercased()
+                }
+                for (index, _policy) in policy.enumerated() {
+                    if _policy.lowercased() == itemPolicy {
+                        desti.oriSelectedIndex = index
+                        break
+                    }
+                }
             }
         }
     }

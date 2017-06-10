@@ -57,7 +57,7 @@ class RequestListTableViewController: UITableViewController {
                 return true
             })
         } catch {
-            print(error)
+             DDLogError("\(error)")
         }
     }
 
@@ -105,12 +105,12 @@ class RequestListTableViewController: UITableViewController {
         let attributeDescription = NSMutableAttributedString(string: "")
 
         if let rule = hostTraffic.hostConnectInfo?.rule {
-            switch rule {
-            case "Direct":
+            switch rule.lowercased() {
+            case "direct":
                 let attributeRule = NSAttributedString(string: rule, attributes: [NSBackgroundColorAttributeName: UIColor.init(red: 0.24, green: 0.545, blue: 0.153, alpha: 1.0)])
                 attributeDescription.append(attributeRule)
                 attributeDescription.append(NSAttributedString(string: " "))
-            case "Proxy":
+            case "proxy":
                 let attributeRule = NSAttributedString(string: rule, attributes: [NSBackgroundColorAttributeName: UIColor.orange])
                 attributeDescription.append(attributeRule)
                 attributeDescription.append(NSAttributedString(string: " "))

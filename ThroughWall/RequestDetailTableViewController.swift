@@ -7,12 +7,16 @@
 //
 
 import UIKit
+import CocoaAsyncSocket
+import CocoaLumberjack
 
 class RequestDetailTableViewController: UITableViewController {
 
     var hostRequest: HostTraffic!
     var prototypeCell: UITableViewCell!
 
+    var outgoing = OutGoing()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -22,6 +26,7 @@ class RequestDetailTableViewController: UITableViewController {
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
         prototypeCell = tableView.dequeueReusableCell(withIdentifier: "trafficHeader")
+//        outgoingConnection = GCDAsyncSocket(delegate: self, delegateQueue: DispatchQueue.global())
     }
 
     override func didReceiveMemoryWarning() {
@@ -29,6 +34,15 @@ class RequestDetailTableViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
 
+    @IBAction func testConnection(_ sender: UIBarButtonItem) {
+        guard let host = hostRequest.hostConnectInfo?.name, let port = hostRequest.hostConnectInfo?.port else {
+            return
+        }
+        DispatchQueue.global().async {
+            self.outgoing.connect2(toHost: host, andPort: UInt16(port))
+        }
+    }
+    
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -202,4 +216,87 @@ class RequestDetailTableViewController: UITableViewController {
     }
     */
 
+}
+
+
+class OutGoing: NSObject, GCDAsyncSocketDelegate {
+    
+    var outgoingConnection: GCDAsyncSocket?
+
+    func connect(toHost host: String, andPort port: UInt16) {
+        outgoingConnection = GCDAsyncSocket(delegate: self, delegateQueue: DispatchQueue.global())
+        
+        do {
+            try outgoingConnection?.connect(toHost: host, onPort: port)
+            DDLogDebug("connecting \(host):\(port)")
+        }catch {
+            DDLogError("\(error)")
+        }
+    }
+    
+    func connect2(toHost host: String, andPort port: UInt16) {
+        DDLogInfo("Start")
+        var hints = addrinfo(
+            ai_flags: 0,
+            ai_family: PF_UNSPEC,
+            ai_socktype: SOCK_STREAM,
+            ai_protocol: IPPROTO_TCP,
+            ai_addrlen: 0,
+            ai_canonname: nil,
+            ai_addr: nil,
+            ai_next: nil)
+        
+//        let host:CString = "www.apple.com"
+//        let port:CString = "http" //could use "80" here
+        var result: UnsafeMutablePointer<addrinfo>? = nil
+        
+        let error = getaddrinfo(host, "\(port)", &hints, &result)
+        
+        DDLogDebug("error \(error)")
+
+        var info = result
+        while info != nil {
+            let (clientIp, service) = sockaddrDescription(addr: info!.pointee.ai_addr)
+            let message = "HostIp: " + (clientIp ?? "?") + " at port: " + (service ?? "?")
+            print(message)
+            info = info!.pointee.ai_next
+        }
+        
+        //free the chain
+        freeaddrinfo(result)
+        
+    }
+    
+    
+    func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16) {
+        DDLogDebug("Connected \(host):\(port)")
+    }
+    
+    
+    func sockaddrDescription(addr: UnsafePointer<sockaddr>) -> (String?, String?) {
+        
+        var host : String?
+        var service : String?
+        
+        var hostBuffer = [CChar](repeating: 0, count: Int(NI_MAXHOST))
+        var serviceBuffer = [CChar](repeating: 0, count: Int(NI_MAXSERV))
+        
+        if getnameinfo(
+            addr,
+            socklen_t(addr.pointee.sa_len),
+            &hostBuffer,
+            socklen_t(hostBuffer.count),
+            &serviceBuffer,
+            socklen_t(serviceBuffer.count),
+            NI_NUMERICHOST | NI_NUMERICSERV)
+            
+            == 0 {
+            
+            host = String(cString: hostBuffer)
+            service = String(cString: serviceBuffer)
+        }
+        return (host, service)
+        
+    }
+    
 }

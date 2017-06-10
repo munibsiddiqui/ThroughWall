@@ -32,9 +32,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
 
         CoreDataController.sharedInstance.closeCrashLogs()
         
-        DDLogVerbose("\(Date().timeIntervalSince1970)")
+//        DDLogVerbose("\(Date().timeIntervalSince1970)")
         Rule.sharedInstance.analyzeRuleFile()
-        DDLogVerbose("\(Date().timeIntervalSince1970)")
+//        DDLogVerbose("\(Date().timeIntervalSince1970)")
 
         addObserver(self, forKeyPath: "defaultPath", options: NSKeyValueObservingOptions.initial, context: nil)
 
@@ -45,7 +45,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 return
             }
             DDLogVerbose("shadowsocks port: \(ShadowLibSocksPort)")
-            DDLogVerbose("\(Date().timeIntervalSince1970)")
+//            DDLogVerbose("\(Date().timeIntervalSince1970)")
             NotificationCenter.default.addObserver(self, selector: #selector(PacketTunnelProvider.onShadowsocksClientClosed), name: NSNotification.Name(rawValue: Tun2SocksStoppedNotification), object: nil)
 
             //HTTP/HTTPS Proxy Setting
@@ -56,13 +56,13 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                     return
                 }
                 DDLogVerbose("http(s) port: \(httpProxyPort)")
-                DDLogVerbose("\(Date().timeIntervalSince1970)")
+//                DDLogVerbose("\(Date().timeIntervalSince1970)")
                 self.httpPort = httpProxyPort
 
                 //socksTohttp
                 Socks2HTTPS.sharedInstance.start(bindToPort: UInt16(httpProxyPort), callback: { (socksPortToHTTP, error) in
                     DDLogVerbose("socksToHTTP port: \(socksPortToHTTP)")
-                    DDLogVerbose("\(Date().timeIntervalSince1970)")
+//                    DDLogVerbose("\(Date().timeIntervalSince1970)")
                     //TunnelSetting
                     self.setupTunnelWith(proxyPort: httpProxyPort, completionHandle: { (error) in
                         //Forward IP Packets
@@ -138,8 +138,27 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         let port = Int(conf["port"] as! String)
         let password = conf["password"] as! String
         let method = conf["method"] as! String
-
-        ssControler.startShodowsocksClientWithhostAddress(server, hostPort: NSNumber(value: port!), hostPassword: password, authscheme: method) { (port, error) in
+        let protocol_ssr: String
+        if let _protocol = conf["protocol"] as? String {
+            protocol_ssr = _protocol
+        }else{
+            protocol_ssr = ""
+        }
+        let obfs: String
+        if let _obfs = conf["obfs"] as? String {
+            obfs = _obfs
+        }else{
+            obfs = ""
+        }
+        let obfs_param: String
+        if let _obfs_param = conf["obfs_param"] as? String {
+            obfs_param = _obfs_param
+        }else{
+            obfs_param = ""
+        }
+//        BOOL ota = [json[@"ota"] boolValue];
+        
+        ssControler.startShodowsocksClientWithhostAddress(server, hostPort: NSNumber(value: port!), hostPassword: password, authscheme: method, protocol: protocol_ssr, obfs: obfs, param: obfs_param) { (port, error) in
             callback(Int(port), error)
         }
     }

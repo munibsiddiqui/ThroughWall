@@ -78,8 +78,33 @@
                                     <outlet property="itemDetail" destination="lpZ-gQ-2pq" id="uZ7-3i-EDz"/>
                                 </connections>
                             </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="selectionField" id="pHZ-g4-RIe" customClass="SelectionFieldCell" customModule="ThroughWall" customModuleProvider="target">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="switch" id="iTL-1s-Fvi" customClass="InputTextFieldCell" customModule="ThroughWall" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="72" width="375" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="iTL-1s-Fvi" id="tPT-sh-hWh">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="toc-p8-btR">
+                                            <rect key="frame" x="16" y="11" width="45" height="21"/>
+                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tTw-uA-pCp">
+                                            <rect key="frame" x="318" y="6" width="51" height="31"/>
+                                        </switch>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="trailingMargin" secondItem="tTw-uA-pCp" secondAttribute="trailing" id="8xu-yP-tHC"/>
+                                        <constraint firstItem="toc-p8-btR" firstAttribute="centerY" secondItem="tPT-sh-hWh" secondAttribute="centerY" id="aiQ-6d-fTg"/>
+                                        <constraint firstItem="tTw-uA-pCp" firstAttribute="centerY" secondItem="tPT-sh-hWh" secondAttribute="centerY" id="dyI-Y6-Xtu"/>
+                                        <constraint firstItem="toc-p8-btR" firstAttribute="leading" secondItem="tPT-sh-hWh" secondAttribute="leadingMargin" constant="8" id="veT-7y-5cm"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="selectionField" id="pHZ-g4-RIe" customClass="SelectionFieldCell" customModule="ThroughWall" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="116" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="pHZ-g4-RIe" id="Rtx-S5-oU9">
                                     <rect key="frame" x="0.0" y="0.0" width="342" height="43.5"/>
@@ -111,7 +136,7 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="deleteType" id="96Q-k4-qvQ" customClass="SelectionFieldCell" customModule="ThroughWall" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="116" width="375" height="44"/>
+                                <rect key="frame" x="0.0" y="160" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="96Q-k4-qvQ" id="z8a-qO-HfQ">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -134,7 +159,7 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="importQRType" id="CYi-mB-Bu2" customClass="SelectionFieldCell" customModule="ThroughWall" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="160" width="375" height="44"/>
+                                <rect key="frame" x="0.0" y="204" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="CYi-mB-Bu2" id="Dnd-b8-Aqd">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -157,7 +182,7 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="showQREx" rowHeight="126" id="E1I-Nz-ts3" customClass="SelectionFieldCell" customModule="ThroughWall" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="204" width="375" height="126"/>
+                                <rect key="frame" x="0.0" y="248" width="375" height="126"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="E1I-Nz-ts3" id="jqH-tt-cMF">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="125.5"/>
@@ -817,7 +842,13 @@
                             <outlet property="delegate" destination="lhv-d3-L0x" id="zXQ-XP-F95"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Detail" id="iDw-AD-cii"/>
+                    <navigationItem key="navigationItem" title="Detail" id="iDw-AD-cii">
+                        <barButtonItem key="rightBarButtonItem" title="Test" id="Tqn-Kg-VRB">
+                            <connections>
+                                <action selector="testConnection:" destination="lhv-d3-L0x" id="a7A-4c-OKw"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Cif-tO-BCX" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

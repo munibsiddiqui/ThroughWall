@@ -17,7 +17,7 @@ class ProxyConfig: NSObject {
     private let proxies = ["CUSTOM", "HTTP", "SOCKS5"]
 
     private let items = [
-        "CUSTOM": ["proxy", "description", "server", "port", "password", "method"],
+        "CUSTOM": ["proxy", "description", "server", "port", "password", "method", "protocol", "obfs", "obfs_param"],
         "HTTP": ["proxy", "description", "server", "port", "user", "password"],
         "SOCKS5": ["proxy", "description", "server", "port", "user", "password"]
     ]
@@ -27,7 +27,7 @@ class ProxyConfig: NSObject {
     ]
 
     private let defaults = [
-        "CUSTOM": ["proxy": "CUSTOM", "method": "aes-256-cfb", "dns": "System Default"],
+        "CUSTOM": ["proxy": "CUSTOM", "method": "aes-256-cfb", "dns": "System Default", "protocol": "", "obfs": ""],
         "HTTP": ["proxy": "HTTP"],
         "SOCKS5": ["proxy": "SOCKS5"]
     ]
@@ -50,6 +50,16 @@ class ProxyConfig: NSObject {
                 ],
                 "customize": [
                     CustomizeOption
+                ]
+            ],
+            "protocol": [
+                "preset": [
+                    "", "origin", "tls1.2_ticket_auth", "verify_simple", "auth_simple", "auth_sha1", "auth_sha1_v2"
+                ]
+            ],
+            "obfs": [
+                "preset": [
+                    "", "plain", "http_simple", "tls1.2_ticket_auth"
                 ]
             ]
         ],
@@ -74,7 +84,8 @@ class ProxyConfig: NSObject {
             "description": ["default", "next"],
             "server": ["url", "next"],
             "port": ["number", "accessary", "next"],
-            "password": ["default", "secure", "done"]
+            "password": ["default", "secure", "next"],
+            "obfs_param": ["default", "done"]
         ]
     ]
 
@@ -87,6 +98,9 @@ class ProxyConfig: NSObject {
         "password": "Password",
         "method": "Method",
         //        "dns": "DNS"
+        "protocol": "Protocol(SSR)",
+        "obfs": "Ofbs(SSR)",
+        "obfs_param": "Obfs Param(SSR)"
     ]
 
     private var _currentProxy = ""
@@ -523,6 +537,246 @@ class SiteConfigController {
     }
 
 }
+
+
+class QRCodeProcess {
+    private var proxyConfig: ProxyConfig? = nil
+
+
+    // decode
+
+    func decode(QRCode code: String, intoProxyConfig proxyConfig: ProxyConfig) -> (ProxyConfig, Bool) {
+        self.proxyConfig = proxyConfig
+        var code = code
+        let succeed: Bool
+        if let preRange = code.range(of: "ssr://") {
+            code.removeSubrange(preRange)
+            succeed = SSRDecode(withCode: code)
+        } else if let preRange = code.range(of: "ss://") {
+            code.removeSubrange(preRange)
+            succeed = SSDecode(withCode: code)
+        } else {
+            succeed = false
+        }
+
+        return (self.proxyConfig!, succeed)
+    }
+
+    private func SSRDecode(withCode code: String) -> Bool {
+        //host:port:protocol:method:obfs:base64pass/?obfsparam=base64param&protoparam=base64param&remarks=base64remarks&group=base64group&udpport=0&uot=0
+        if let decodestring = decodeUsingBase64(code) {
+            DDLogDebug(decodestring)
+            let parts = decodestring.components(separatedBy: "/?")
+            if extractSSR(requiredPart: parts[0]) {
+                extractSSR(optionPart: parts[1])
+                return true
+            }
+        }
+
+        return false
+    }
+
+    private func extractSSR(requiredPart rPart: String) -> Bool {
+        let parts = rPart.components(separatedBy: ":")
+        if parts.count == 6 {
+            if let password = decodeUsingBase64(parts[5]) {
+                proxyConfig?.setValue(byItem: "server", value: parts[0])
+                proxyConfig?.setValue(byItem: "port", value: parts[1])
+                proxyConfig?.setValue(byItem: "protocol", value: parts[2])
+                proxyConfig?.setValue(byItem: "method", value: parts[3])
+                proxyConfig?.setValue(byItem: "obfs", value: parts[4])
+                proxyConfig?.setValue(byItem: "password", value: password)
+                proxyConfig?.setValue(byItem: "description", value: "\(parts[0]):\(parts[1])")
+                return true
+            }
+        }
+        return false
+    }
+
+    private func extractSSR(optionPart oPart: String) {
+        let parts = oPart.components(separatedBy: "&")
+        for part in parts {
+            let items = part.components(separatedBy: "=")
+            if items.count == 2 {
+                if let param = decodeUsingBase64(items[1]) {
+                    switch items[0] {
+                    case "obfsparam":
+                        proxyConfig?.setValue(byItem: "obfs_param", value: param)
+                    case "protoparam":
+                        proxyConfig?.setValue(byItem: "proto_param", value: param)
+                    case "remarks":
+                        proxyConfig?.setValue(byItem: "description", value: param)
+                    case "group":
+                        proxyConfig?.setValue(byItem: "group", value: param)
+                    default:
+                        break
+                    }
+                }
+            }
+        }
+    }
+
+
+    private func SSDecode(withCode code: String) -> Bool {
+        let desciption: String
+        var code = code
+
+        if let poundsignIndex = code.range(of: "#")?.lowerBound {
+            let removeRange = Range(uncheckedBounds: (lower: poundsignIndex, upper: code.endIndex))
+            desciption = code.substring(from: code.index(after: poundsignIndex))
+            code.removeSubrange(removeRange)
+        } else {
+            desciption = ""
+        }
+
+        if let decodestring = decodeUsingBase64(code) {
+            DDLogDebug(decodestring)
+            let components = decodestring.components(separatedBy: ":")
+            if components.count == 3 {
+                var method = components[0]
+                let passwordHost = components[1]
+                let port = components[2]
+
+                let components2 = passwordHost.components(separatedBy: "@")
+                if components2.count == 2 {
+                    let password = components2[0]
+                    let host = components2[1]
+
+                    if let range = method.range(of: "-auth") {
+                        method.removeSubrange(range)
+                    }
+
+                    if desciption == "" {
+                        proxyConfig?.setValue(byItem: "description", value: "\(host):\(port)")
+                    } else {
+                        proxyConfig?.setValue(byItem: "description", value: desciption)
+                    }
+                    proxyConfig?.setValue(byItem: "server", value: host)
+                    proxyConfig?.setValue(byItem: "port", value: port)
+                    proxyConfig?.setValue(byItem: "password", value: password)
+                    proxyConfig?.setValue(byItem: "method", value: method)
+
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    private func decodeUsingBase64(_ string: String) -> String? {
+        var str = string
+        str = str.padding(toLength: ((str.characters.count + 3) / 4) * 4, withPad: "=", startingAt: 0)
+        let decodeData = Data.init(base64Encoded: str)
+        if let decodestring = String(data: decodeData ?? Data(), encoding: String.Encoding.utf8) {
+            return decodestring
+        }
+        return nil
+    }
+
+
+    //  encode
+
+    func getEncodedServerInfo(withProxyConfig proxyConfig: ProxyConfig) -> String {
+        self.proxyConfig = proxyConfig
+
+        if let value = proxyConfig.getValue(byItem: "protocol") {
+            if value != "" {
+                return getEncodedSSRServerInfo()
+            }
+        }
+
+        return getEncodedSSServerInfo()
+    }
+
+    private func getEncodedSSRServerInfo() -> String {
+        //host:port:protocol:method:obfs:base64pass/?obfsparam=base64param&protoparam=base64param&remarks=base64remarks&group=base64group&udpport=0&uot=0
+        if let rPart = encodeSSRRequiedPart() {
+            let content = rPart + "/?" + encodeSSROptionPart()
+            DDLogDebug(content)
+            return "ssr://" + encodeUsingBase64(content)
+        }
+        return ""
+    }
+
+    private func encodeSSRRequiedPart() -> String? {
+        let partRItems = ["server", "port", "protocol", "method", "obfs"]
+        var rValues = [String]()
+        for item in partRItems {
+            if let value = proxyConfig?.getValue(byItem: item) {
+                rValues.append(value)
+            } else {
+                return nil
+            }
+        }
+        if let value = proxyConfig?.getValue(byItem: "password") {
+            rValues.append(encodeUsingBase64(value))
+        } else {
+            return nil
+        }
+        return rValues.joined(separator: ":")
+    }
+
+    private func encodeSSROptionPart() -> String {
+        let oItems = [["obfs_param", "obfsparam"], ["proto_param", "protoparam"], ["description", "remarks"], ["grpup", "group"]]
+        var oValues = [String]()
+        for item in oItems {
+            if let value = proxyConfig?.getValue(byItem: item[0]) {
+                if value != "" {
+                    oValues.append("\(item[1])=\(encodeUsingBase64(value))")
+                }
+            }
+        }
+        return oValues.joined(separator: "&")
+    }
+
+
+    private func getEncodedSSServerInfo() -> String {
+        var result = ""
+
+        if let value = proxyConfig?.getValue(byItem: "method") {
+            result = value
+        } else {
+            return ""
+        }
+        if let value = proxyConfig?.getValue(byItem: "password") {
+            result = result + ":" + value
+        } else {
+            return ""
+        }
+        if let value = proxyConfig?.getValue(byItem: "server") {
+            result = result + "@" + value
+        } else {
+            return ""
+        }
+        if let value = proxyConfig?.getValue(byItem: "port") {
+            result = result + ":" + value
+        } else {
+            return ""
+        }
+
+        DDLogDebug("\(result)")
+        result = encodeUsingBase64(result)
+        if let value = proxyConfig?.getValue(byItem: "description") {
+            let tmp = result + "#" + value
+            DDLogDebug(tmp)
+            result = "ss://" + result + "#" + value
+        }
+        return result
+    }
+
+    func encodeUsingBase64(_ string: String) -> String {
+        let utf8Str = string.data(using: .utf8)
+        if var base64Encoded = utf8Str?.base64EncodedString(options: NSData.Base64EncodingOptions(rawValue: 0)) {
+            while base64Encoded.hasSuffix("=") {
+                base64Encoded.remove(at: base64Encoded.index(before: base64Encoded.endIndex))
+            }
+            return base64Encoded
+        }
+        return ""
+    }
+
+}
+
 
 class RuleFileUpdateController: NSObject {
 

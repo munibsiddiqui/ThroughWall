@@ -274,46 +274,15 @@ class HomeViewController: UIViewController {
     // MARK: - kQRCodeExtracted notification
     func didExtractedQRCode(notification: Notification) {
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kQRCodeExtracted), object: nil)
-        if var ss = notification.userInfo?["string"] as? String {
-            if let preRange = ss.range(of: "ss://") {
-                ss.removeSubrange(preRange)
-            }
-            if let poundsignIndex = ss.range(of: "#")?.lowerBound {
-                let removeRange = Range(uncheckedBounds: (lower: poundsignIndex, upper: ss.endIndex))
-                ss.removeSubrange(removeRange)
-            }
-            ss = ss.padding(toLength: ((ss.characters.count + 3) / 4) * 4, withPad: "=", startingAt: 0)
-            let decodeData = Data.init(base64Encoded: ss)
-            if let decodestring = String.init(data: decodeData ?? Data(), encoding: String.Encoding.utf8) {
-                let components = decodestring.components(separatedBy: ":")
-                if components.count == 3 {
-                    var method = components[0]
-                    let passwordHost = components[1]
-                    let port = components[2]
-
-                    let components2 = passwordHost.components(separatedBy: "@")
-                    if components2.count == 2 {
-                        let password = components2[0]
-                        let host = components2[1]
-
-                        if let range = method.range(of: "-auth") {
-                            method.removeSubrange(range)
-                        }
-
-                        let proxyConfig = ProxyConfig()
-                        proxyConfig.currentProxy = "CUSTOM"
-                        proxyConfig.setValue(byItem: "description", value: "\(host):\(port)")
-                        proxyConfig.setValue(byItem: "server", value: host)
-                        proxyConfig.setValue(byItem: "port", value: port)
-                        proxyConfig.setValue(byItem: "password", value: password)
-                        proxyConfig.setValue(byItem: "method", value: method)
-
-                        DispatchQueue.main.async {
-                            self.addNewVPN(withNewConfig: proxyConfig)
-                        }
-                        return
-                    }
+        if let code = notification.userInfo?["string"] as? String {
+            let proxyConfig = ProxyConfig()
+            proxyConfig.currentProxy = "CUSTOM"
+            let (_proxyConfig, succeed) = QRCodeProcess().decode(QRCode: code, intoProxyConfig: proxyConfig)
+            if succeed {
+                DispatchQueue.main.async {
+                    self.addNewVPN(withNewConfig: _proxyConfig)
                 }
+                return
             }
         }
         presentExtractQRFailed()

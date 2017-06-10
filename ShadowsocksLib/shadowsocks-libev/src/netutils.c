@@ -134,7 +134,7 @@ ssize_t get_sockaddr(char *host, char *port, struct sockaddr_storage *storage, i
         struct addrinfo *result, *rp;
 
         memset(&hints, 0, sizeof(struct addrinfo));
-        hints.ai_family   = AF_UNSPEC;   /* Return IPv4 and IPv6 choices */
+        hints.ai_family   = AF_INET;   /* Return IPv4 and IPv6 choices */
         hints.ai_socktype = SOCK_STREAM; /* We want a TCP socket */
 
         int err, i;

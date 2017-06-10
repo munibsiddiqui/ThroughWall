@@ -8,17 +8,17 @@
 
 import UIKit
 
-class SelectInputViewController: UITableViewController,UITextFieldDelegate {
+class SelectInputViewController: UITableViewController, UITextFieldDelegate {
 
     var item = ""
     var presetSelections = [String]()
     var customSelection = [String]()
     var selected = ""
     var delegate: ConfigureViewController? = nil
-    
+
     var selectedIndex = -1;
 
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -33,22 +33,21 @@ class SelectInputViewController: UITableViewController,UITextFieldDelegate {
         if let index = temp.index(of: selected) {
             selectedIndex = index
         }
-        
+
     }
-    
-    
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         let temp = presetSelections + customSelection
-        
-        delegate?.updateSelectedResult(item, selected: temp[selectedIndex])
-        
+        if selectedIndex != -1 {
+            delegate?.updateSelectedResult(item, selected: temp[selectedIndex])
+        }
     }
-    
+
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
-    
+
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -66,20 +65,20 @@ class SelectInputViewController: UITableViewController,UITextFieldDelegate {
         return presetSelections.count + customSelection.count
     }
 
-    
+
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
+
         if indexPath.row < presetSelections.count {
             //preset
             let cell = tableView.dequeueReusableCell(withIdentifier: "selectionCell", for: indexPath)
             cell.textLabel?.text = presetSelections[indexPath.row]
             if selectedIndex == indexPath.row {
                 cell.accessoryType = .checkmark
-            }else{
+            } else {
                 cell.accessoryType = .none
             }
             return cell
-        }else{
+        } else {
             //custom
             let cell = tableView.dequeueReusableCell(withIdentifier: "inputCell", for: indexPath)
             let textField = cell.viewWithTag(100) as! UITextField
@@ -88,27 +87,27 @@ class SelectInputViewController: UITableViewController,UITextFieldDelegate {
             if selected == textField.text {
                 cell.accessoryType = .checkmark
                 selectedIndex = indexPath.row
-            }else{
+            } else {
                 cell.accessoryType = .none
             }
             return cell
         }
     }
-    
+
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         selected = textField.text!
-        
+
         return true
     }
-    
+
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let oldIndexPath = IndexPath(row: selectedIndex, section: 0)
         tableView.cellForRow(at: oldIndexPath)?.accessoryType = .none
         tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
         selectedIndex = indexPath.row
     }
-    
+
     /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {

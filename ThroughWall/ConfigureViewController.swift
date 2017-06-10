@@ -55,7 +55,7 @@ class ConfigureViewController: UITableViewController {
             return false
         }
     }
-    
+
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
@@ -71,49 +71,14 @@ class ConfigureViewController: UITableViewController {
 
     func didExtractedQRCode(notification: Notification) {
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kQRCodeExtracted), object: nil)
-        if var ss = notification.userInfo?["string"] as? String {
-            if let preRange = ss.range(of: "ss://") {
-                ss.removeSubrange(preRange)
-            }
-            if let poundsignIndex = ss.range(of: "#")?.lowerBound {
-                let removeRange = Range(uncheckedBounds: (lower: poundsignIndex, upper: ss.endIndex))
-                ss.removeSubrange(removeRange)
-            }
-            ss = ss.padding(toLength: ((ss.characters.count + 3) / 4) * 4, withPad: "=", startingAt: 0)
-            let decodeData = Data.init(base64Encoded: ss)
-            if let decodestring = String.init(data: decodeData ?? Data(), encoding: String.Encoding.utf8) {
-                let components = decodestring.components(separatedBy: ":")
-                if components.count == 3 {
-                    var method = components[0]
-                    let passwordHost = components[1]
-                    let port = components[2]
-
-                    let components2 = passwordHost.components(separatedBy: "@")
-                    if components2.count == 2 {
-                        let password = components2[0]
-                        let host = components2[1]
-
-                        if let range = method.range(of: "-auth") {
-                            method.removeSubrange(range)
-                        }
-
-//                        withUnsafePointer(to: &proxyConfig, { (p) in
-//                            print("proxyconfig \(p)")
-//                        })
-
-//                        proxyConfig.currentProxy = "CUSTOM"
-                        proxyConfig.setValue(byItem: "description", value: "\(host):\(port)")
-                        proxyConfig.setValue(byItem: "server", value: host)
-                        proxyConfig.setValue(byItem: "port", value: port)
-                        proxyConfig.setValue(byItem: "password", value: password)
-                        proxyConfig.setValue(byItem: "method", value: method)
-
-                        DispatchQueue.main.async {
-                            self.tableView.reloadData()
-                        }
-                        return
-                    }
+        if let code = notification.userInfo?["string"] as? String {
+           let (_proxyConfig, succeed)  = QRCodeProcess().decode(QRCode: code, intoProxyConfig: proxyConfig)
+            if succeed {
+                proxyConfig = _proxyConfig
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
                 }
+                return
             }
         }
 
@@ -126,40 +91,8 @@ class ConfigureViewController: UITableViewController {
         }
     }
 
-    func getEncodedServerInfo() -> String {
-        var result = ""
-
-        if let value = proxyConfig.getValue(byItem: "method") {
-            result = value
-        } else {
-            return ""
-        }
-        if let value = proxyConfig.getValue(byItem: "password") {
-            result = result + ":" + value
-        } else {
-            return ""
-        }
-        if let value = proxyConfig.getValue(byItem: "server") {
-            result = result + "@" + value
-        } else {
-            return ""
-        }
-        if let value = proxyConfig.getValue(byItem: "port") {
-            result = result + ":" + value
-        } else {
-            return ""
-        }
-        let utf8Str = result.data(using: .utf8)
-        if let base64Encoded = utf8Str?.base64EncodedString(options: NSData.Base64EncodingOptions(rawValue: 0)) {
-            return base64Encoded
-        }
-        return result
-    }
-
     func showQRImage() {
-        var str = getEncodedServerInfo()
-        str = str.padding(toLength: ((str.characters.count + 3) / 4) * 4, withPad: "=", startingAt: 0)
-        str = "ss://" + str
+        let str = QRCodeProcess().getEncodedServerInfo(withProxyConfig: proxyConfig)
         let data = str.data(using: .isoLatin1)
         let filter = CIFilter(name: "CIQRCodeGenerator")
         filter?.setValue(data, forKey: "inputMessage")
@@ -264,7 +197,7 @@ class ConfigureViewController: UITableViewController {
                 }
 
 //                cell.itemDetail.placeholder = placeholder
-                
+
                 cell.valueChanged = {
                     self.proxyConfig.setValue(byItem: item, value: cell.itemDetail.text!)
                 }

@@ -1080,9 +1080,6 @@
 				349D235F1E8511E400381DE1 /* RuleConfig */,
 				349D235E1E84EF4200381DE1 /* ServerConfig */,
 				3452C3461E763D27008CCC4E /* MainView */,
-				34765C811E10D8810055C294 /* HistoryFigureViewController.swift */,
-				34C7D5721E25C9300052CE78 /* ArchivedTrafficCountTableViewController.swift */,
-				34E3F1FB1E11428600FAD65C /* RequestDetailTableViewController.swift */,
 				3433528B1DF943B700CF7281 /* Core Data */,
 				348CFFC91DEBF36400A2720E /* SupportingFiles */,
 			);
@@ -1232,9 +1229,12 @@
 			isa = PBXGroup;
 			children = (
 				34A26A6A1E13447400A8CC93 /* HistoryOptionTableViewController.swift */,
+				34C7D5721E25C9300052CE78 /* ArchivedTrafficCountTableViewController.swift */,
+				34765C811E10D8810055C294 /* HistoryFigureViewController.swift */,
 				344EF2C81EC345980055A049 /* LogViewController.swift */,
 				34C59BF91EDC1F9C00CD77CB /* RequestsInTimelineViewController.swift */,
 				34765C941E1116780055C294 /* RequestListTableViewController.swift */,
+				34E3F1FB1E11428600FAD65C /* RequestDetailTableViewController.swift */,
 				3450CA7A1EDC6871004E4A09 /* TimelineCellView.swift */,
 				3450CA781EDC685E004E4A09 /* TimelineCellView.xib */,
 			);

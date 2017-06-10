@@ -50,7 +50,7 @@ int sock_port (int fd) {
     
 }
 
-- (void) startShodowsocksClientWithhostAddress:(NSString *)host hostPort:(NSNumber *)port hostPassword:(NSString *)password authscheme:(NSString *)method completion:(ShadowsocksClientCompletion)completion {
+- (void) startShodowsocksClientWithhostAddress:(NSString *)host hostPort:(NSNumber *)port hostPassword:(NSString *)password authscheme:(NSString *)method protocol:(NSString *)protocol_ssr obfs:(NSString*)obfs_ssr param:(NSString *)param_ssr completion:(ShadowsocksClientCompletion)completion {
     
     _shadowCompletion = completion;
     
@@ -62,14 +62,23 @@ int sock_port (int fd) {
         profile.password = strdup([password UTF8String]);
         profile.method = strdup([method UTF8String]);
         profile.local_addr = "127.0.0.1";
-        profile.local_port = 1085;
+        profile.local_port = 0;
         profile.timeout = 600;
         profile.auth = false;
+        
+        if (![protocol_ssr  isEqual: @""]) {
+            profile.protocol = strdup([protocol_ssr UTF8String]);
+        }
+        if (![obfs_ssr  isEqual: @""]) {
+            profile.obfs = strdup([obfs_ssr UTF8String]);
+        }
+        if (![param_ssr  isEqual: @""]) {
+            profile.obfs_param = strdup([param_ssr UTF8String]);
+        }
         
         _profile = profile;
         
         [NSThread detachNewThreadSelector:@selector(_startShadowsocks) toTarget:self withObject: nil];
-        
         
     }else {
         if (self.shadowCompletion) {

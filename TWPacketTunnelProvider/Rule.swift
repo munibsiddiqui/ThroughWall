@@ -129,9 +129,9 @@ class Rule {
 
         for item in items {
             let components = item.components(separatedBy: ",")
-            if components.count == 3 && components[0] != "GEOIP" {
+//            if components.count == 3 && components[0] != "GEOIP" {
                 result.append(components)
-            }
+//            }
         }
         return result
     }

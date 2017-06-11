@@ -66,13 +66,13 @@ int sock_port (int fd) {
         profile.timeout = 600;
         profile.auth = false;
         
-        if (![protocol_ssr  isEqual: @""]) {
+        if (protocol_ssr &&  ![protocol_ssr  isEqual: @""]) {
             profile.protocol = strdup([protocol_ssr UTF8String]);
         }
-        if (![obfs_ssr  isEqual: @""]) {
+        if (obfs_ssr && ![obfs_ssr  isEqual: @""]) {
             profile.obfs = strdup([obfs_ssr UTF8String]);
         }
-        if (![param_ssr  isEqual: @""]) {
+        if (param_ssr && ![param_ssr  isEqual: @""]) {
             profile.obfs_param = strdup([param_ssr UTF8String]);
         }
         

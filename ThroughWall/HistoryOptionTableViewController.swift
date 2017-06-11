@@ -301,10 +301,10 @@ class HistoryOptionTableViewController: UITableViewController {
             }
         case 1:
             if indexPath.row == 0 {
-                cell.textLabel?.text = "Enable Logging (Experimental)"
+                cell.textLabel?.text = "Enable Logging"
                 cell.accessoryView = logRequestSwitch
             } else {
-                cell.textLabel?.text = "Requests' Log (Experimental)"
+                cell.textLabel?.text = "Requests' Log"
                 cell.accessoryType = .disclosureIndicator
             }
         case 2:

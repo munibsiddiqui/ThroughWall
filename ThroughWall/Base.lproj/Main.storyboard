@@ -842,13 +842,7 @@
                             <outlet property="delegate" destination="lhv-d3-L0x" id="zXQ-XP-F95"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Detail" id="iDw-AD-cii">
-                        <barButtonItem key="rightBarButtonItem" title="Test" id="Tqn-Kg-VRB">
-                            <connections>
-                                <action selector="testConnection:" destination="lhv-d3-L0x" id="a7A-4c-OKw"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
+                    <navigationItem key="navigationItem" title="Detail" id="iDw-AD-cii"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Cif-tO-BCX" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

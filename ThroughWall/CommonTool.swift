@@ -294,7 +294,7 @@ class SiteConfigController {
         }
         if proxyConfigs.count > 0 {
             self.writeIntoSiteConfigFile(withConfigs: proxyConfigs)
-            DDLogInfo("save config file")
+            DDLogDebug("save config file")
         }
     }
 
@@ -307,7 +307,7 @@ class SiteConfigController {
                 } else {
                     //delete old
                     manager.removeFromPreferences(completionHandler: nil)
-                    DDLogInfo("delete old")
+                    DDLogDebug("delete old")
                 }
             }
         }
@@ -397,14 +397,14 @@ class SiteConfigController {
                 DDLogError("Unknow")
                 completion(nil)
             case .EMPTY:
-                DDLogInfo("empty")
+                DDLogDebug("empty")
                 completion(nil)
             case .CONVERTED:
-                DDLogInfo("converted")
+                DDLogDebug("converted")
                 let newVersionManager = self.deleteOldServer(fromVPNManagers: vpnManagers)
                 completion(newVersionManager)
             case .NOTCONVERTED:
-                DDLogInfo("not converted")
+                DDLogDebug("not converted")
                 self.saveConfigFile(fromOldVPNManagers: vpnManagers)
                 self.createNewTypeServer { _newManager in
                     let _ = self.deleteOldServer(fromVPNManagers: vpnManagers)

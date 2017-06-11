@@ -68,6 +68,8 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     private var shouldKeepAlive = false
     private var brokenData: Data?
     private var responseFromServerstate: Int?
+    private let disconnectLock = NSLock()
+    
     private lazy var baseParseURL: URL = {
         let url = CoreDataController.sharedInstance.getDatabaseUrl().appendingPathComponent(parseFolderName)
         if !FileManager.default.fileExists(atPath: url.path) {
@@ -79,6 +81,7 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         }
         return url
     }()
+
     private lazy var hostTraffic: HostTraffic = {
         let context = CoreDataController.sharedInstance.getContext()
         let hostTraffic = HostTraffic(context: context)
@@ -176,9 +179,11 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
 
 
     func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
+        disconnectLock.lock()
+        clientSocket = nil
+        
         DDLogVerbose("H\(intTag)H Socks side disconnect")
 
-        clientSocket = nil
         if outGoing == nil {
             DDLogVerbose("H\(intTag)H Both side disconnected")
             saveInOutCount()
@@ -197,6 +202,7 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
                 outGoing?.disconnect()
             }
         }
+        disconnectLock.unlock()
     }
 
     func socket(_ sock: GCDAsyncSocket, shouldTimeoutReadWithTag tag: Int, elapsed: TimeInterval, bytesDone length: UInt) -> TimeInterval {
@@ -477,8 +483,16 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         return (host, replaced, port, repostRequest)
     }
 
-
     func tryConnect(toHost host: String, port: UInt16) {
+        disconnectLock.lock()
+        _tryConnect(toHost: host, port: port)
+        disconnectLock.unlock()
+    }
+    
+    func _tryConnect(toHost host: String, port: UInt16) {
+        if clientSocket == nil {
+            return
+        }
         let rule = Rule.sharedInstance.ruleForDomain(host)
         proxyType = rule.description
         DDLogVerbose("H\(intTag)H Proxy:\(proxyType) Connect: \(host):\(port)")
@@ -794,44 +808,44 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     }
 
     func recordRequestBody(withData data: Data) {
-        if shouldParseTraffic {
-            let length = data.count
-            let fileName = createRandomFile(atURL: baseParseURL, withContent: data)
-            DDLogVerbose("H\(self.intTag)H data count: \(length)")
-
-            DispatchQueue.main.async {
-                let context = CoreDataController.sharedInstance.getContext()
-                let pieceBody = RequestBodyPiece(context: context)
-                pieceBody.timeStamp = NSDate()
-                pieceBody.fileName = fileName
-                pieceBody.belongToTraffic = self.hostTraffic
-//                CoreDataController.sharedInstance.saveContext()
-//                context.refresh(pieceBody, mergeChanges: false)
-                CoreDataController.sharedInstance.addToRefreshList(withObj: pieceBody, andContext: context)
-                DDLogVerbose("H\(self.intTag)H Record \(length)")
-            }
-        }
+//        if shouldParseTraffic {
+//            let length = data.count
+//            let fileName = createRandomFile(atURL: baseParseURL, withContent: data)
+//            DDLogVerbose("H\(self.intTag)H data count: \(length)")
+//
+//            DispatchQueue.main.async {
+//                let context = CoreDataController.sharedInstance.getContext()
+//                let pieceBody = RequestBodyPiece(context: context)
+//                pieceBody.timeStamp = NSDate()
+//                pieceBody.fileName = fileName
+//                pieceBody.belongToTraffic = self.hostTraffic
+////                CoreDataController.sharedInstance.saveContext()
+////                context.refresh(pieceBody, mergeChanges: false)
+//                CoreDataController.sharedInstance.addToRefreshList(withObj: pieceBody, andContext: context)
+//                DDLogVerbose("H\(self.intTag)H Record \(length)")
+//            }
+//        }
     }
 
     func recordResponseBody(withData data: Data) {
-        if shouldParseTraffic {
-            let length = data.count
-
-            let fileName = createRandomFile(atURL: baseParseURL, withContent: data)
-            DDLogVerbose("H\(self.intTag)H data count: \(length)")
-
-            DispatchQueue.main.async {
-                let context = CoreDataController.sharedInstance.getContext()
-                let pieceBody = ResponseBodyPiece(context: context)
-                pieceBody.timeStamp = NSDate()
-                pieceBody.fileName = fileName
-                pieceBody.belongToTraffic = self.hostTraffic
-//                CoreDataController.sharedInstance.saveContext()
-//                context.refresh(pieceBody, mergeChanges: false)
-                CoreDataController.sharedInstance.addToRefreshList(withObj: pieceBody, andContext: context)
-                DDLogVerbose("H\(self.intTag)H Record \(length)")
-            }
-        }
+//        if shouldParseTraffic {
+//            let length = data.count
+//
+//            let fileName = createRandomFile(atURL: baseParseURL, withContent: data)
+//            DDLogVerbose("H\(self.intTag)H data count: \(length)")
+//
+//            DispatchQueue.main.async {
+//                let context = CoreDataController.sharedInstance.getContext()
+//                let pieceBody = ResponseBodyPiece(context: context)
+//                pieceBody.timeStamp = NSDate()
+//                pieceBody.fileName = fileName
+//                pieceBody.belongToTraffic = self.hostTraffic
+////                CoreDataController.sharedInstance.saveContext()
+////                context.refresh(pieceBody, mergeChanges: false)
+//                CoreDataController.sharedInstance.addToRefreshList(withObj: pieceBody, andContext: context)
+//                DDLogVerbose("H\(self.intTag)H Record \(length)")
+//            }
+//        }
     }
 
     func createRandomFile(atURL url: URL, withContent content: Data) -> String {

@@ -119,8 +119,8 @@ class HomeViewController: UIViewController {
             defaultDebugLevel = DDLogLevel.verbose
             DDLogDebug("Current Log Level: verbose")
         #else
-            defaultDebugLevel = DDLogLevel.debug
-            DDLogDebug("Current Log Level: debug")
+            defaultDebugLevel = DDLogLevel.info
+            DDLogDebug("Current Log Level: info")
         #endif
 
 //        DDLogVerbose("\(fileLogger.currentLogFileInfo)")
@@ -239,7 +239,7 @@ class HomeViewController: UIViewController {
         let defaults = UserDefaults()
         defaults.set(text, forKey: kCurrentManagerStatus)
         defaults.synchronize()
-        DDLogInfo(text)
+        DDLogDebug(text)
     }
 
     func reloadTable() {

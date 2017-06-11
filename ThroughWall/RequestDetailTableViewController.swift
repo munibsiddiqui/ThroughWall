@@ -34,14 +34,14 @@ class RequestDetailTableViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
 
-    @IBAction func testConnection(_ sender: UIBarButtonItem) {
-        guard let host = hostRequest.hostConnectInfo?.name, let port = hostRequest.hostConnectInfo?.port else {
-            return
-        }
-        DispatchQueue.global().async {
-            self.outgoing.connect2(toHost: host, andPort: UInt16(port))
-        }
-    }
+//    @IBAction func testConnection(_ sender: UIBarButtonItem) {
+//        guard let host = hostRequest.hostConnectInfo?.name, let port = hostRequest.hostConnectInfo?.port else {
+//            return
+//        }
+//        DispatchQueue.global().async {
+//            self.outgoing.connect2(toHost: host, andPort: UInt16(port))
+//        }
+//    }
     
     // MARK: - Table view data source
 

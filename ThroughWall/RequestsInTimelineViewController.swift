@@ -57,8 +57,8 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
         viewWidthConstraint.constant = CGFloat(duringTime * Double(horiScaller) + 48)
         drawTraffic(fromTime: beginTime, toTime: endTime)
         drawTimelineRuler(fromTime: beginTime, toTime: endTime)
-        requestResponseTraffic()
-        drawResponseTraffic()
+//        requestResponseTraffic()
+//        drawResponseTraffic()
     }
 
     override func didReceiveMemoryWarning() {
@@ -118,7 +118,7 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
                 return true
             })
         } catch {
-             DDLogError("\(error)")
+            DDLogError("\(error)")
         }
     }
 
@@ -264,7 +264,7 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
                 CoreDataController.sharedInstance.getContext().refresh(piece, mergeChanges: false)
             }
         } catch {
-             DDLogError("\(error)")
+            DDLogError("\(error)")
         }
     }
 
@@ -334,7 +334,12 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
             line.move(to: .zero)
             for (index, value) in responseTraffic.enumerated() {
                 let x = 0.1 * Double((index + 1) * horiScaller)
-                let y = height * value / maxValue
+                let y: Int
+                if maxValue == 0 {
+                    y = 0
+                } else {
+                    y = height * value / maxValue
+                }
                 line.addLine(to: CGPoint(x: CGFloat(x), y: CGFloat(y)))
             }
             shapeLayer.path = line.cgPath

@@ -1186,10 +1186,10 @@
 		348CFFC91DEBF36400A2720E /* SupportingFiles */ = {
 			isa = PBXGroup;
 			children = (
+				3474EC7A1DDC926C00EBF3C5 /* AppDelegate.swift */,
 				3474EC7E1DDC926C00EBF3C5 /* Main.storyboard */,
 				345ECB851DF8F48800F70ACC /* rule.config */,
 				348AC2431E8A9C910072AB1B /* ThroughWall-Bridging-Header.h */,
-				3474EC7A1DDC926C00EBF3C5 /* AppDelegate.swift */,
 				34CC5FFD1DDCAE5F0061AA44 /* ThroughWall.entitlements */,
 				3474EC841DDC926C00EBF3C5 /* Assets.xcassets */,
 				3474EC861DDC926C00EBF3C5 /* LaunchScreen.storyboard */,

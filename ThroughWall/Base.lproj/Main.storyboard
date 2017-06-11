@@ -709,14 +709,15 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Request" id="IAj-Dx-4lB">
-                        <barButtonItem key="rightBarButtonItem" systemItem="reply" id="o2V-0c-ehB">
+                        <barButtonItem key="rightBarButtonItem" title="Action" id="o2V-0c-ehB">
                             <connections>
-                                <segue destination="86e-5Z-nSS" kind="show" id="QoE-8o-sbC"/>
+                                <action selector="actionsToTake:" destination="JZZ-lZ-SNN" id="0sV-pQ-dOS"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
                     <connections>
                         <segue destination="lhv-d3-L0x" kind="show" identifier="showRequestDetail" id="4hy-1X-jUL"/>
+                        <segue destination="86e-5Z-nSS" kind="show" identifier="showTimeline" id="iOS-iZ-1mS"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="MUB-am-m6U" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -1468,7 +1469,7 @@
         <image name="WelcomeTop" width="277" height="277"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="hOG-lh-3rX"/>
+        <segue reference="4hy-1X-jUL"/>
         <segue reference="3XZ-k2-Q4g"/>
     </inferredMetricsTieBreakers>
 </document>

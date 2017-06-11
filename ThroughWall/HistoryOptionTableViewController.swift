@@ -119,7 +119,7 @@ class HistoryOptionTableViewController: UITableViewController {
 
     func trigerLogFunction() {
         if logRequestSwitch.isOn {
-            let alertController = UIAlertController(title: "Caution", message: "This function may cause network issue", preferredStyle: .alert)
+            let alertController = UIAlertController(title: "Caution", message: "Logs will NOT be deleted automatically. You should delete logs manually.", preferredStyle: .alert)
             
             let dismissAction = UIAlertAction(title: "Dismmiss", style: .default, handler: { (_) in
                 

@@ -7,6 +7,7 @@
 //
 
 import CocoaLumberjack
+import MMDB_Swift
 
 enum DomainRule: CustomStringConvertible {
     case Proxy
@@ -31,13 +32,13 @@ enum DomainRule: CustomStringConvertible {
 class Rule {
 
     static let sharedInstance = Rule()
-
+    private var db = MMDB()
     private var fullRules: [String: DomainRule]?
     private var suffixRules: [String: DomainRule]?
     private var containRules: [String: DomainRule]?
     private var ipRules: [String: DomainRule]?
     private var rewriteRules: [[String]]?
-    private var geoIPRule: (String, DomainRule)?
+    private var geoIPRule: [(String, DomainRule)]?
     private var finalRule: DomainRule?
     private var globalMode = false
 
@@ -128,7 +129,7 @@ class Rule {
 
         for item in items {
             let components = item.components(separatedBy: ",")
-            if components.count == 3  && components[0] != "GEOIP"{
+            if components.count == 3 && components[0] != "GEOIP" {
                 result.append(components)
             }
         }
@@ -155,7 +156,7 @@ class Rule {
         suffixRules = [String: DomainRule]()
         containRules = [String: DomainRule]()
         ipRules = [String: DomainRule]()
-
+        geoIPRule = [(String, DomainRule)]()
         for item in items {
 //            DDLogVerbose(item)
             let components = item.components(separatedBy: ",")
@@ -174,7 +175,7 @@ class Rule {
                 case "IP-CIDR":
                     ipRules?[translateToBinary(fromIPRange: components[1])] = rule
                 case "GEOIP":
-                    geoIPRule = (components[1], rule)
+                    geoIPRule?.append((components[1], rule))
                 default:
                     break
                 }
@@ -277,7 +278,7 @@ class Rule {
                 }
             }
         }
-        return DomainRule.Direct
+        return DomainRule.Unkown
     }
 
     func ruleForDomain(_ domain: String) -> DomainRule {
@@ -294,12 +295,130 @@ class Rule {
 //        default:
 //            break
 //        }
-        if rule == .Direct && globalMode {
+        if rule != .Reject && globalMode {
             rule = .Proxy
         }
         return rule
     }
 
+    func checkLastRule(forDomain domain: String, andPort port: UInt16) -> (DomainRule, String) {
+        let (rule, ip) = checkGEORule(forDomain: domain, andPort: port)
+        if rule != .Unkown {
+            return (rule, ip)
+        }
+        
+        if let final = finalRule {
+            return (final, domain)
+        }
+        
+        return(.Direct, domain)
+    }
+    
+    private func checkGEORule(forDomain domain: String, andPort port: UInt16) -> (DomainRule, String) {
+        guard let geoRule = geoIPRule else {
+            return(.Unkown, domain)
+        }
+        
+        if geoRule.isEmpty {
+            return(.Unkown, domain)
+        }
+        
+        let (ip, _) = convertToIPPort(toHost: domain, andPort: port)
+        
+        if let _ip = ip {
+            let country = lookupCountry(withIP: _ip)
+            DDLogDebug("\(country) \(domain) \(_ip)")
+            for _geoRule in geoRule {
+                if country == _geoRule.0 {
+                    DDLogDebug("\(_geoRule.1.description) \(domain)")
+                    return (_geoRule.1, _ip)
+                }
+            }
+            DDLogError("GEO no match for \(domain):\(port)")
+        }else {
+            DDLogError("no IP for \(domain):\(port)")
+        }
+        
+        return(.Unkown, domain)
+    }
+    
+
+
+    private func lookupCountry(withIP ip: String) -> String {
+        guard let _db = db else {
+            return "Unknown"
+        }
+        if let country = _db.lookup(ip) {
+            return country.isoCode
+        }
+        return "Unknown"
+    }
+
+
+    private func convertToIPPort(toHost host: String, andPort port: UInt16) -> (String?, String?) {
+
+        var hints = addrinfo(
+            ai_flags: 0,
+            ai_family: PF_INET,
+            ai_socktype: SOCK_STREAM,
+            ai_protocol: IPPROTO_TCP,
+            ai_addrlen: 0,
+            ai_canonname: nil,
+            ai_addr: nil,
+            ai_next: nil)
+
+        var result: UnsafeMutablePointer<addrinfo>? = nil
+
+        let error = getaddrinfo(host, "\(port)", &hints, &result)
+
+        if error != 0 {
+            DDLogError("getaddrinfo \(error)")
+            //free the chain
+            freeaddrinfo(result)
+            return (nil, nil)
+        }
+
+        var info = result
+        while info != nil {
+            let (clientIp, service) = sockaddrDescription(addr: info!.pointee.ai_addr)
+            if clientIp != nil && service != nil {
+                //free the chain
+                freeaddrinfo(result)
+                return (clientIp, service)
+            }
+            info = info!.pointee.ai_next
+        }
+
+        //free the chain
+        freeaddrinfo(result)
+        return(nil, nil)
+    }
+
+    private func sockaddrDescription(addr: UnsafePointer<sockaddr>) -> (String?, String?) {
+
+        var host: String?
+        var service: String?
+
+        var hostBuffer = [CChar](repeating: 0, count: Int(NI_MAXHOST))
+        var serviceBuffer = [CChar](repeating: 0, count: Int(NI_MAXSERV))
+
+        if getnameinfo(
+                addr,
+                socklen_t(addr.pointee.sa_len),
+                    &hostBuffer,
+                socklen_t(hostBuffer.count),
+                    &serviceBuffer,
+                socklen_t(serviceBuffer.count),
+                NI_NUMERICHOST | NI_NUMERICSERV)
+
+            == 0 {
+
+            host = String(cString: hostBuffer)
+            service = String(cString: serviceBuffer)
+        }
+        return (host, service)
+
+    }
 
     private func replace(_ url: String, byString bString: String, withPattern pattern: String) -> String {
         let regex = try! NSRegularExpression(pattern: pattern, options: NSRegularExpression.Options(rawValue: 0))

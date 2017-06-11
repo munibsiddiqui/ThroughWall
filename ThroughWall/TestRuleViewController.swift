@@ -36,6 +36,10 @@ class TestRuleViewController: UIViewController, UITextFieldDelegate {
         var result = "Empty"
         if let server = textField.text {
             let rule = Rule.sharedInstance.ruleForDomain(server)
+            if rule == .Unkown {
+                let (_rule, _) = Rule.sharedInstance.checkLastRule(forDomain: server, andPort: 80)
+                result = _rule.description
+            }
             result = rule.description
         }
 

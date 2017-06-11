@@ -73,7 +73,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                         } else {
                             DDLogVerbose("complete")
                         }
-                        DDLogVerbose("\(Date().timeIntervalSince1970)")
+//                        DDLogVerbose("\(Date().timeIntervalSince1970)")
                         self.pendingStartCompletion?(error)
 
                     })

@@ -16,6 +16,7 @@ target 'ThroughWall' do
   pod 'Charts'
   pod 'Fabric'
   pod 'Crashlytics'
+  pod 'MMDB-Swift'
   # Pods for ThroughWall
 
 end
@@ -46,6 +47,7 @@ target 'TWPacketTunnelProvider' do
   pod 'CocoaLumberjack/Swift'
   pod 'Fabric'
   pod 'Crashlytics'
+  pod 'MMDB-Swift'
   # Pods for TWPacketTunnelProvider
 
 end

@@ -69,7 +69,7 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     private var brokenData: Data?
     private var responseFromServerstate: Int?
     private let disconnectLock = NSLock()
-    
+
     private lazy var baseParseURL: URL = {
         let url = CoreDataController.sharedInstance.getDatabaseUrl().appendingPathComponent(parseFolderName)
         if !FileManager.default.fileExists(atPath: url.path) {
@@ -180,9 +180,9 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
 
     func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
         disconnectLock.lock()
-        clientSocket = nil
-        
+
         DDLogVerbose("H\(intTag)H Socks side disconnect")
+        clientSocket = nil
 
         if outGoing == nil {
             DDLogVerbose("H\(intTag)H Both side disconnected")
@@ -488,12 +488,17 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         _tryConnect(toHost: host, port: port)
         disconnectLock.unlock()
     }
-    
+
     func _tryConnect(toHost host: String, port: UInt16) {
         if clientSocket == nil {
             return
         }
-        let rule = Rule.sharedInstance.ruleForDomain(host)
+        var rule = Rule.sharedInstance.ruleForDomain(host)
+        var ip = ""
+        if rule == .Unkown {
+            (rule, ip) = Rule.sharedInstance.checkLastRule(forDomain: host, andPort: port)
+        }
+
         proxyType = rule.description
         DDLogVerbose("H\(intTag)H Proxy:\(proxyType) Connect: \(host):\(port)")
         if shouldParseTraffic {
@@ -532,7 +537,7 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         }
 
         do {
-            try outGoing?.connnect(toRemoteHost: host, onPort: port)
+            try outGoing?.connnect(toRemoteHost: ip == "" ? host : ip, onPort: port)
         } catch {
             DDLogError("H\(intTag)H \(error)")
             outGoing = nil
@@ -671,6 +676,7 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
 
     func forceDisconnect() {
         isForceDisconnect = true
+        
         clientSocket?.disconnect()
         DDLogVerbose("H\(intTag)H forceDisconnect")
     }

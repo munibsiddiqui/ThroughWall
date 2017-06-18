@@ -94,7 +94,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         let logFileManager = DDLogFileManagerDefault(logsDirectory: url.path)
         let fileLogger: DDFileLogger = DDFileLogger(logFileManager: logFileManager) // File Logger
         fileLogger.rollingFrequency = TimeInterval(60 * 60) // 1 hours
-        fileLogger.logFileManager.maximumNumberOfLogFiles = 2
+//        fileLogger.logFileManager.maximumNumberOfLogFiles = 2
         DDLog.add(fileLogger)
 
         DDLogInfo("------Extension Log Start------")

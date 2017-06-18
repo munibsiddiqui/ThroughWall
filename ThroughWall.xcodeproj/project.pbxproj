@@ -67,6 +67,7 @@
 		349C99421DFA540A0079502B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3474EC841DDC926C00EBF3C5 /* Assets.xcassets */; };
 		34A17DD51E8CF6F6005BC19B /* RuleListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A17DD41E8CF6F6005BC19B /* RuleListTableViewController.swift */; };
 		34A26A6B1E13447400A8CC93 /* HistoryOptionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A26A6A1E13447400A8CC93 /* HistoryOptionTableViewController.swift */; };
+		34AF3CB31EF548DC0065EEC6 /* StateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34AF3CB21EF548DC0065EEC6 /* StateMachine.swift */; };
 		34BD966C1DDD392E002442BF /* ShadowsocksLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3474ECBB1DDC950000EBF3C5 /* ShadowsocksLib.framework */; };
 		34BD966D1DDD3932002442BF /* TunnelLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3474ECCD1DDC951100EBF3C5 /* TunnelLib.framework */; };
 		34C59BFA1EDC1F9C00CD77CB /* RequestsInTimelineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34C59BF91EDC1F9C00CD77CB /* RequestsInTimelineViewController.swift */; };
@@ -350,6 +351,7 @@
 		348F61981E8E540000F6AF9A /* RawRuleTXTViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RawRuleTXTViewController.swift; sourceTree = "<group>"; };
 		34A17DD41E8CF6F6005BC19B /* RuleListTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleListTableViewController.swift; sourceTree = "<group>"; };
 		34A26A6A1E13447400A8CC93 /* HistoryOptionTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryOptionTableViewController.swift; sourceTree = "<group>"; };
+		34AF3CB21EF548DC0065EEC6 /* StateMachine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StateMachine.swift; sourceTree = "<group>"; };
 		34C59BF91EDC1F9C00CD77CB /* RequestsInTimelineViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestsInTimelineViewController.swift; sourceTree = "<group>"; };
 		34C7D5721E25C9300052CE78 /* ArchivedTrafficCountTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArchivedTrafficCountTableViewController.swift; sourceTree = "<group>"; };
 		34CC5B211DDC9B790061AA44 /* BLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLog.h; sourceTree = "<group>"; };
@@ -2265,6 +2267,7 @@
 			children = (
 				34CC5FEE1DDCA6750061AA44 /* HTTPProxyManager.swift */,
 				34CC5FEF1DDCA6750061AA44 /* HTTPAnalyzer.swift */,
+				34AF3CB21EF548DC0065EEC6 /* StateMachine.swift */,
 				3423C7641DF00C60002B5AE8 /* OutgoingSide.swift */,
 			);
 			name = "HTTP(S) Proxy";
@@ -2820,6 +2823,7 @@
 				3474EC981DDC928400EBF3C5 /* PacketTunnelProvider.swift in Sources */,
 				3444AB861DF164B600FD3B9F /* Socks2HTTPS.swift in Sources */,
 				343352891DF93FAD00CF7281 /* ThroughWall.xcdatamodeld in Sources */,
+				34AF3CB31EF548DC0065EEC6 /* StateMachine.swift in Sources */,
 				34CC5FED1DDCA65F0061AA44 /* dns.m in Sources */,
 				3423C7651DF00C60002B5AE8 /* OutgoingSide.swift in Sources */,
 				34765C921E10EB240055C294 /* Common.swift in Sources */,

@@ -68,7 +68,10 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     private var shouldKeepAlive = false
     private var brokenData: Data?
     private var responseFromServerstate: Int?
-    private let disconnectLock = NSLock()
+    private let clientDisconnectLock = NSLock()
+    private let outDisconnectLock = NSLock()
+    private var pendingClientDisconnect = false
+    private var outBusy = false
 
     private lazy var baseParseURL: URL = {
         let url = CoreDataController.sharedInstance.getDatabaseUrl().appendingPathComponent(parseFolderName)
@@ -136,6 +139,15 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     // MARK: - GCDAsyncSocketDelegate
 
     func socket(_ sock: GCDAsyncSocket, didWriteDataWithTag tag: Int) {
+        outDisconnectLock.lock()
+        outBusy = false
+        if pendingClientDisconnect {
+            clearOutAndDisClient()
+            outDisconnectLock.unlock()
+            return
+        }
+        outDisconnectLock.unlock()
+
         if tag == TAG_WRITE_TO_CLIENT {
             DDLogVerbose("H\(intTag)H TAG_WRITE_TO_CLIENT")
             outGoing?.readData(withTimeout: -1, tag: TAG_READ_FROM_SERVER)
@@ -179,7 +191,7 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
 
 
     func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
-        disconnectLock.lock()
+        clientDisconnectLock.lock()
 
         DDLogVerbose("H\(intTag)H Socks side disconnect")
         clientSocket = nil
@@ -199,16 +211,18 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
                 delegate = nil
             } else {
                 DDLogVerbose("H\(intTag)H Going to disconnect Outgoing Side")
+                outDisconnectLock.lock()
+                outBusy = false
+                outDisconnectLock.unlock()
                 outGoing?.disconnect()
             }
         }
-        disconnectLock.unlock()
+        clientDisconnectLock.unlock()
     }
 
     func socket(_ sock: GCDAsyncSocket, shouldTimeoutReadWithTag tag: Int, elapsed: TimeInterval, bytesDone length: UInt) -> TimeInterval {
-        DispatchQueue.global().async {
-            self.forceDisconnect()
-        }
+        forceDisconnect()
+        DDLogVerbose("H\(intTag)H TimeoutRead")
         return 0
     }
 
@@ -370,8 +384,8 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
                 return false
             }
         }
-        return true
-//        return false
+//        return true
+        return false
     }
 
     func extractDetail(from request: String, by name: String) -> String? {
@@ -484,9 +498,9 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     }
 
     func tryConnect(toHost host: String, port: UInt16) {
-        disconnectLock.lock()
+        clientDisconnectLock.lock()
         _tryConnect(toHost: host, port: port)
-        disconnectLock.unlock()
+        clientDisconnectLock.unlock()
     }
 
     func _tryConnect(toHost host: String, port: UInt16) {
@@ -578,23 +592,38 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     }
 
     internal func outgoingSocket(didRead data: Data, withTag tag: Int) {
-        if shouldParseTraffic {
-            inCount = inCount + data.count
-        }
-        delegate?.didDownloadFromServer(dataSize: data.count, proxyType: proxyType)
+        clientDisconnectLock.lock()
+        if clientSocket != nil {
 
-        switch tag {
-        case TAG_READ_FROM_SERVER:
-            DDLogVerbose("H\(intTag)H TAG_READ_FROM_SERVER length:\(data.count)")
-            clientSocket?.write(data, withTimeout: -1, tag: TAG_WRITE_TO_CLIENT)
-            recordResponseBody(withData: data)
-        case TAG_READ_RESPONSE_FROM_SERVER:
-            DDLogVerbose("H\(intTag)H TAG_READ_RESPONSE_FROM_SERVER length:\(data.count)")
-            didReadServerResponse(withData: data)
-        default:
-            DDLogError("H\(intTag)H Unknown Outgoing didread Tag")
-            break
+            outDisconnectLock.lock()
+            outBusy = true
+            outDisconnectLock.unlock()
+
+            if shouldParseTraffic {
+                inCount = inCount + data.count
+            }
+            delegate?.didDownloadFromServer(dataSize: data.count, proxyType: proxyType)
+
+            switch tag {
+            case TAG_READ_FROM_SERVER:
+
+                DDLogVerbose("H\(intTag)H TAG_READ_FROM_SERVER length:\(data.count)")
+                clientSocket?.write(data, withTimeout: -1, tag: TAG_WRITE_TO_CLIENT)
+                recordResponseBody(withData: data)
+
+            case TAG_READ_RESPONSE_FROM_SERVER:
+                DDLogVerbose("H\(intTag)H TAG_READ_RESPONSE_FROM_SERVER length:\(data.count)")
+                didReadServerResponse(withData: data)
+            default:
+                DDLogError("H\(intTag)H Unknown Outgoing didread Tag")
+                break
+            }
+        } else {
+            outDisconnectLock.lock()
+            outBusy = false
+            outDisconnectLock.unlock()
         }
+        clientDisconnectLock.unlock()
     }
 
     internal func outgoingSocket(didConnectToHost host: String, port: UInt16) {
@@ -660,6 +689,18 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
 
     internal func outgoingSocketDidDisconnect(_ outgoing: OutgoingSide) {
         DDLogVerbose("H\(intTag)H Outgoing side disconnect")
+
+        outDisconnectLock.lock()
+        if outBusy {
+            pendingClientDisconnect = true
+            DDLogVerbose("H\(intTag)H Pending Outgoing side disconnect")
+        } else {
+            clearOutAndDisClient()
+        }
+        outDisconnectLock.unlock()
+    }
+
+    func clearOutAndDisClient() {
         outGoing = nil
         if clientSocket == nil {
             DDLogVerbose("H\(intTag)H Both side disconnected")
@@ -676,7 +717,6 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
 
     func forceDisconnect() {
         isForceDisconnect = true
-        
         clientSocket?.disconnect()
         DDLogVerbose("H\(intTag)H forceDisconnect")
     }

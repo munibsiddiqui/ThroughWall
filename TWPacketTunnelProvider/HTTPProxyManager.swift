@@ -30,6 +30,8 @@ class HTTPProxyManager: NSObject {
     fileprivate let downloadLock = NSLock()
     fileprivate let uploadLock = NSLock()
     fileprivate let tagLock = NSLock()
+    fileprivate var clientEmptySemaphore: DispatchSemaphore? =  nil
+    
     fileprivate let outgoingStoreLock = NSLock()
 //    private var downloadCount = 0
     fileprivate var proxyDownloadCount = 0
@@ -41,6 +43,7 @@ class HTTPProxyManager: NSObject {
     private var repeatDeleteTimer: DispatchSourceTimer?
     private var repeatDisconnectTimer: DispatchSourceTimer?
     fileprivate var tagCount = 0
+    
     fileprivate var outgoingStorage = [String: [OutgoingSide]]()
     struct downUpTraffic {
         var proxyDownload = 0
@@ -69,16 +72,23 @@ class HTTPProxyManager: NSObject {
     func stopProxy() {
         socketServer.disconnect()
 
-        for client in clientSocket {
-            client.forceDisconnect()
-        }
-
-        while true {
-            if clientSocket.count == 0 {
-                break
+        analyzerLock.lock()
+        
+        if clientSocket.count > 0 {
+            clientEmptySemaphore = DispatchSemaphore(value: 0)
+            for client in clientSocket {
+                client.forceDisconnect()
             }
         }
+        analyzerLock.unlock()
+//        while true {
+//            if clientSocket.count == 0 {
+//                break
+//            }
+//        }
 
+        clientEmptySemaphore?.wait()
+        
         saveTrafficTimer?.cancel()
         saveTrafficTimer = nil
         repeatDeleteTimer?.cancel()
@@ -303,6 +313,11 @@ extension HTTPProxyManager: HTTPAnalyzerDelegate {
         } else {
             DDLogError("H\(analyzer.getIntTag())H cann't find in the array")
         }
+        
+        if clientSocket.count == 0 {
+            clientEmptySemaphore?.signal()
+        }
+        
         analyzerLock.unlock()
     }
 

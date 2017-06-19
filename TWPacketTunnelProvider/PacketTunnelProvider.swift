@@ -192,6 +192,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     func onShadowsocksClientClosed() {
         DDLogDebug("onShadowsocksClientClosed")
         HTTPProxyManager.shardInstance.stopProxy()
+        DDLogDebug("StopCompletion")
+        DDLog.flushLog()
         if pendingStopCompletion != nil {
             pendingStopCompletion!()
         }

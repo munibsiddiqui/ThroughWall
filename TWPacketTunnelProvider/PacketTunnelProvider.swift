@@ -94,7 +94,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         let logFileManager = DDLogFileManagerDefault(logsDirectory: url.path)
         let fileLogger: DDFileLogger = DDFileLogger(logFileManager: logFileManager) // File Logger
         fileLogger.rollingFrequency = TimeInterval(60 * 60) // 1 hours
-//        fileLogger.logFileManager.maximumNumberOfLogFiles = 2
+        fileLogger.logFileManager.maximumNumberOfLogFiles = 6  // 6 files
+        fileLogger.maximumFileSize = 0
         DDLog.add(fileLogger)
 
         DDLogInfo("------Extension Log Start------")
@@ -207,7 +208,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 if lastPath == nil {
                     lastPath = defaultPath
                 } else {
-                    DDLogDebug("received network change notifcation")
+                    DDLogDebug("received network change notification")
                     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1, execute: {
                         self.setupTunnelWith(proxyPort: self.httpPort, completionHandle: { (_) in
 

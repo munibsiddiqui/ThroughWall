@@ -74,7 +74,7 @@ class Socks2HTTPS: NSObject, GCDAsyncSocketDelegate, Socks2HTTPSConverterDelegat
         newClient.socksOpen()
         lockQueue.async {
             self.converts?.append(newClient)
-            DDLogVerbose("S\(newClient.getIntTag())S added into arrary")
+            DDLogVerbose("S\(newClient.getIntTag())S added into array")
         }
     }
 
@@ -82,7 +82,7 @@ class Socks2HTTPS: NSObject, GCDAsyncSocketDelegate, Socks2HTTPSConverterDelegat
         lockQueue.async {
             if let index = self.converts?.index(of: sock) {
                 self.converts?.remove(at: index)
-                DDLogVerbose("S\(sock.getIntTag())S removed from arrary")
+                DDLogVerbose("S\(sock.getIntTag())S removed from array")
             }
         }
     }

@@ -72,6 +72,7 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     private let outDisconnectLock = NSLock()
     private var pendingClientDisconnect = false
     private var outBusy = false
+    private var timerForReadTimeout: DispatchSourceTimer? = nil
 
     private lazy var baseParseURL: URL = {
         let url = CoreDataController.sharedInstance.getDatabaseUrl().appendingPathComponent(parseFolderName)
@@ -128,8 +129,18 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         socket.delegateQueue = DispatchQueue.global()
         clientSocket = socket
         bindToPort = port
-
-        clientSocket?.readData(to: crlfData, withTimeout: TimeInterval(10), tag: TAG_READ_REQUEST_HEAD_FROM_CLIENT)
+        DDLogVerbose("H\(intTag)H Init Read")
+        timerForReadTimeout = DispatchSource.makeTimerSource(queue: DispatchQueue.global())
+        
+        timerForReadTimeout?.scheduleOneshot(deadline: .now() + 120)
+        timerForReadTimeout?.setEventHandler(handler: {
+            DDLogVerbose("H\(self.intTag)H Timeout TAG_READ_REQUEST_HEAD_FROM_CLIENT")
+            self.clientSocket = nil
+            self.disconnectClient()
+        })
+        timerForReadTimeout?.resume()
+        
+        clientSocket?.readData(to: crlfData, withTimeout: -1, tag: TAG_READ_REQUEST_HEAD_FROM_CLIENT)
     }
 
     func getIntTag() -> Int {
@@ -142,7 +153,7 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         outDisconnectLock.lock()
         outBusy = false
         if pendingClientDisconnect {
-            clearOutAndDisClient()
+            disconnectClient()
             outDisconnectLock.unlock()
             return
         }
@@ -174,6 +185,8 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         }
         switch tag {
         case TAG_READ_REQUEST_HEAD_FROM_CLIENT:
+            timerForReadTimeout?.cancel()
+            timerForReadTimeout = nil
             DDLogVerbose("H\(intTag)H TAG_READ_REQUEST_HEAD_FROM_CLIENT length:\(data.count)")
             didReadClientRequestHead(withData: data)
         case TAG_READ_REQUEST_BODY_FROM_CLIENT:
@@ -195,7 +208,9 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
 
         DDLogVerbose("H\(intTag)H Socks side disconnect")
         clientSocket = nil
-
+        timerForReadTimeout?.cancel()
+        timerForReadTimeout = nil
+        
         if outGoing == nil {
             DDLogVerbose("H\(intTag)H Both side disconnected")
             saveInOutCount()
@@ -220,11 +235,10 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         clientDisconnectLock.unlock()
     }
 
-    func socket(_ sock: GCDAsyncSocket, shouldTimeoutReadWithTag tag: Int, elapsed: TimeInterval, bytesDone length: UInt) -> TimeInterval {
-        forceDisconnect()
-        DDLogVerbose("H\(intTag)H TimeoutRead")
-        return 0
+    func socket(_ sock: GCDAsyncSocket, didReadPartialDataOfLength partialLength: UInt, tag: Int) {
+        DDLogVerbose("H\(intTag)H didReadPartialDataOfLength :\(partialLength) tag:\(tag)")
     }
+
 
     // MARK: - Process Data from client
 
@@ -688,20 +702,20 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     }
 
     internal func outgoingSocketDidDisconnect(_ outgoing: OutgoingSide) {
-        DDLogVerbose("H\(intTag)H Outgoing side disconnect")
-
         outDisconnectLock.lock()
+        DDLogVerbose("H\(intTag)H Outgoing side disconnect")
+        outGoing = nil
         if outBusy {
             pendingClientDisconnect = true
-            DDLogVerbose("H\(intTag)H Pending Outgoing side disconnect")
+
+            DDLogVerbose("H\(intTag)H Pending Client side disconnect")
         } else {
-            clearOutAndDisClient()
+            disconnectClient()
         }
         outDisconnectLock.unlock()
     }
 
-    func clearOutAndDisClient() {
-        outGoing = nil
+    func disconnectClient() {
         if clientSocket == nil {
             DDLogVerbose("H\(intTag)H Both side disconnected")
             saveInOutCount()
@@ -717,29 +731,46 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
 
     func forceDisconnect() {
         isForceDisconnect = true
-        clientSocket?.disconnect()
         DDLogVerbose("H\(intTag)H forceDisconnect")
+
+        outDisconnectLock.lock()
+        if outGoing == nil {
+            clientSocket = nil
+            disconnectClient()
+        }else{
+            clientSocket?.disconnect()
+        }
+        outDisconnectLock.unlock()
+    }
+
+    func _saveInOutCount() {
+        if shouldParseTraffic {
+            if let hostInfo = self.hostTraffic.hostConnectInfo {
+                if hostInfo.requestTime != nil {
+                    DDLogVerbose("H\(self.intTag)H saveInOutCount")
+                    self.hostTraffic.inCount = Int64(self.inCount)
+                    self.hostTraffic.outCount = Int64(self.outCount)
+                    self.hostTraffic.inProcessing = false
+                    self.hostTraffic.disconnectTime = NSDate()
+                    self.hostTraffic.forceDisconnect = self.isForceDisconnect
+//                        CoreDataController.sharedInstance.saveContext()
+//                        CoreDataController.sharedInstance.getContext().refresh(self.hostTraffic, mergeChanges: false)
+                    CoreDataController.sharedInstance.addToRefreshList(withObj: self.hostTraffic, andContext: CoreDataController.sharedInstance.getContext())
+                    return
+                }
+            }
+            DDLogVerbose("H\(self.intTag)H DELETE from context")
+            CoreDataController.sharedInstance.getContext().delete(self.hostTraffic)
+        }
+
     }
 
     func saveInOutCount() {
-        if shouldParseTraffic {
+        if Thread.isMainThread {
+            _saveInOutCount()
+        } else {
             DispatchQueue.main.sync {
-                if let hostInfo = self.hostTraffic.hostConnectInfo {
-                    if hostInfo.requestTime != nil {
-                        DDLogVerbose("H\(self.intTag)H saveInOutCount")
-                        self.hostTraffic.inCount = Int64(self.inCount)
-                        self.hostTraffic.outCount = Int64(self.outCount)
-                        self.hostTraffic.inProcessing = false
-                        self.hostTraffic.disconnectTime = NSDate()
-                        self.hostTraffic.forceDisconnect = self.isForceDisconnect
-//                        CoreDataController.sharedInstance.saveContext()
-//                        CoreDataController.sharedInstance.getContext().refresh(self.hostTraffic, mergeChanges: false)
-                        CoreDataController.sharedInstance.addToRefreshList(withObj: self.hostTraffic, andContext: CoreDataController.sharedInstance.getContext())
-                        return
-                    }
-                }
-                DDLogVerbose("H\(self.intTag)H DELETE from context")
-                CoreDataController.sharedInstance.getContext().delete(self.hostTraffic)
+                self._saveInOutCount()
             }
         }
     }

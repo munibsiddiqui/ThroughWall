@@ -307,11 +307,11 @@ class HTTPProxyManager: NSObject {
 extension HTTPProxyManager: HTTPAnalyzerDelegate {
     func HTTPAnalyzerDidDisconnect(httpAnalyzer analyzer: HTTPAnalyzer) {
         analyzerLock.lock()
-        if let index = self.clientSocket.index(of: analyzer) {
-            self.clientSocket.remove(at: index)
-            DDLogVerbose("H\(analyzer.getIntTag())H removed from arrary")
+        if let index = clientSocket.index(of: analyzer) {
+            clientSocket.remove(at: index)
+            DDLogVerbose("H\(analyzer.getIntTag())H removed from array. \(clientSocket.count)")
         } else {
-            DDLogError("H\(analyzer.getIntTag())H cann't find in the array")
+            DDLogError("H\(analyzer.getIntTag())H can't find in the array")
         }
         
         if clientSocket.count == 0 {
@@ -437,7 +437,7 @@ extension HTTPProxyManager: GCDAsyncSocketDelegate {
 
         analyzerLock.lock()
         clientSocket.append(newClient)
-        DDLogVerbose("H\(newClient.getIntTag())H added into arrary")
+        DDLogVerbose("H\(newClient.getIntTag())H added into array. \(clientSocket.count)")
         analyzerLock.unlock()
     }
 

@@ -8,7 +8,7 @@
 
 import NetworkExtension
 import CocoaLumberjack
-import ShadowsocksLib
+import SSRLib
 import TunnelLib
 import Fabric
 import Crashlytics
@@ -16,7 +16,7 @@ import Crashlytics
 class PacketTunnelProvider: NEPacketTunnelProvider {
     var pendingStartCompletion: ((Error?) -> Void)?
     var pendingStopCompletion: (() -> Void)?
-    let ssControler = SSlibevController()
+    let ssrControler = SSRLibController()
     var lastPath: NWPath?
     var httpPort = 0
 
@@ -145,6 +145,12 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         }else{
             protocol_ssr = ""
         }
+        let pro_param: String
+        if let _pro_param = conf["protocol_param"] as? String {
+            pro_param = _pro_param
+        }else{
+            pro_param = ""
+        }
         let obfs: String
         if let _obfs = conf["obfs"] as? String {
             obfs = _obfs
@@ -159,7 +165,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         }
 //        BOOL ota = [json[@"ota"] boolValue];
         
-        ssControler.startShodowsocksClientWithhostAddress(server, hostPort: NSNumber(value: port!), hostPassword: password, authscheme: method, protocol: protocol_ssr, obfs: obfs, param: obfs_param) { (port, error) in
+        ssrControler.startShodowsocksClientWithhostAddress(server, hostPort: NSNumber(value: port!), hostPassword: password, authscheme: method, protocol: protocol_ssr, pro_para: pro_param, obfs: obfs, obfs_para: obfs_param) { (port, error) in
             callback(Int(port), error)
         }
     }

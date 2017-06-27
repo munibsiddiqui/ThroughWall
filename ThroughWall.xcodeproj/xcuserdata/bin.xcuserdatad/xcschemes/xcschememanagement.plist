@@ -4,10 +4,10 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>ShadowsocksLib.xcscheme</key>
+		<key>SSRLib.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>3</integer>
+			<integer>2</integer>
 		</dict>
 		<key>TWPacketTunnelProvider.xcscheme</key>
 		<dict>
@@ -22,7 +22,7 @@
 		<key>TodayEx.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>2</integer>
+			<integer>3</integer>
 		</dict>
 		<key>TunnelLib.xcscheme</key>
 		<dict>
@@ -53,6 +53,11 @@
 			<true/>
 		</dict>
 		<key>3474ECCC1DDC951100EBF3C5</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>34F124AC1F00BB9C004DEB50</key>
 		<dict>
 			<key>primary</key>
 			<true/>

@@ -17,7 +17,7 @@ class ProxyConfig: NSObject {
     private let proxies = ["CUSTOM", "HTTP", "SOCKS5"]
 
     private let items = [
-        "CUSTOM": ["proxy", "description", "server", "port", "password", "method", "protocol", "obfs", "obfs_param"],
+        "CUSTOM": ["proxy", "description", "server", "port", "password", "method", "protocol", "proto_param", "obfs", "obfs_param"],
         "HTTP": ["proxy", "description", "server", "port", "user", "password"],
         "SOCKS5": ["proxy", "description", "server", "port", "user", "password"]
     ]
@@ -54,12 +54,12 @@ class ProxyConfig: NSObject {
             ],
             "protocol": [
                 "preset": [
-                    "", "origin", "tls1.2_ticket_auth", "verify_simple", "auth_simple", "auth_sha1", "auth_sha1_v2"
+                    "", "origin", "verify_simple", "auth_simple", "auth_sha1", "auth_sha1_v2", "auth_sha1_v4", "auth_aes128_md5", "auth_aes128_sha1","auth_chain_a"
                 ]
             ],
             "obfs": [
                 "preset": [
-                    "", "plain", "http_simple", "tls1.2_ticket_auth"
+                    "", "plain", "http_simple", "http_post", "tls1.2_ticket_auth"
                 ]
             ]
         ],
@@ -85,6 +85,7 @@ class ProxyConfig: NSObject {
             "server": ["url", "next"],
             "port": ["number", "accessary", "next"],
             "password": ["default", "secure", "next"],
+            "proto_param": ["default", "next"],
             "obfs_param": ["default", "done"]
         ]
     ]
@@ -99,6 +100,7 @@ class ProxyConfig: NSObject {
         "method": "Method",
         //        "dns": "DNS"
         "protocol": "Protocol(SSR)",
+        "proto_param": "Protocol Param(SSR)",
         "obfs": "Ofbs(SSR)",
         "obfs_param": "Obfs Param(SSR)"
     ]
@@ -564,7 +566,7 @@ class QRCodeProcess {
 
     private func SSRDecode(withCode code: String) -> Bool {
         //host:port:protocol:method:obfs:base64pass/?obfsparam=base64param&protoparam=base64param&remarks=base64remarks&group=base64group&udpport=0&uot=0
-        if let decodestring = decodeUsingBase64(code) {
+        if let decodestring = decodeUsingUsingURLSafeBase64(code) {
             DDLogDebug(decodestring)
             let parts = decodestring.components(separatedBy: "/?")
             if extractSSR(requiredPart: parts[0]) {
@@ -672,6 +674,13 @@ class QRCodeProcess {
         }
         return nil
     }
+    
+    private func decodeUsingUsingURLSafeBase64(_ string: String) -> String? {
+        var str = string
+        str = str.replacingOccurrences(of: "_", with: "/")
+        str = str.replacingOccurrences(of: "-", with: "+")
+        return decodeUsingBase64(str)
+    }
 
 
     //  encode
@@ -693,7 +702,7 @@ class QRCodeProcess {
         if let rPart = encodeSSRRequiedPart() {
             let content = rPart + "/?" + encodeSSROptionPart()
             DDLogDebug(content)
-            return "ssr://" + encodeUsingBase64(content)
+            return "ssr://" + endcodeUsingURLSafeBase64(content)
         }
         return ""
     }
@@ -709,7 +718,7 @@ class QRCodeProcess {
             }
         }
         if let value = proxyConfig?.getValue(byItem: "password") {
-            rValues.append(encodeUsingBase64(value))
+            rValues.append(endcodeUsingURLSafeBase64(value))
         } else {
             return nil
         }
@@ -722,7 +731,7 @@ class QRCodeProcess {
         for item in oItems {
             if let value = proxyConfig?.getValue(byItem: item[0]) {
                 if value != "" {
-                    oValues.append("\(item[1])=\(encodeUsingBase64(value))")
+                    oValues.append("\(item[1])=\(endcodeUsingURLSafeBase64(value))")
                 }
             }
         }
@@ -764,7 +773,7 @@ class QRCodeProcess {
         return result
     }
 
-    func encodeUsingBase64(_ string: String) -> String {
+    private func encodeUsingBase64(_ string: String) -> String {
         let utf8Str = string.data(using: .utf8)
         if var base64Encoded = utf8Str?.base64EncodedString(options: NSData.Base64EncodingOptions(rawValue: 0)) {
             while base64Encoded.hasSuffix("=") {
@@ -774,7 +783,15 @@ class QRCodeProcess {
         }
         return ""
     }
-
+    
+    private func endcodeUsingURLSafeBase64(_ str: String) -> String {
+        var string = encodeUsingBase64(str)
+        
+        string = string.replacingOccurrences(of: "/", with: "_")
+        string = string.replacingOccurrences(of: "+", with: "-")
+        
+        return string
+    }
 }
 
 

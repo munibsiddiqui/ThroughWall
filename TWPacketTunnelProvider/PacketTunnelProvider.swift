@@ -146,7 +146,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             protocol_ssr = ""
         }
         let pro_param: String
-        if let _pro_param = conf["protocol_param"] as? String {
+        if let _pro_param = conf["proto_param"] as? String {
             pro_param = _pro_param
         }else{
             pro_param = ""

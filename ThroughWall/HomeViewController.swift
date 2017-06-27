@@ -341,19 +341,17 @@ class HomeViewController: UIViewController {
             default:
                 return
             }
+            
+            
 
             if let manager = self.currentVPNManager {
-                manager.isEnabled = true
-                manager.saveToPreferences(completionHandler: { error in
-                    if error != nil {
-                        return
-                    }
+                SiteConfigController().save(withConfig: proxyConfigs[selectedServerIndex], intoManager: manager, completionHander: {
                     manager.loadFromPreferences(completionHandler: { (_error) in
                         if let error = _error {
                             self.showError(error, title: "load preferences 2")
                         } else {
                             if self.setVPNManager(withManager: manager, shouldON: shouldOn) == false {
-
+                                
                             }
                         }
                     })
@@ -470,6 +468,7 @@ class HomeViewController: UIViewController {
             }
         } else {
             //save
+
             SiteConfigController().writeIntoSiteConfigFile(withConfigs: proxyConfigs)
             reloadTable()
         }

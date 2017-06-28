@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1A278AF59DA185F024B942D2 /* Pods_ThroughWall.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 541B6C2129C7CA6D95A9FB35 /* Pods_ThroughWall.framework */; };
 		3423C7651DF00C60002B5AE8 /* OutgoingSide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3423C7641DF00C60002B5AE8 /* OutgoingSide.swift */; };
 		343352891DF93FAD00CF7281 /* ThroughWall.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3474EC811DDC926C00EBF3C5 /* ThroughWall.xcdatamodeld */; };
 		3433528D1DF943D100CF7281 /* CoreDataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3433528C1DF943D100CF7281 /* CoreDataController.swift */; };
@@ -298,9 +297,10 @@
 		34F1263D1F00CD33004DEB50 /* libpcre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34F126391F00CD33004DEB50 /* libpcre.a */; };
 		34F1263E1F00CD33004DEB50 /* libsodium.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34F1263A1F00CD33004DEB50 /* libsodium.a */; };
 		34F1263F1F00CD33004DEB50 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34F1263B1F00CD33004DEB50 /* libssl.a */; };
-		560A5FB41FCB850B8240A0EF /* Pods_TWPacketTunnelProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D54040D7632C1761B2803BD /* Pods_TWPacketTunnelProvider.framework */; };
 		6F35DA3314EA72D537C22254 /* Pods_TunnelLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C49EBEDDB2AF6AB02D6E3DEC /* Pods_TunnelLib.framework */; };
 		8788255218AB66821DB5C29F /* Pods_TodayEx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6776F291F2979F3F8EA43E5 /* Pods_TodayEx.framework */; };
+		914AEF6B56CAEE1284A50FD3 /* Pods_ThroughWall.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC97AEC51BBAB2D672F89826 /* Pods_ThroughWall.framework */; };
+		91CC2B09AFECD09D31023A7D /* Pods_TWPacketTunnelProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2570E6ECDA38476866EA39BB /* Pods_TWPacketTunnelProvider.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -362,8 +362,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0D54040D7632C1761B2803BD /* Pods_TWPacketTunnelProvider.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TWPacketTunnelProvider.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		172477E3A4C2AE264451794D /* Pods-ThroughWall.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThroughWall.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ThroughWall/Pods-ThroughWall.debug.xcconfig"; sourceTree = "<group>"; };
+		2570E6ECDA38476866EA39BB /* Pods_TWPacketTunnelProvider.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TWPacketTunnelProvider.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		340329CD1ECD8AAA00651955 /* ThroughWall 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "ThroughWall 2.xcdatamodel"; sourceTree = "<group>"; };
 		3423C7641DF00C60002B5AE8 /* OutgoingSide.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutgoingSide.swift; sourceTree = "<group>"; };
 		3433528C1DF943D100CF7281 /* CoreDataController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataController.swift; sourceTree = "<group>"; };
@@ -1014,15 +1014,14 @@
 		34F1263A1F00CD33004DEB50 /* libsodium.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsodium.a; path = SSRLib/lib/libsodium.a; sourceTree = "<group>"; };
 		34F1263B1F00CD33004DEB50 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = SSRLib/lib/libssl.a; sourceTree = "<group>"; };
 		3CE3B4B0CF2F4A6FF2DF8953 /* Pods-TunnelLib.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TunnelLib.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TunnelLib/Pods-TunnelLib.debug.xcconfig"; sourceTree = "<group>"; };
-		541B6C2129C7CA6D95A9FB35 /* Pods_ThroughWall.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThroughWall.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7AF134C978EF050C79063031 /* Pods-TunnelLib.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TunnelLib.release.xcconfig"; path = "Pods/Target Support Files/Pods-TunnelLib/Pods-TunnelLib.release.xcconfig"; sourceTree = "<group>"; };
 		8A2F6B7412937B1814159223 /* Pods-TodayEx.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TodayEx.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TodayEx/Pods-TodayEx.debug.xcconfig"; sourceTree = "<group>"; };
 		95CDCD467F65BA91101E2FCE /* Pods-TWPacketTunnelProvider.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TWPacketTunnelProvider.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TWPacketTunnelProvider/Pods-TWPacketTunnelProvider.debug.xcconfig"; sourceTree = "<group>"; };
-		9CDD734ABD4D1F309A39B824 /* Pods_ShadowsocksLib.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ShadowsocksLib.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A823D555ABAD2A9D06C0A955 /* Pods-TodayEx.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TodayEx.release.xcconfig"; path = "Pods/Target Support Files/Pods-TodayEx/Pods-TodayEx.release.xcconfig"; sourceTree = "<group>"; };
 		C34FE648E3E3D603A18C27BD /* Pods-ThroughWall.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThroughWall.release.xcconfig"; path = "Pods/Target Support Files/Pods-ThroughWall/Pods-ThroughWall.release.xcconfig"; sourceTree = "<group>"; };
 		C49EBEDDB2AF6AB02D6E3DEC /* Pods_TunnelLib.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TunnelLib.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6776F291F2979F3F8EA43E5 /* Pods_TodayEx.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TodayEx.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC97AEC51BBAB2D672F89826 /* Pods_ThroughWall.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThroughWall.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DED36AB4DED043EC2E5B3CCC /* Pods-TWPacketTunnelProvider.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TWPacketTunnelProvider.release.xcconfig"; path = "Pods/Target Support Files/Pods-TWPacketTunnelProvider/Pods-TWPacketTunnelProvider.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1035,8 +1034,8 @@
 				3464BF701EC4A86300D81663 /* CoreImage.framework in Frameworks */,
 				3464BF6A1EC49BDC00D81663 /* NetworkExtension.framework in Frameworks */,
 				3474ECD41DDC951100EBF3C5 /* TunnelLib.framework in Frameworks */,
-				1A278AF59DA185F024B942D2 /* Pods_ThroughWall.framework in Frameworks */,
 				34F124B41F00BB9C004DEB50 /* SSRLib.framework in Frameworks */,
+				914AEF6B56CAEE1284A50FD3 /* Pods_ThroughWall.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1047,7 +1046,7 @@
 				34BD966D1DDD3932002442BF /* TunnelLib.framework in Frameworks */,
 				34CC5FF61DDCA9200061AA44 /* libresolv.tbd in Frameworks */,
 				3464BF6B1EC49BFC00D81663 /* NetworkExtension.framework in Frameworks */,
-				560A5FB41FCB850B8240A0EF /* Pods_TWPacketTunnelProvider.framework in Frameworks */,
+				91CC2B09AFECD09D31023A7D /* Pods_TWPacketTunnelProvider.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1188,11 +1187,10 @@
 				3464BF691EC49BDC00D81663 /* NetworkExtension.framework */,
 				34CC5E7C1DDCA0EA0061AA44 /* libresolv.tbd */,
 				3474ECA71DDC92B900EBF3C5 /* NotificationCenter.framework */,
-				9CDD734ABD4D1F309A39B824 /* Pods_ShadowsocksLib.framework */,
-				0D54040D7632C1761B2803BD /* Pods_TWPacketTunnelProvider.framework */,
-				541B6C2129C7CA6D95A9FB35 /* Pods_ThroughWall.framework */,
 				C6776F291F2979F3F8EA43E5 /* Pods_TodayEx.framework */,
 				C49EBEDDB2AF6AB02D6E3DEC /* Pods_TunnelLib.framework */,
+				2570E6ECDA38476866EA39BB /* Pods_TWPacketTunnelProvider.framework */,
+				CC97AEC51BBAB2D672F89826 /* Pods_ThroughWall.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

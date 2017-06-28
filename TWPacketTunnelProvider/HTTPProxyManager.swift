@@ -75,6 +75,7 @@ class HTTPProxyManager: NSObject {
         analyzerLock.lock()
         
         if clientSocket.count > 0 {
+            DDLogVerbose("client count: \(clientSocket.count)")
             clientEmptySemaphore = DispatchSemaphore(value: 0)
             for client in clientSocket {
                 client.forceDisconnect()
@@ -87,7 +88,9 @@ class HTTPProxyManager: NSObject {
 //            }
 //        }
 
+        DDLogVerbose("wait for all disconnected")
         clientEmptySemaphore?.wait()
+        DDLogVerbose("continue~~~")
         
         saveTrafficTimer?.cancel()
         saveTrafficTimer = nil

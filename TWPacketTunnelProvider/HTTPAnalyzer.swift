@@ -736,11 +736,14 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         outDisconnectLock.lock()
         if outGoing == nil {
             clientSocket = nil
-            disconnectClient()
+            DispatchQueue.global().async {
+                self.disconnectClient()
+            }
         }else{
             clientSocket?.disconnect()
         }
         outDisconnectLock.unlock()
+        DDLogVerbose("H\(intTag)H forceDisconnect out")
     }
 
     func _saveInOutCount() {

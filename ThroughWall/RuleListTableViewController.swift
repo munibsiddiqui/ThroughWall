@@ -66,7 +66,6 @@ class RuleListTableViewController: UITableViewController, UISearchResultsUpdatin
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         reloadItemsFromDisk()
-
     }
 
     func reloadItemsFromDisk() {
@@ -225,7 +224,7 @@ class RuleListTableViewController: UITableViewController, UISearchResultsUpdatin
                 let item = ruleItems[indexPath.row - rewriteItems.count]
                 cell.textLabel?.attributedText = nil
                 cell.detailTextLabel?.attributedText = nil
-                if item.count == 3 {
+                if item.count >= 3 {
                     cell.textLabel?.text = item[1]
                     cell.detailTextLabel?.attributedText = makeAttributeDescription(withMatchRule: item[0], andProxyRule: item[2])
                 } else {

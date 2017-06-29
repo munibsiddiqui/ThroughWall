@@ -620,15 +620,19 @@ class QRCodeProcess {
 
 
     private func SSDecode(withCode code: String) -> Bool {
-        let desciption: String
+        let description: String
         var code = code
 
         if let poundsignIndex = code.range(of: "#")?.lowerBound {
             let removeRange = Range(uncheckedBounds: (lower: poundsignIndex, upper: code.endIndex))
-            desciption = code.substring(from: code.index(after: poundsignIndex))
+            description = code.substring(from: code.index(after: poundsignIndex))
+            code.removeSubrange(removeRange)
+        }else if let remarkRange = code.range(of: "?remark") {
+            let removeRange = Range(uncheckedBounds: (lower: remarkRange.lowerBound, upper: code.endIndex))
+            description = code.substring(from: code.index(after: remarkRange.upperBound))
             code.removeSubrange(removeRange)
         } else {
-            desciption = ""
+            description = ""
         }
 
         if let decodestring = decodeUsingBase64(code) {
@@ -648,10 +652,10 @@ class QRCodeProcess {
                         method.removeSubrange(range)
                     }
 
-                    if desciption == "" {
+                    if description == "" {
                         proxyConfig?.setValue(byItem: "description", value: "\(host):\(port)")
                     } else {
-                        proxyConfig?.setValue(byItem: "description", value: desciption)
+                        proxyConfig?.setValue(byItem: "description", value: description)
                     }
                     proxyConfig?.setValue(byItem: "server", value: host)
                     proxyConfig?.setValue(byItem: "port", value: port)
@@ -817,6 +821,22 @@ class RuleFileUpdateController: NSObject {
         defaults?.synchronize()
     }
 
+    func readCurrentRuleFileURL() -> String {
+        if getCurrentFileSource() == defaultFileSource {
+            if let path = Bundle.main.path(forResource: "rule", ofType: "config") {
+                return path
+            }
+        } else {
+            let customPath = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)[0] + "/" + configFileName
+            let fileManager = FileManager.default
+            
+            if fileManager.fileExists(atPath: customPath) {
+                return customPath
+            }
+        }
+        return ""
+    }
+    
 
     func readCurrentRuleFileContent() -> String {
         //if default, return file in bundle. if custom, return file in downlaod position
@@ -941,7 +961,7 @@ class RuleFileUpdateController: NSObject {
                 continue
             }
 
-            if item.hasPrefix("#") || item == "" {
+            if item.hasPrefix("#") || item == "" || item.hasPrefix("//") {
                 continue
             }
 

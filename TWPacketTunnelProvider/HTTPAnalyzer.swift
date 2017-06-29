@@ -131,15 +131,14 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         bindToPort = port
         DDLogVerbose("H\(intTag)H Init Read")
         timerForReadTimeout = DispatchSource.makeTimerSource(queue: DispatchQueue.global())
-        
+
         timerForReadTimeout?.scheduleOneshot(deadline: .now() + 120)
         timerForReadTimeout?.setEventHandler(handler: {
             DDLogVerbose("H\(self.intTag)H Timeout TAG_READ_REQUEST_HEAD_FROM_CLIENT")
-            self.clientSocket = nil
-            self.disconnectClient()
+            self.clientDisconnectSchedule()
         })
         timerForReadTimeout?.resume()
-        
+
         clientSocket?.readData(to: crlfData, withTimeout: -1, tag: TAG_READ_REQUEST_HEAD_FROM_CLIENT)
     }
 
@@ -153,8 +152,8 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         outDisconnectLock.lock()
         outBusy = false
         if pendingClientDisconnect {
-            disconnectClient()
             outDisconnectLock.unlock()
+            clientDisconnectSchedule()
             return
         }
         outDisconnectLock.unlock()
@@ -185,8 +184,10 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         }
         switch tag {
         case TAG_READ_REQUEST_HEAD_FROM_CLIENT:
+
             timerForReadTimeout?.cancel()
             timerForReadTimeout = nil
+
             DDLogVerbose("H\(intTag)H TAG_READ_REQUEST_HEAD_FROM_CLIENT length:\(data.count)")
             didReadClientRequestHead(withData: data)
         case TAG_READ_REQUEST_BODY_FROM_CLIENT:
@@ -204,13 +205,18 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
 
 
     func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
-        clientDisconnectLock.lock()
+        clientDisconnectSchedule()
+    }
+
+    func clientDisconnectSchedule() {
+        lockBothSide()
 
         DDLogVerbose("H\(intTag)H Socks side disconnect")
         clientSocket = nil
+
         timerForReadTimeout?.cancel()
         timerForReadTimeout = nil
-        
+
         if outGoing == nil {
             DDLogVerbose("H\(intTag)H Both side disconnected")
             saveInOutCount()
@@ -226,19 +232,12 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
                 delegate = nil
             } else {
                 DDLogVerbose("H\(intTag)H Going to disconnect Outgoing Side")
-                outDisconnectLock.lock()
                 outBusy = false
-                outDisconnectLock.unlock()
                 outGoing?.disconnect()
             }
         }
-        clientDisconnectLock.unlock()
+        unlockBothSide()
     }
-
-    func socket(_ sock: GCDAsyncSocket, didReadPartialDataOfLength partialLength: UInt, tag: Int) {
-        DDLogVerbose("H\(intTag)H didReadPartialDataOfLength :\(partialLength) tag:\(tag)")
-    }
-
 
     // MARK: - Process Data from client
 
@@ -283,7 +282,7 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
 
             let (hostName, portNumber) = extractHostAndPort(fromCONNECTComponent: requestComponents[0])
 
-            if host == nil {
+            if hostName != nil {
                 host = hostName
             }
             if port == nil {
@@ -323,7 +322,7 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
             return
         }
 
-        if host == nil {
+        if hostName != nil {
             host = hostName
         } else if replaced {
             //replace host in request
@@ -425,19 +424,20 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
 
         if destiReqComponents[1].hasPrefix("[") {
             //ipv6 address
-            let destiComponents = destiReqComponents[1].components(separatedBy: "]")
-            if destiComponents.count == 2 {
-                var host = destiComponents[0]
-                host.remove(at: host.startIndex)
-                var port = destiComponents[1]
-                if port.hasPrefix(":") {
-                    port.remove(at: port.startIndex)
-                }
-                return (host, UInt16(port))
-            } else {
-                DDLogError("H\(intTag)H extactHostAndPort: \(ConnectionError.IPV6AnalysisError)")
-                return (nil, nil)
-            }
+//            let destiComponents = destiReqComponents[1].components(separatedBy: "]")
+//            if destiComponents.count == 2 {
+//                var host = destiComponents[0]
+//                host.remove(at: host.startIndex)
+//                var port = destiComponents[1]
+//                if port.hasPrefix(":") {
+//                    port.remove(at: port.startIndex)
+//                }
+//                return (host, UInt16(port))
+//            } else {
+//                DDLogError("H\(intTag)H extactHostAndPort: \(ConnectionError.IPV6AnalysisError)")
+//                return (nil, nil)
+//            }
+            return (nil, nil)
         } else {
             //ipv4 address or domain
             let destiComponents = destiReqComponents[1].components(separatedBy: ":")
@@ -480,19 +480,20 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
 
         if destiComponents[2].hasPrefix("[") {
             //ipv6 address
-            let hostAndPortComponents = destiComponents[2].components(separatedBy: "]")
-            if hostAndPortComponents.count == 2 {
-                host = hostAndPortComponents[0]
-                host.remove(at: host.startIndex)
-                var _port = hostAndPortComponents[1]
-                if _port.hasPrefix(":") {
-                    _port.remove(at: _port.startIndex)
-                }
-                port = UInt16(_port)
-            } else {
-                DDLogError("H\(intTag)H extractHostAndPortWithRepost: \(ConnectionError.IPV6AnalysisError)")
-                return (nil, replaced, nil, nil)
-            }
+//            let hostAndPortComponents = destiComponents[2].components(separatedBy: "]")
+//            if hostAndPortComponents.count == 2 {
+//                host = hostAndPortComponents[0]
+//                host.remove(at: host.startIndex)
+//                var _port = hostAndPortComponents[1]
+//                if _port.hasPrefix(":") {
+//                    _port.remove(at: _port.startIndex)
+//                }
+//                port = UInt16(_port)
+//            } else {
+//                DDLogError("H\(intTag)H extractHostAndPortWithRepost: \(ConnectionError.IPV6AnalysisError)")
+//                return (nil, replaced, nil, nil)
+//            }
+            return (nil, replaced, nil, nil)
         } else {
             //ipv4 address or domain
             let hostAndPortComponents = destiComponents[2].components(separatedBy: ":")
@@ -512,9 +513,9 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     }
 
     func tryConnect(toHost host: String, port: UInt16) {
-        clientDisconnectLock.lock()
+        lockBothSide()
         _tryConnect(toHost: host, port: port)
-        clientDisconnectLock.unlock()
+        unlockBothSide()
     }
 
     func _tryConnect(toHost host: String, port: UInt16) {
@@ -556,7 +557,7 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         case .Reject:
             Thread.sleep(forTimeInterval: 1.0)
             outGoing = nil
-            forceDisconnect()
+            rejectClient()
             return
         case .Proxy:
             outGoing?.setProxyHost(withHostName: "127.0.0.1", port: UInt16(bindToPort))
@@ -569,7 +570,7 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
         } catch {
             DDLogError("H\(intTag)H \(error)")
             outGoing = nil
-            forceDisconnect()
+            rejectClient()
         }
     }
 
@@ -702,48 +703,79 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     }
 
     internal func outgoingSocketDidDisconnect(_ outgoing: OutgoingSide) {
-        outDisconnectLock.lock()
+        outgoingDisconnectSchedule()
+    }
+
+    private func outgoingDisconnectSchedule() {
+        lockBothSide()
         DDLogVerbose("H\(intTag)H Outgoing side disconnect")
         outGoing = nil
         if outBusy {
             pendingClientDisconnect = true
-
             DDLogVerbose("H\(intTag)H Pending Client side disconnect")
         } else {
-            disconnectClient()
+            if clientSocket == nil {
+                DDLogVerbose("H\(intTag)H Both side disconnected")
+                saveInOutCount()
+                delegate?.HTTPAnalyzerDidDisconnect(httpAnalyzer: self)
+                delegate = nil
+            } else {
+                DDLogVerbose("H\(intTag)H Going to disconnect Socks Side")
+                clientSocket?.disconnect()
+            }
         }
-        outDisconnectLock.unlock()
-    }
-
-    func disconnectClient() {
-        if clientSocket == nil {
-            DDLogVerbose("H\(intTag)H Both side disconnected")
-            saveInOutCount()
-            delegate?.HTTPAnalyzerDidDisconnect(httpAnalyzer: self)
-            delegate = nil
-        } else {
-            DDLogVerbose("H\(intTag)H Going to disconnect Socks Side")
-            clientSocket?.disconnect()
-        }
+        unlockBothSide()
     }
 
     // MARK: - Other
 
     func forceDisconnect() {
+        DispatchQueue.global().async {
+            self._forceDisconnect()
+        }
+    }
+
+    private func _forceDisconnect() {
         isForceDisconnect = true
         DDLogVerbose("H\(intTag)H forceDisconnect")
 
-        outDisconnectLock.lock()
-        if outGoing == nil {
-            clientSocket = nil
+        lockBothSide()
+
+        clientSocket?.disconnect()
+        if timerForReadTimeout != nil {
             DispatchQueue.global().async {
-                self.disconnectClient()
+                self.clientDisconnectSchedule()
             }
-        }else{
-            clientSocket?.disconnect()
         }
-        outDisconnectLock.unlock()
+
+        unlockBothSide()
         DDLogVerbose("H\(intTag)H forceDisconnect out")
+
+    }
+
+    private func rejectClient() {
+        DispatchQueue.global().async {
+            self._rejectClient()
+        }
+    }
+
+    private func _rejectClient() {
+        isForceDisconnect = true
+        DDLogVerbose("H\(intTag)H rejectClient")
+
+        lockBothSide()
+        clientSocket?.disconnect()
+        unlockBothSide()
+    }
+
+    private func lockBothSide() {
+        clientDisconnectLock.lock()
+        outDisconnectLock.lock()
+    }
+
+    private func unlockBothSide() {
+        clientDisconnectLock.unlock()
+        outDisconnectLock.unlock()
     }
 
     func _saveInOutCount() {

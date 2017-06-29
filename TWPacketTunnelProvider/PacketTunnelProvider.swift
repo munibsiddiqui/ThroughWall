@@ -19,13 +19,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     let ssrControler = SSRLibController()
     var lastPath: NWPath?
     var httpPort = 0
-
+    var startTime = Date()
     let filePath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] + "/" + configFileName
 
     override func startTunnel(options: [String: NSObject]?, completionHandler: @escaping (Error?) -> Void) {
         // Add code here to start the process of connecting the tunnel.
         Fabric.with([Crashlytics.self])
-
+        Answers.logCustomEvent(withName: "Start", customAttributes: ["time": "\(Date())"])
+        
         setupDDLog()
         DDLogVerbose("Going to start VPN")
         pendingStartCompletion = completionHandler
@@ -72,6 +73,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                             DDLogVerbose("complete with \(_error)")
                         } else {
                             DDLogVerbose("complete")
+                            Answers.logCustomEvent(withName: "StartComplete", customAttributes: nil)
+                            self.startTime = Date()
                         }
 //                        DDLogVerbose("\(Date().timeIntervalSince1970)")
                         self.pendingStartCompletion?(error)
@@ -201,6 +204,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         HTTPProxyManager.shardInstance.stopProxy()
         DDLogDebug("StopCompletion")
         DDLog.flushLog()
+        
         if pendingStopCompletion != nil {
             pendingStopCompletion!()
         }
@@ -232,6 +236,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         TunnelManager.sharedInterface().stop()
         pendingStopCompletion = completionHandler
         DDLogDebug("stopTunnel")
+        Answers.logCustomEvent(withName: "Stop", customAttributes: ["during": "\(Date().timeIntervalSince(startTime))"])
     }
 
     override func handleAppMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)?) {

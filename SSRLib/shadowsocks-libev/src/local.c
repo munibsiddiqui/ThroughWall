@@ -141,6 +141,8 @@ static struct cork_dllist inactive_profiles;
 static listen_ctx_t *current_profile;
 static struct cork_dllist all_connections;
 
+char * dumHost = NULL;
+
 #ifndef __MINGW32__
 int
 setnonblocking(int fd)
@@ -838,7 +840,10 @@ server_recv_cb(EV_P_ ev_io *w, int revents)
                 if (server_env->hostname)
                     strcpy(_server_info.host, server_env->hostname);
                 else
-                    strcpy(_server_info.host, server_env->host);
+                    if (server_env->host)
+                        strcpy(_server_info.host, server_env->host);
+                    else
+                        strcpy(_server_info.host, dumHost);
                 if (verbose) {
                     LOGI("server_info host %s", _server_info.host);
                 }
@@ -2076,7 +2081,8 @@ start_ss_local_server(profile_t profile, shadowsocks_cb cb, void *data)
     server_cfg.obfs_param = profile.obfs_param;
     serv->addr = serv->addr_udp = storage;
     serv->addr_len = serv->addr_udp_len = get_sockaddr_len((struct sockaddr *) storage);
-    serv->host = strdup(remote_host);
+    dumHost = ss_strdup(remote_host);
+    serv->host = dumHost;
     listen_ctx.timeout        = timeout;
     listen_ctx.iface          = NULL;
     listen_ctx.mptcp          = mptcp;

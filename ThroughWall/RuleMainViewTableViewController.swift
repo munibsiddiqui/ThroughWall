@@ -9,7 +9,7 @@
 import UIKit
 import CocoaLumberjack
 
-class RuleMainViewTableViewController: UITableViewController, URLSessionDownloadDelegate {
+class RuleMainViewTableViewController: UITableViewController, URLSessionDownloadDelegate, UIDocumentMenuDelegate, UIDocumentPickerDelegate, UINavigationControllerDelegate {
     var globalModeSwitch = UISwitch()
     var downloadTask: URLSessionDownloadTask!
     let downloadFilePath = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)[0] + "/" + configFileName
@@ -122,9 +122,9 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         case 0:
             return 2
         case 1:
-            return 3
+            return 4
         case 2:
-            return 2
+            return 3
         default:
             return 0
         }
@@ -215,6 +215,8 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
             case 1:
                 cell.textLabel?.text = "From Local Document"
             case 2:
+                cell.textLabel?.text = "From Cloud"
+            case 3:
                 cell.textLabel?.text = "Reset to Default"
             default:
                 break
@@ -229,6 +231,8 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
             case 1:
                 cell.textLabel?.text = "As Raw TXT"
                 cell.accessoryType = .disclosureIndicator
+            case 2:
+                cell.textLabel?.text = "Export"
             default:
                 break
             }
@@ -259,6 +263,8 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
                 let rect = tableView.rectForRow(at: indexPath)
                 popFileListInLocalFile(withSourceRect: rect)
             case 2:
+                importFromCloud()
+            case 3:
                 useDefaultRule()
             default:
                 break
@@ -273,6 +279,14 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
 
                 self.navigationController?.pushViewController(vc, animated: true)
 //                performSegue(withIdentifier: "showRawTXT", sender: nil)
+            case 2:
+                let url = URL(fileURLWithPath: RuleFileUpdateController().readCurrentRuleFileURL())
+
+                    let activityViewController = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+//
+                    self.present(activityViewController, animated: true, completion: nil)
+            
+//                exportToCloud()
             default:
                 break
             }
@@ -282,6 +296,23 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
     }
 
     // MARK: - Import Rule File
+
+    func importFromCloud() {
+        let importMenu = UIDocumentMenuViewController(documentTypes: ["public.text", "public.data", "public.pdf", "public.doc"], in: .import)
+        importMenu.delegate = self
+        importMenu.modalPresentationStyle = .formSheet
+        present(importMenu, animated: true, completion: nil)
+    }
+
+    func exportToCloud() {
+        let url = URL(fileURLWithPath: RuleFileUpdateController().readCurrentRuleFileURL())
+        let documentPicker = UIDocumentPickerViewController(url: url, in: .exportToService)
+        documentPicker.delegate = self
+        documentPicker.modalPresentationStyle = .formSheet
+        present(documentPicker, animated: true, completion: nil)
+
+    }
+
 
     func popFileListInLocalFile(withSourceRect sourceRect: CGRect) {
         //        let alertController = UIAlertController(title: "Input URL", message: nil, preferredStyle: .alert)
@@ -326,7 +357,7 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
 //            print("rule list:", ruleFileNames)
             return ruleFiles
         } catch {
-             DDLogError("\(error)")
+            DDLogError("\(error)")
         }
         return []
     }
@@ -402,6 +433,29 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         fileManager.createFile(atPath: downloadFilePath, contents: content.data(using: String.Encoding.utf8), attributes: nil)
     }
 
+    // MARK: - UIDocumentPickerDelegate
+
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentAt url: URL) {
+        if controller.documentPickerMode == .import {
+            do {
+                let content = try String(contentsOf: url, encoding: String.Encoding.utf8)
+                saveToConfigFile(content)
+                RuleFileUpdateController().updateRuleFileFromImportedFile(downloadFilePath)
+            } catch {
+                DDLogError("\(error)")
+            }
+        }
+    }
+
+    func documentMenuWasCancelled(_ documentMenu: UIDocumentMenuViewController) {
+        print("we cancelled")
+        dismiss(animated: true, completion: nil)
+    }
+
+    func documentMenu(_ documentMenu: UIDocumentMenuViewController, didPickDocumentPicker documentPicker: UIDocumentPickerViewController) {
+        documentPicker.delegate = self
+        present(documentPicker, animated: true, completion: nil)
+    }
 
     // MARK: - URLSessionDownloadDelegate
 
@@ -411,7 +465,7 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
             saveToConfigFile(content)
             RuleFileUpdateController().updateRuleFileFromImportedFile(downloadFilePath)
         } catch {
-             DDLogError("\(error)")
+            DDLogError("\(error)")
         }
         DispatchQueue.main.async {
             self.backgroundView.isHidden = true

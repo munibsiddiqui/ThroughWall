@@ -25,6 +25,8 @@ let currentConfigureVersion = 1
 let kSelectedServerIndex = "Bingo.TW.SelectedServerIndex"
 
 let kCurrentManagerStatus = "Bingo.TW.ManagerStatus"
+let kHintVersion = "Bingo.HintVersion"
+let hintVersion = 1
 
 let databaseFolderName = "DataBase"
 let databaseFileName = "Record.sqlite"

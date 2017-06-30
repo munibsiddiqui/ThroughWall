@@ -341,8 +341,8 @@ class HomeViewController: UIViewController {
             default:
                 return
             }
-            
-            
+
+
 
             if let manager = self.currentVPNManager {
                 SiteConfigController().save(withConfig: proxyConfigs[selectedServerIndex], intoManager: manager, completionHander: {
@@ -351,7 +351,7 @@ class HomeViewController: UIViewController {
                             self.showError(error, title: "load preferences 2")
                         } else {
                             if self.setVPNManager(withManager: manager, shouldON: shouldOn) == false {
-                                
+
                             }
                         }
                     })
@@ -394,6 +394,15 @@ class HomeViewController: UIViewController {
         if on {
             do {
                 try manger.connection.startVPNTunnel()
+                let userDefault = UserDefaults()
+                if let _hintVersion = userDefault.value(forKey: kHintVersion) as? Int {
+                    if _hintVersion < hintVersion {
+                        tryShowWarning()
+                    }
+                } else {
+                    tryShowWarning()
+                }
+
             } catch {
                 showError(error, title: "start vpn")
 
@@ -404,6 +413,19 @@ class HomeViewController: UIViewController {
             manger.connection.stopVPNTunnel()
         }
         return result
+    }
+
+    func tryShowWarning() {
+        DispatchQueue.main.async {
+            let alertController = UIAlertController(title: "Hint", message: "最近增加了SSR支持，如遇网络连接问题，请联系我。我会尽力修复问题。\nSSR support was added recently. If any networking problem happens, please do not hesitate to contact me. I'll try my best to fix it.", preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+
+            alertController.addAction(okAction)
+
+            self.present(alertController, animated: true, completion: nil)
+            let userDefault = UserDefaults()
+            userDefault.set(hintVersion, forKey: kHintVersion)
+        }
     }
 
     // MARK: - Test Server Dalay

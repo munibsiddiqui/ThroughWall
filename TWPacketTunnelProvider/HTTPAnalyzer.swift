@@ -189,7 +189,9 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
             timerForReadTimeout = nil
 
             DDLogVerbose("H\(intTag)H TAG_READ_REQUEST_HEAD_FROM_CLIENT length:\(data.count)")
+            lockBothSide()
             didReadClientRequestHead(withData: data)
+            unlockBothSide()
         case TAG_READ_REQUEST_BODY_FROM_CLIENT:
             DDLogVerbose("H\(intTag)H TAG_READ_REQUEST_BODY_FROM_CLIENT length:\(data.count)")
             didReadClientRequestBody(withData: data)
@@ -513,12 +515,6 @@ class HTTPAnalyzer: NSObject, GCDAsyncSocketDelegate, OutgoingTransmitDelegate {
     }
 
     func tryConnect(toHost host: String, port: UInt16) {
-        lockBothSide()
-        _tryConnect(toHost: host, port: port)
-        unlockBothSide()
-    }
-
-    func _tryConnect(toHost host: String, port: UInt16) {
         if clientSocket == nil {
             return
         }

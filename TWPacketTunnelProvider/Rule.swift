@@ -387,10 +387,10 @@ class Rule {
 
         if let _ip = ip {
             let country = lookupCountry(withIP: _ip)
-            DDLogDebug("\(country) \(domain) \(_ip)")
+            DDLogVerbose("\(country) \(domain) \(_ip)")
             for _geoRule in geoRule {
                 if country == _geoRule.0 {
-                    DDLogDebug("\(_geoRule.1.description) \(domain)")
+                    DDLogVerbose("\(_geoRule.1.description) \(domain)")
                     return (_geoRule.1, _ip)
                 }
             }

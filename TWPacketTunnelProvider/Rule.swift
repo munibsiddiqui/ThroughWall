@@ -40,6 +40,7 @@ class Rule {
     private var rewriteRules: [[String]]?
     private var geoIPRule: [(String, DomainRule)]?
     private var finalRule: DomainRule?
+    private var bypassTunRule: [(String, String)]?
     private var globalMode = false
 
     private func trasnlateRule(fromString value: String) -> DomainRule {
@@ -54,14 +55,14 @@ class Rule {
             return DomainRule.Unkown
         }
     }
-
-    private func itemsInRuleFile() -> [String] {
+    
+    private func getContent(withFileName fileName: String) -> [String] {
         let fileManager = FileManager.default
         guard var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName) else {
             return []
         }
-        url.appendPathComponent(ruleFileName)
-
+        url.appendPathComponent(fileName)
+        
         var fileString = ""
         do {
             fileString = try String(contentsOf: url, encoding: String.Encoding.utf8)
@@ -69,30 +70,22 @@ class Rule {
             DDLogDebug("\(error)")
             return []
         }
-
+        
         var items = fileString.components(separatedBy: "\n")
         items.removeLast()
         return items
     }
 
+    private func itemsInRuleFile() -> [String] {
+        return getContent(withFileName: ruleFileName)
+    }
+
     private func itemsInRewriteFile() -> [String] {
-        let fileManager = FileManager.default
-        guard var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName) else {
-            return []
-        }
-        url.appendPathComponent(rewriteFileName)
+        return getContent(withFileName: rewriteFileName)
+    }
 
-        var fileString = ""
-        do {
-            fileString = try String(contentsOf: url, encoding: String.Encoding.utf8)
-        } catch {
-            DDLogDebug("\(error)")
-            return []
-        }
-
-        var items = fileString.components(separatedBy: "\n")
-        items.removeLast()
-        return items
+    private func itemsInGeneralFile() -> [String] {
+        return getContent(withFileName: generalFileName)
     }
 
 
@@ -130,7 +123,7 @@ class Rule {
         for item in items {
             let components = item.components(separatedBy: ",")
 //            if components.count == 3 && components[0] != "GEOIP" {
-                result.append(components)
+            result.append(components)
 //            }
         }
         return result
@@ -147,6 +140,72 @@ class Rule {
         }
         return result
     }
+
+    private func getGeneralItems() {
+        for item in itemsInGeneralFile() {
+            if item.hasPrefix("bypass-tun") {
+                generateBypassTun(withItem: item)
+            }
+        }
+    }
+
+    private func generateBypassTun(withItem item: String) {
+        bypassTunRule = [(String, String)]()
+        let tmp = item.components(separatedBy: "=")
+        if tmp.count == 2 {
+            let IPMaskPart = tmp[1]
+            let IPMasks = IPMaskPart.components(separatedBy: ",")
+            for IPMask in IPMasks {
+                let _IPMask = removeSpaceBeforeAndAfter(forContent: IPMask)
+                let parts = _IPMask.components(separatedBy: "/")
+                if parts.count == 2 {
+                    if let count = Int(parts[1]) {
+                        let mask = generateMask(throughBitCount: count)
+                        bypassTunRule?.append((parts[0], mask))
+                    }
+                }
+            }
+        }
+    }
+
+    private func removeSpaceBeforeAndAfter(forContent content: String) -> String {
+        var chars = content.characters
+        while chars.first == " " {
+            chars.removeFirst()
+        }
+        while chars.last == " " {
+            chars.removeLast()
+        }
+        return String(chars)
+    }
+
+    private func generateMask(throughBitCount count: Int) -> String {
+        var masks = [String]()
+        var _count = count
+        for _ in 0 ..< 4 {
+            let subCount: Int
+            if _count >= 8 {
+                subCount = 8
+                _count = _count - 8
+            } else {
+                subCount = _count
+                _count = 0
+            }
+            var number = 0
+            for i in 0 ..< subCount {
+                number = number * 2
+                number = number + 1
+            }
+            number = number << (8 - subCount)
+            masks.append("\(number)")
+        }
+        return masks.joined(separator: ".")
+    }
+
+    func getBypassTunRule() -> [(String, String)] {
+        return bypassTunRule!
+    }
+
 
     func analyzeRuleFile() {
 
@@ -188,6 +247,7 @@ class Rule {
         }
 
         rewriteRules = getCurrentRewriteItems()
+        getGeneralItems()
 
         let defaults = UserDefaults.init(suiteName: groupName)
 
@@ -306,25 +366,25 @@ class Rule {
         if rule != .Unkown {
             return (rule, ip)
         }
-        
+
         if let final = finalRule {
             return (final, domain)
         }
-        
+
         return(.Direct, domain)
     }
-    
+
     private func checkGEORule(forDomain domain: String, andPort port: UInt16) -> (DomainRule, String) {
         guard let geoRule = geoIPRule else {
             return(.Unkown, domain)
         }
-        
+
         if geoRule.isEmpty {
             return(.Unkown, domain)
         }
-        
+
         let (ip, _) = convertToIPPort(toHost: domain, andPort: port)
-        
+
         if let _ip = ip {
             let country = lookupCountry(withIP: _ip)
             DDLogDebug("\(country) \(domain) \(_ip)")
@@ -335,13 +395,13 @@ class Rule {
                 }
             }
             DDLogError("GEO no match for \(domain):\(port)")
-        }else {
+        } else {
             DDLogError("no IP for \(domain):\(port)")
         }
-        
+
         return(.Unkown, domain)
     }
-    
+
 
 
     private func lookupCountry(withIP ip: String) -> String {

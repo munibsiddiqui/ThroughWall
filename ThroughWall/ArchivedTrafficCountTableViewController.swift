@@ -81,7 +81,7 @@ class ArchivedTrafficCountTableViewController: UITableViewController {
             // Configure the cell...
             let (date, count) = archived[indexPath.row]
             let (scale, unit) = autoFitRange(maxValue: count)
-            cell.textLabel?.text = "\(date): \(count/scale)\(unit)"
+            cell.textLabel?.text = "\(date): \(String(format: "%.2f", Double(count) / Double(scale)))\(unit)"
             
             return cell
         }else {

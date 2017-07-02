@@ -289,7 +289,7 @@ class HistoryOptionTableViewController: UITableViewController {
                 if date == "" {
                     cell.textLabel?.text = "No traffic record now"
                 } else {
-                    cell.textLabel?.text = "\(date): \(String.init(format: "%.2f", Double(totalCount) / Double(scale))) \(unit)"
+                    cell.textLabel?.text = "\(date): \(String(format: "%.2f", Double(totalCount) / Double(scale))) \(unit)"
                 }
 
             } else if indexPath.row == 1 {

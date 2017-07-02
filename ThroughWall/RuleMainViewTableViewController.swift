@@ -247,6 +247,7 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
+        let rect = tableView.rectForRow(at: indexPath)
         switch indexPath.section {
         case 0:
             switch indexPath.row {
@@ -260,10 +261,9 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
             case 0:
                 popTextFieldForURLInput()
             case 1:
-                let rect = tableView.rectForRow(at: indexPath)
                 popFileListInLocalFile(withSourceRect: rect)
             case 2:
-                importFromCloud()
+                importFromCloud(withSourceRect: rect)
             case 3:
                 useDefaultRule()
             default:
@@ -280,13 +280,7 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
                 self.navigationController?.pushViewController(vc, animated: true)
 //                performSegue(withIdentifier: "showRawTXT", sender: nil)
             case 2:
-                let url = URL(fileURLWithPath: RuleFileUpdateController().readCurrentRuleFileURL())
-
-                    let activityViewController = UIActivityViewController(activityItems: [url], applicationActivities: nil)
-//
-                    self.present(activityViewController, animated: true, completion: nil)
-            
-//                exportToCloud()
+                exportToCloud(withSourceRect: rect)
             default:
                 break
             }
@@ -297,20 +291,26 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
 
     // MARK: - Import Rule File
 
-    func importFromCloud() {
+    func importFromCloud(withSourceRect sourceRect: CGRect) {
         let importMenu = UIDocumentMenuViewController(documentTypes: ["public.text", "public.data", "public.pdf", "public.doc"], in: .import)
         importMenu.delegate = self
         importMenu.modalPresentationStyle = .formSheet
+        if let popoverPresentationController = importMenu.popoverPresentationController {
+            popoverPresentationController.sourceView = view
+            popoverPresentationController.sourceRect = sourceRect
+        }
         present(importMenu, animated: true, completion: nil)
     }
 
-    func exportToCloud() {
+    func exportToCloud(withSourceRect sourceRect: CGRect) {
         let url = URL(fileURLWithPath: RuleFileUpdateController().readCurrentRuleFileURL())
-        let documentPicker = UIDocumentPickerViewController(url: url, in: .exportToService)
-        documentPicker.delegate = self
-        documentPicker.modalPresentationStyle = .formSheet
-        present(documentPicker, animated: true, completion: nil)
-
+        let activityViewController = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+ 
+        if let popoverPresentationController = activityViewController.popoverPresentationController {
+            popoverPresentationController.sourceView = view
+            popoverPresentationController.sourceRect = sourceRect
+        }
+        present(activityViewController, animated: true, completion: nil)
     }
 
 

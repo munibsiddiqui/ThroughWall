@@ -178,7 +178,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
 
         let ipv4Setting = NEIPv4Settings(addresses: ["192.0.2.1"], subnetMasks: ["255.255.255.0"])
         ipv4Setting.includedRoutes = [NEIPv4Route.default()]
-
+        ipv4Setting.excludedRoutes = generateExcludedRoutes()
+        
+        if let first = ipv4Setting.includedRoutes?.first {
+            DDLogError("address: \(first.destinationAddress)")
+            DDLogError("mask: \(first.destinationSubnetMask)")
+        }
+        
+        
         settings.iPv4Settings = ipv4Setting
         settings.mtu = 1600
 
@@ -198,6 +205,16 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             completionHandle(error)
         }
     }
+    
+    func generateExcludedRoutes() -> [NEIPv4Route] {
+        let bypassTunRules = Rule.sharedInstance.getBypassTunRule()
+        var result = [NEIPv4Route]()
+        for rule in bypassTunRules {
+            result.append(NEIPv4Route(destinationAddress: rule.0, subnetMask: rule.1))
+        }
+        return result
+    }
+    
 
     func onShadowsocksClientClosed() {
         DDLogDebug("onShadowsocksClientClosed")

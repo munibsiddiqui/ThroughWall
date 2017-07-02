@@ -54,7 +54,7 @@ class ProxyConfig: NSObject {
             ],
             "protocol": [
                 "preset": [
-                    "", "origin", "verify_simple", "auth_simple", "auth_sha1", "auth_sha1_v2", "auth_sha1_v4", "auth_aes128_md5", "auth_aes128_sha1","auth_chain_a"
+                    "", "origin", "verify_simple", "auth_simple", "auth_sha1", "auth_sha1_v2", "auth_sha1_v4", "auth_aes128_md5", "auth_aes128_sha1", "auth_chain_a"
                 ]
             ],
             "obfs": [
@@ -627,7 +627,7 @@ class QRCodeProcess {
             let removeRange = Range(uncheckedBounds: (lower: poundsignIndex, upper: code.endIndex))
             description = code.substring(from: code.index(after: poundsignIndex))
             code.removeSubrange(removeRange)
-        }else if let remarkRange = code.range(of: "?remark") {
+        } else if let remarkRange = code.range(of: "?remark") {
             let removeRange = Range(uncheckedBounds: (lower: remarkRange.lowerBound, upper: code.endIndex))
             description = code.substring(from: code.index(after: remarkRange.upperBound))
             code.removeSubrange(removeRange)
@@ -678,7 +678,7 @@ class QRCodeProcess {
         }
         return nil
     }
-    
+
     private func decodeUsingUsingURLSafeBase64(_ string: String) -> String? {
         var str = string
         str = str.replacingOccurrences(of: "_", with: "/")
@@ -787,13 +787,13 @@ class QRCodeProcess {
         }
         return ""
     }
-    
+
     private func endcodeUsingURLSafeBase64(_ str: String) -> String {
         var string = encodeUsingBase64(str)
-        
+
         string = string.replacingOccurrences(of: "/", with: "_")
         string = string.replacingOccurrences(of: "+", with: "-")
-        
+
         return string
     }
 }
@@ -829,14 +829,14 @@ class RuleFileUpdateController: NSObject {
         } else {
             let customPath = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)[0] + "/" + configFileName
             let fileManager = FileManager.default
-            
+
             if fileManager.fileExists(atPath: customPath) {
                 return customPath
             }
         }
         return ""
     }
-    
+
 
     func readCurrentRuleFileContent() -> String {
         //if default, return file in bundle. if custom, return file in downlaod position
@@ -948,6 +948,7 @@ class RuleFileUpdateController: NSObject {
         var currentClass = ""
         var ruleItems = [String]()
         var rewriteItems = [String]()
+        var generalItems = [String]()
 
         for item in items {
             if item.hasPrefix("[") {
@@ -955,6 +956,8 @@ class RuleFileUpdateController: NSObject {
                     currentClass = "Rule"
                 } else if item == "[URL Rewrite]" {
                     currentClass = "URL Rewrite"
+                } else if item == "[General]" {
+                    currentClass = "General"
                 } else {
                     currentClass = ""
                 }
@@ -970,6 +973,8 @@ class RuleFileUpdateController: NSObject {
                 ruleItems.append(item)
             case "URL Rewrite":
                 rewriteItems.append(item)
+            case "General":
+                generalItems.append(item)
             default:
                 break
             }
@@ -1010,6 +1015,23 @@ class RuleFileUpdateController: NSObject {
             DDLogError("\(error)")
             return
         }
+        
+        //general
+        let generalURL = url.appendingPathComponent(generalFileName)
+        fileManager.createFile(atPath: generalURL.path, contents: nil, attributes: nil)
+        do {
+            let filehandle = try FileHandle(forWritingTo: generalURL)
+            for item in generalItems {
+                filehandle.seekToEndOfFile()
+                filehandle.write("\(item)\n".data(using: String.Encoding.utf8)!)
+            }
+            filehandle.synchronizeFile()
+            filehandle.closeFile()
+        } catch {
+            DDLogError("\(error)")
+            return
+        }
+        
     }
 
 }

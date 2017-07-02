@@ -78,6 +78,9 @@ class LogViewController: UIViewController {
 
         let shareAction = UIAlertAction(title: "SHARE", style: .default) { (_) in
             let activityViewController = UIActivityViewController(activityItems: [self.logTextView.text], applicationActivities: nil)
+            if let popoverPresentationController = activityViewController.popoverPresentationController {
+                popoverPresentationController.barButtonItem = sender
+            }
             self.present(activityViewController, animated: true, completion: nil)
         }
         listController.addAction(shareAction)

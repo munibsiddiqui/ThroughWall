@@ -34,10 +34,11 @@ let parseFolderName = "Parse"
 
 let groupName = "group.Bingo.ThroughWall"
 let ruleFileName = "rule.conf"
+let generalFileName = "gene.conf"
 let rewriteFileName = "rew.conf"
 let siteFileName = "site.conf"
 let PacketTunnelProviderLogFolderName = "PacketTunnelProvider"
-let bundlefileVersion = 3
+let bundlefileVersion = 4
 let savedFileVersion = "Bingo.SavedFileVersion"
 let currentFileSource = "Bingo.FileSource"
 let defaultFileSource = "Bingo.FileSource.Default"

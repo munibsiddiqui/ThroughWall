@@ -13,6 +13,7 @@
 		3433528E1DF943D500CF7281 /* CoreDataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3433528C1DF943D100CF7281 /* CoreDataController.swift */; };
 		3439FA061DEEB7A000F8CE59 /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3439FA051DEEB7A000F8CE59 /* Rule.swift */; };
 		343B9E7A1EE8EC88003B7320 /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 343B9E791EE8EC88003B7320 /* AboutViewController.swift */; };
+		3441766D1F0A6381001708A4 /* ReadWriteLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3441766C1F0A6381001708A4 /* ReadWriteLock.swift */; };
 		3444AB861DF164B600FD3B9F /* Socks2HTTPS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3444AB851DF164B600FD3B9F /* Socks2HTTPS.swift */; };
 		3445FB091E8D5F82001504E9 /* RuleDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3445FB081E8D5F82001504E9 /* RuleDetailTableViewController.swift */; };
 		344EF2C91EC345980055A049 /* LogViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 344EF2C81EC345980055A049 /* LogViewController.swift */; };
@@ -369,6 +370,7 @@
 		3433528C1DF943D100CF7281 /* CoreDataController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataController.swift; sourceTree = "<group>"; };
 		3439FA051DEEB7A000F8CE59 /* Rule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Rule.swift; sourceTree = "<group>"; };
 		343B9E791EE8EC88003B7320 /* AboutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
+		3441766C1F0A6381001708A4 /* ReadWriteLock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadWriteLock.swift; sourceTree = "<group>"; };
 		3444AB851DF164B600FD3B9F /* Socks2HTTPS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Socks2HTTPS.swift; sourceTree = "<group>"; };
 		3445FB081E8D5F82001504E9 /* RuleDetailTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleDetailTableViewController.swift; sourceTree = "<group>"; };
 		344EF2C81EC345980055A049 /* LogViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogViewController.swift; sourceTree = "<group>"; };
@@ -1954,6 +1956,7 @@
 				34CC5FEF1DDCA6750061AA44 /* HTTPAnalyzer.swift */,
 				34AF3CB21EF548DC0065EEC6 /* StateMachine.swift */,
 				3423C7641DF00C60002B5AE8 /* OutgoingSide.swift */,
+				3441766C1F0A6381001708A4 /* ReadWriteLock.swift */,
 			);
 			name = "HTTP(S) Proxy";
 			sourceTree = "<group>";
@@ -2924,6 +2927,7 @@
 				3474EC981DDC928400EBF3C5 /* PacketTunnelProvider.swift in Sources */,
 				3444AB861DF164B600FD3B9F /* Socks2HTTPS.swift in Sources */,
 				343352891DF93FAD00CF7281 /* ThroughWall.xcdatamodeld in Sources */,
+				3441766D1F0A6381001708A4 /* ReadWriteLock.swift in Sources */,
 				34AF3CB31EF548DC0065EEC6 /* StateMachine.swift in Sources */,
 				34CC5FED1DDCA65F0061AA44 /* dns.m in Sources */,
 				3423C7651DF00C60002B5AE8 /* OutgoingSide.swift in Sources */,

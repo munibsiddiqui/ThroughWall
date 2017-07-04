@@ -155,3 +155,171 @@ class FollowOnSocial {
         }
     }
 }
+
+
+class PurchaseValidator {
+    
+    func getReceipt() -> String {
+        //Get the Path to the receipt
+        let receiptUrl = Bundle.main.appStoreReceiptURL
+        //Check if it's actually there
+        if FileManager.default.fileExists(atPath: receiptUrl!.path)
+        {
+            //Load in the receipt
+            let receipt: Data = try! Data(contentsOf: receiptUrl!, options: [])
+            let receiptBio = BIO_new(BIO_s_mem())
+            BIO_write(receiptBio, (receipt as NSData).bytes, Int32(receipt.count))
+            let receiptPKCS7 = d2i_PKCS7_bio(receiptBio, nil)
+            //Verify receiptPKCS7 is not nil
+            
+            if receiptPKCS7 == nil {
+                return ""
+            }
+            
+            //Swift 3
+            let octets = pkcs7_d_data(pkcs7_d_sign(receiptPKCS7).pointee.contents)
+            var ptr = UnsafePointer<UInt8>(octets?.pointee.data)
+            let end = ptr?.advanced(by: Int((octets?.pointee.length)!))
+            
+            var type: Int32 = 0
+            var xclass: Int32 = 0
+            var length = 0
+            
+            ASN1_get_object(&ptr, &length, &type, &xclass, end! - ptr!)
+            if (type != V_ASN1_SET) {
+                print("failed to read ASN1 from receipt")
+                return ""
+            }
+            
+            while (ptr! < end!)
+            {
+                var integer: UnsafeMutablePointer<ASN1_INTEGER>
+                
+                // Expecting an attribute sequence
+                ASN1_get_object(&ptr, &length, &type, &xclass, end! - ptr!)
+                if type != V_ASN1_SEQUENCE {
+                    print("ASN1 error: expected an attribute sequence")
+                    return ""
+                }
+                //Swift 2
+                //let seq_end = ptr.advancedBy(length)
+                //Swift 3
+                let seq_end = ptr?.advanced(by: length)
+                var attr_type = 0
+                
+                // The attribute is an integer
+                ASN1_get_object(&ptr, &length, &type, &xclass, end! - ptr!)
+                if type != V_ASN1_INTEGER {
+                    print("ASN1 error: attribute not an integer")
+                    return ""
+                }
+                
+                integer = c2i_ASN1_INTEGER(nil, &ptr, length)
+                attr_type = ASN1_INTEGER_get(integer)
+                ASN1_INTEGER_free(integer)
+                
+                // The version is an integer
+                ASN1_get_object(&ptr, &length, &type, &xclass, end! - ptr!)
+                if type != V_ASN1_INTEGER {
+                    print("ASN1 error: version not an integer")
+                    return ""
+                }
+                
+                integer = c2i_ASN1_INTEGER(nil, &ptr, length);
+                ASN1_INTEGER_free(integer);
+                
+                // The attribute value is an octet string
+                ASN1_get_object(&ptr, &length, &type, &xclass, end! - ptr!)
+                if type != V_ASN1_OCTET_STRING {
+                    print("ASN1 error: value not an octet string")
+                    return ""
+                }
+                
+//                if attr_type == 2 {
+//                    // Bundle identifier
+//                    var str_ptr = ptr
+//                    var str_type: Int32 = 0
+//                    var str_length = 0
+//                    var str_xclass: Int32 = 0
+//                    ASN1_get_object(&str_ptr, &str_length, &str_type, &str_xclass, seq_end! - str_ptr!)
+//                    if str_type == V_ASN1_UTF8STRING {
+//                        //Swift 2
+//                        //bundleIdString1 = NSString(bytes: str_ptr, length: str_length, encoding: NSUTF8StringEncoding)
+//                        //bundleIdData1 = NSData(bytes: ptr, length: length)
+//                        
+//                        //Swift 3
+//                        bundleIdString1 = NSString(bytes: str_ptr!, length: str_length, encoding: String.Encoding.utf8.rawValue)
+//                        bundleIdData1 = Data(bytes: UnsafePointer<UInt8>(ptr!), count: length)
+//                    }
+//                }
+//                else if attr_type == 3 {
+//                    // Bundle version
+//                    var str_ptr = ptr
+//                    var str_type: Int32 = 0
+//                    var str_length = 0
+//                    var str_xclass: Int32 = 0
+//                    ASN1_get_object(&str_ptr, &str_length, &str_type, &str_xclass, seq_end! - str_ptr!)
+//                    
+//                    if str_type == V_ASN1_UTF8STRING {
+//                        //Swift 2
+//                        //bundleVersionString1 = NSString(bytes: str_ptr, length: str_length, encoding: NSUTF8StringEncoding)
+//                        //Swift 3
+//                        bundleVersionString1 = NSString(bytes: str_ptr!, length: str_length, encoding: String.Encoding.utf8.rawValue)
+//                    }
+//                }
+//                else if attr_type == 4 {
+//                    // Opaque value
+//                    //Swift 2
+//                    //opaqueData1 = NSData(bytes: ptr, length: length)
+//                    //Swift 3
+//                    opaqueData1 = Data(bytes: UnsafePointer<UInt8>(ptr!), count: length)
+//                }
+//                else if attr_type == 5 {
+//                    // Computed GUID (SHA-1 Hash)
+//                    //Swift 2
+//                    //hashData1 = NSData(bytes: ptr, length: length)
+//                    //Swift 3
+//                    hashData1 = Data(bytes: UnsafePointer<UInt8>(ptr!), count: length)
+//                }
+//                else if attr_type == 17 {
+//                    //In app receipt
+//                    //Swift 2
+//                    //let r = NSData(bytes: ptr, length: length)
+//                    //Swift 3
+//                    let r = Data(bytes: UnsafePointer<UInt8>(ptr!), count: length)
+//                    let id = self.getProductIdFromReceipt(r)
+//                    
+//                    if id != nil {
+//                        pIds.append(id!)
+//                    }
+//                }else
+                if attr_type == 19 {
+                    var str_ptr = ptr
+                    var str_type: Int32 = 0
+                    var str_length = 0
+                    var str_xclass: Int32 = 0
+                    ASN1_get_object(&str_ptr, &str_length, &str_type, &str_xclass, seq_end! - str_ptr!)
+                    
+                    if str_type == V_ASN1_UTF8STRING {
+                        //Swift 2
+                        //bundleVersionString1 = NSString(bytes: str_ptr, length: str_length, encoding: NSUTF8StringEncoding)
+                        //Swift 3
+                        if let version =  NSString(bytes: str_ptr!, length: str_length, encoding: String.Encoding.utf8.rawValue) {
+                            return version as String
+                        }
+                        
+                    }
+                }
+                
+                // Move past the value
+                //Swift 2
+                //ptr = ptr.advancedBy(length)
+                //Swift 3
+                ptr = ptr?.advanced(by: length)
+            }
+        }
+        return ""
+    }
+}
+
+

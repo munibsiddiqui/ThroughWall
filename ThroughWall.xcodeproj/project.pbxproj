@@ -135,6 +135,9 @@
 		34D2E4991E88EF31009A07A0 /* RuleMainViewTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34D2E4981E88EF31009A07A0 /* RuleMainViewTableViewController.swift */; };
 		34D369E81F0158BD00D1EAE6 /* SSRLibController.h in Headers */ = {isa = PBXBuildFile; fileRef = 34585E4E1F01510C001380C1 /* SSRLibController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		34E3F1FC1E11428600FAD65C /* RequestDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34E3F1FB1E11428600FAD65C /* RequestDetailTableViewController.swift */; };
+		34ECAEF61F0B48C2006B105A /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34F126381F00CD33004DEB50 /* libcrypto.a */; };
+		34ECAEF71F0B48C2006B105A /* libsodium.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34F1263A1F00CD33004DEB50 /* libsodium.a */; };
+		34ECAEF81F0B48C2006B105A /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34F1263B1F00CD33004DEB50 /* libssl.a */; };
 		34F0B8F01EB2DFED007A286B /* CommonTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34F0B8EF1EB2DFED007A286B /* CommonTool.swift */; };
 		34F0B8F11EB2DFED007A286B /* CommonTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34F0B8EF1EB2DFED007A286B /* CommonTool.swift */; };
 		34F124B11F00BB9C004DEB50 /* SSRLib.h in Headers */ = {isa = PBXBuildFile; fileRef = 34F124AF1F00BB9C004DEB50 /* SSRLib.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1032,6 +1035,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				34ECAEF61F0B48C2006B105A /* libcrypto.a in Frameworks */,
+				34ECAEF71F0B48C2006B105A /* libsodium.a in Frameworks */,
+				34ECAEF81F0B48C2006B105A /* libssl.a in Frameworks */,
 				3464BF721EC4A88900D81663 /* AVFoundation.framework in Frameworks */,
 				3464BF701EC4A86300D81663 /* CoreImage.framework in Frameworks */,
 				3464BF6A1EC49BDC00D81663 /* NetworkExtension.framework in Frameworks */,
@@ -3252,9 +3258,37 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/SSRLib/include",
+					"\"${PODS_ROOT}/Headers/Public\"",
+					"\"${PODS_ROOT}/Headers/Public/Crashlytics\"",
+					"\"${PODS_ROOT}/Headers/Public/Fabric\"",
+				);
 				INFOPLIST_FILE = ThroughWall/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/SSRLib/lib",
+				);
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-iquote",
+					"\"$PODS_CONFIGURATION_BUILD_DIR/Charts/Charts.framework/Headers\"",
+					"-iquote",
+					"\"$PODS_CONFIGURATION_BUILD_DIR/CocoaAsyncSocket/CocoaAsyncSocket.framework/Headers\"",
+					"-iquote",
+					"\"$PODS_CONFIGURATION_BUILD_DIR/CocoaLumberjack/CocoaLumberjack.framework/Headers\"",
+					"-iquote",
+					"\"$PODS_CONFIGURATION_BUILD_DIR/MMDB-Swift/MMDB_Swift.framework/Headers\"",
+					"-isystem",
+					"\"${PODS_ROOT}/Headers/Public\"",
+					"-isystem",
+					"\"${PODS_ROOT}/Headers/Public/Crashlytics\"",
+					"-isystem",
+					"\"${PODS_ROOT}/Headers/Public/Fabric\"",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = Bingo.ThroughWall;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -3275,9 +3309,37 @@
 				CODE_SIGN_ENTITLEMENTS = ThroughWall/ThroughWall.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEVELOPMENT_TEAM = "";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/SSRLib/include",
+					"\"${PODS_ROOT}/Headers/Public\"",
+					"\"${PODS_ROOT}/Headers/Public/Crashlytics\"",
+					"\"${PODS_ROOT}/Headers/Public/Fabric\"",
+				);
 				INFOPLIST_FILE = ThroughWall/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/SSRLib/lib",
+				);
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-iquote",
+					"\"$PODS_CONFIGURATION_BUILD_DIR/Charts/Charts.framework/Headers\"",
+					"-iquote",
+					"\"$PODS_CONFIGURATION_BUILD_DIR/CocoaAsyncSocket/CocoaAsyncSocket.framework/Headers\"",
+					"-iquote",
+					"\"$PODS_CONFIGURATION_BUILD_DIR/CocoaLumberjack/CocoaLumberjack.framework/Headers\"",
+					"-iquote",
+					"\"$PODS_CONFIGURATION_BUILD_DIR/MMDB-Swift/MMDB_Swift.framework/Headers\"",
+					"-isystem",
+					"\"${PODS_ROOT}/Headers/Public\"",
+					"-isystem",
+					"\"${PODS_ROOT}/Headers/Public/Crashlytics\"",
+					"-isystem",
+					"\"${PODS_ROOT}/Headers/Public/Fabric\"",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = Bingo.ThroughWall;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";

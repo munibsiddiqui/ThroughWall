@@ -53,6 +53,7 @@ class HomeViewController: UIViewController {
         convertToNewServerStyle()
         registerNotificationWhenLoaded()
 //        print(hardwareString())
+        PurchaseValidator().getReceipt()
     }
 
 //    func hardwareString() -> String {

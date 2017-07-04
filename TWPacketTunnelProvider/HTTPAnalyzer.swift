@@ -202,7 +202,7 @@ class HTTPAnalyzer: NSObject {
             }
         }
     }
-    
+
     fileprivate func removeFromManager() {
         DispatchQueue.global().async {
             self.clientSocketLock.withWriteLock {
@@ -917,27 +917,35 @@ extension HTTPAnalyzer: OutgoingTransmitDelegate {
         DDLogVerbose("H\(intTag)H Outgoing side disconnect")
         outGoingLock.withWriteLock {
             outGoing = nil
-            if outBusy {
-                pendingClientDisconnect = true
-                DDLogVerbose("H\(intTag)H Pending Client side disconnect")
-            } else {
-                DispatchQueue.global().async {
-                    self.disconnectClientSocket()
-                }
-            }
         }
+        tryDisconnectClientSocket()
     }
 
-    private func disconnectClientSocket() {
+    private func tryDisconnectClientSocket() {
         clientSocketLock.withReadLock {
             if clientSocket == nil {
                 DDLogVerbose("H\(intTag)H Both side disconnected")
                 saveInOutCount()
                 removeFromManager()
             } else {
-                DDLogVerbose("H\(intTag)H Going to disconnect Socks Side")
-                clientSocket?.disconnect()
+                outGoingLock.withReadLock {
+                    if outBusy {
+                        pendingClientDisconnect = true
+                        DDLogVerbose("H\(intTag)H Pending Client side disconnect")
+                    } else {
+                        DispatchQueue.global().async {
+                            self._disconnectClientSocket()
+                        }
+                    }
+                }
             }
+        }
+    }
+
+    private func _disconnectClientSocket() {
+        clientSocketLock.withReadLock {
+            DDLogVerbose("H\(intTag)H Going to disconnect Socks Side")
+            clientSocket?.disconnect()
         }
     }
 }

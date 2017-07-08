@@ -394,9 +394,9 @@ class Rule {
                     return (_geoRule.1, _ip)
                 }
             }
-            DDLogError("GEO no match for \(domain):\(port)")
+            DDLogVerbose("GEO no match for \(domain):\(port)")
         } else {
-            DDLogError("no IP for \(domain):\(port)")
+            DDLogVerbose("no IP for \(domain):\(port)")
         }
 
         return(.Unkown, domain)

@@ -17,7 +17,7 @@ class CoreDataController: NSObject {
     var toRefreshObjInMain = [NSManagedObject]()
     var toRefreshObjInPriv = [NSManagedObject]()
     let handleRefreshLock = NSLock()
-    let maxCount = 50
+    let maxCount = 5
 
     // MARK: - Core Data stack
 

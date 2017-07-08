@@ -178,13 +178,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
 
         let ipv4Setting = NEIPv4Settings(addresses: ["192.0.2.1"], subnetMasks: ["255.255.255.0"])
         ipv4Setting.includedRoutes = [NEIPv4Route.default()]
-        ipv4Setting.excludedRoutes = generateExcludedRoutes()
-        
-        if let first = ipv4Setting.includedRoutes?.first {
-            DDLogError("address: \(first.destinationAddress)")
-            DDLogError("mask: \(first.destinationSubnetMask)")
-        }
-        
+        ipv4Setting.excludedRoutes = generateExcludedRoutes()        
         
         settings.iPv4Settings = ipv4Setting
         settings.mtu = 1600

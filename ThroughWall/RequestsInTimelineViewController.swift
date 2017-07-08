@@ -57,8 +57,8 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
         viewWidthConstraint.constant = CGFloat(duringTime * Double(horiScaller) + 48)
         drawTraffic(fromTime: beginTime, toTime: endTime)
         drawTimelineRuler(fromTime: beginTime, toTime: endTime)
-//        requestResponseTraffic()
-//        drawResponseTraffic()
+        requestResponseTraffic()
+        drawResponseTraffic()
     }
 
     override func didReceiveMemoryWarning() {

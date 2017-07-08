@@ -229,44 +229,43 @@ class HTTPAnalyzer: NSObject {
     }
 
     fileprivate func recordRequestBody(withData data: Data) {
-//        if shouldParseTraffic {
-//            let length = data.count
-//            let fileName = createRandomFile(atURL: baseParseURL, withContent: data)
-//            DDLogVerbose("H\(self.intTag)H data count: \(length)")
-//
-//            DispatchQueue.main.async {
-//                let context = CoreDataController.sharedInstance.getContext()
-//                let pieceBody = RequestBodyPiece(context: context)
-//                pieceBody.timeStamp = NSDate()
-//                pieceBody.fileName = fileName
-//                pieceBody.belongToTraffic = self.hostTraffic
-////                CoreDataController.sharedInstance.saveContext()
-////                context.refresh(pieceBody, mergeChanges: false)
-//                CoreDataController.sharedInstance.addToRefreshList(withObj: pieceBody, andContext: context)
-//                DDLogVerbose("H\(self.intTag)H Record \(length)")
-//            }
-//        }
+        DispatchQueue.main.async {
+            if self.shouldParseTraffic {
+                let length = data.count
+                let fileName = self.createRandomFile(atURL: self.baseParseURL, withContent: data)
+                DDLogVerbose("H\(self.intTag)H data count: \(length)")
+                
+                let context = CoreDataController.sharedInstance.getContext()
+                let pieceBody = RequestBodyPiece(context: context)
+                pieceBody.timeStamp = NSDate()
+                pieceBody.fileName = fileName
+                pieceBody.belongToTraffic = self.hostTraffic
+//                CoreDataController.sharedInstance.saveContext()
+//                context.refresh(pieceBody, mergeChanges: false)
+                CoreDataController.sharedInstance.addToRefreshList(withObj: pieceBody, andContext: context)
+                DDLogVerbose("H\(self.intTag)H Record \(length)")
+            }
+        }
     }
 
     fileprivate func recordResponseBody(withData data: Data) {
-//        if shouldParseTraffic {
-//            let length = data.count
-//
-//            let fileName = createRandomFile(atURL: baseParseURL, withContent: data)
-//            DDLogVerbose("H\(self.intTag)H data count: \(length)")
-//
-//            DispatchQueue.main.async {
-//                let context = CoreDataController.sharedInstance.getContext()
-//                let pieceBody = ResponseBodyPiece(context: context)
-//                pieceBody.timeStamp = NSDate()
-//                pieceBody.fileName = fileName
-//                pieceBody.belongToTraffic = self.hostTraffic
-////                CoreDataController.sharedInstance.saveContext()
-////                context.refresh(pieceBody, mergeChanges: false)
-//                CoreDataController.sharedInstance.addToRefreshList(withObj: pieceBody, andContext: context)
-//                DDLogVerbose("H\(self.intTag)H Record \(length)")
-//            }
-//        }
+        DispatchQueue.main.async {
+            if self.shouldParseTraffic {
+                let length = data.count
+                let fileName = self.createRandomFile(atURL: self.baseParseURL, withContent: data)
+                DDLogVerbose("H\(self.intTag)H data count: \(length)")
+
+                let context = CoreDataController.sharedInstance.getContext()
+                let pieceBody = ResponseBodyPiece(context: context)
+                pieceBody.timeStamp = NSDate()
+                pieceBody.fileName = fileName
+                pieceBody.belongToTraffic = self.hostTraffic
+//                CoreDataController.sharedInstance.saveContext()
+//                context.refresh(pieceBody, mergeChanges: false)
+                CoreDataController.sharedInstance.addToRefreshList(withObj: pieceBody, andContext: context)
+                DDLogVerbose("H\(self.intTag)H Record \(length)")
+            }
+        }
     }
 
     private func createRandomFile(atURL url: URL, withContent content: Data) -> String {

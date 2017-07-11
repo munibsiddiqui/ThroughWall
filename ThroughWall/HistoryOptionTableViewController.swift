@@ -336,9 +336,11 @@ class HistoryOptionTableViewController: UITableViewController {
                 cell.textLabel?.text = "Network's Log"
             }else if indexPath.row == 1 {
                 cell.textLabel?.text = "App's Log"
-            }else if indexPath.row == 3 {
+            }else if indexPath.row == 2 {
+                cell.textLabel?.text = "Export All Logs"
+            }else if indexPath.row == -3 {
                 cell.textLabel?.text = "Merge to Document"
-            } else if indexPath.row == 2 {
+            } else if indexPath.row == -2 {
                 cell.textLabel?.text = "AirDrop"
             }
         default:

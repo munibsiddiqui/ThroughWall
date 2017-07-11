@@ -229,43 +229,43 @@ class HTTPAnalyzer: NSObject {
     }
 
     fileprivate func recordRequestBody(withData data: Data) {
-        DispatchQueue.main.async {
-            if self.shouldParseTraffic {
-                let length = data.count
-                let fileName = self.createRandomFile(atURL: self.baseParseURL, withContent: data)
-                DDLogVerbose("H\(self.intTag)H data count: \(length)")
-                
-                let context = CoreDataController.sharedInstance.getContext()
-                let pieceBody = RequestBodyPiece(context: context)
-                pieceBody.timeStamp = NSDate()
-                pieceBody.fileName = fileName
-                pieceBody.belongToTraffic = self.hostTraffic
-//                CoreDataController.sharedInstance.saveContext()
-//                context.refresh(pieceBody, mergeChanges: false)
-                CoreDataController.sharedInstance.addToRefreshList(withObj: pieceBody, andContext: context)
-                DDLogVerbose("H\(self.intTag)H Record \(length)")
-            }
-        }
+//        DispatchQueue.main.async {
+//            if self.shouldParseTraffic {
+//                let length = data.count
+//                let fileName = self.createRandomFile(atURL: self.baseParseURL, withContent: data)
+//                DDLogVerbose("H\(self.intTag)H data count: \(length)")
+//
+//                let context = CoreDataController.sharedInstance.getContext()
+//                let pieceBody = RequestBodyPiece(context: context)
+//                pieceBody.timeStamp = NSDate()
+//                pieceBody.fileName = fileName
+//                pieceBody.belongToTraffic = self.hostTraffic
+////                CoreDataController.sharedInstance.saveContext()
+////                context.refresh(pieceBody, mergeChanges: false)
+//                CoreDataController.sharedInstance.addToRefreshList(withObj: pieceBody, andContext: context)
+//                DDLogVerbose("H\(self.intTag)H Record \(length)")
+//            }
+//        }
     }
 
     fileprivate func recordResponseBody(withData data: Data) {
-        DispatchQueue.main.async {
-            if self.shouldParseTraffic {
-                let length = data.count
-                let fileName = self.createRandomFile(atURL: self.baseParseURL, withContent: data)
-                DDLogVerbose("H\(self.intTag)H data count: \(length)")
-
-                let context = CoreDataController.sharedInstance.getContext()
-                let pieceBody = ResponseBodyPiece(context: context)
-                pieceBody.timeStamp = NSDate()
-                pieceBody.fileName = fileName
-                pieceBody.belongToTraffic = self.hostTraffic
-//                CoreDataController.sharedInstance.saveContext()
-//                context.refresh(pieceBody, mergeChanges: false)
-                CoreDataController.sharedInstance.addToRefreshList(withObj: pieceBody, andContext: context)
-                DDLogVerbose("H\(self.intTag)H Record \(length)")
-            }
-        }
+//        DispatchQueue.main.async {
+//            if self.shouldParseTraffic {
+//                let length = data.count
+//                let fileName = self.createRandomFile(atURL: self.baseParseURL, withContent: data)
+//                DDLogVerbose("H\(self.intTag)H data count: \(length)")
+//
+//                let context = CoreDataController.sharedInstance.getContext()
+//                let pieceBody = ResponseBodyPiece(context: context)
+//                pieceBody.timeStamp = NSDate()
+//                pieceBody.fileName = fileName
+//                pieceBody.belongToTraffic = self.hostTraffic
+////                CoreDataController.sharedInstance.saveContext()
+////                context.refresh(pieceBody, mergeChanges: false)
+//                CoreDataController.sharedInstance.addToRefreshList(withObj: pieceBody, andContext: context)
+//                DDLogVerbose("H\(self.intTag)H Record \(length)")
+//            }
+//        }
     }
 
     private func createRandomFile(atURL url: URL, withContent content: Data) -> String {
@@ -291,7 +291,6 @@ extension HTTPAnalyzer: GCDAsyncSocketDelegate {
                 DispatchQueue.global().async {
                     self.clientDisconnectSchedule()
                 }
-                return
             }
         }
         socket(didWriteDataWithTag: tag)
@@ -461,7 +460,7 @@ extension HTTPAnalyzer {
 
             let (hostName, portNumber) = extractHostAndPort(fromCONNECTComponent: requestComponents[0])
 
-            if hostName != nil {
+            if host == nil {
                 host = hostName
             }
             if port == nil {
@@ -499,7 +498,7 @@ extension HTTPAnalyzer {
             return
         }
 
-        if hostName != nil {
+        if host == nil {
             host = hostName
         } else if replaced {
             //replace host in request
@@ -589,20 +588,20 @@ extension HTTPAnalyzer {
 
         if destiReqComponents[1].hasPrefix("[") {
             //ipv6 address
-            //            let destiComponents = destiReqComponents[1].components(separatedBy: "]")
-            //            if destiComponents.count == 2 {
-            //                var host = destiComponents[0]
-            //                host.remove(at: host.startIndex)
-            //                var port = destiComponents[1]
-            //                if port.hasPrefix(":") {
-            //                    port.remove(at: port.startIndex)
-            //                }
-            //                return (host, UInt16(port))
-            //            } else {
-            //                DDLogError("H\(intTag)H extactHostAndPort: \(ConnectionError.IPV6AnalysisError)")
-            //                return (nil, nil)
-            //            }
-            return (nil, nil)
+            let destiComponents = destiReqComponents[1].components(separatedBy: "]")
+            if destiComponents.count == 2 {
+                var host = destiComponents[0]
+                host.remove(at: host.startIndex)
+                var port = destiComponents[1]
+                if port.hasPrefix(":") {
+                    port.remove(at: port.startIndex)
+                }
+                return (host, UInt16(port))
+            } else {
+                DDLogError("H\(intTag)H extactHostAndPort: \(ConnectionError.IPV6AnalysisError)")
+                return (nil, nil)
+            }
+//            return (nil, nil)
         } else {
             //ipv4 address or domain
             let destiComponents = destiReqComponents[1].components(separatedBy: ":")
@@ -638,39 +637,43 @@ extension HTTPAnalyzer {
             }
         }
         var destiComponents = newDestiReqComponent.components(separatedBy: "/")
-        if destiComponents.count < 3 {
-            DDLogError("H\(intTag)H extractHostAndPortWithRepost: \(ConnectionError.URLComponentAnalysisError)")
-            return (nil, replaced, nil, nil)
-        }
-
-        if destiComponents[2].hasPrefix("[") {
-            //ipv6 address
-            //            let hostAndPortComponents = destiComponents[2].components(separatedBy: "]")
-            //            if hostAndPortComponents.count == 2 {
-            //                host = hostAndPortComponents[0]
-            //                host.remove(at: host.startIndex)
-            //                var _port = hostAndPortComponents[1]
-            //                if _port.hasPrefix(":") {
-            //                    _port.remove(at: _port.startIndex)
-            //                }
-            //                port = UInt16(_port)
-            //            } else {
-            //                DDLogError("H\(intTag)H extractHostAndPortWithRepost: \(ConnectionError.IPV6AnalysisError)")
-            //                return (nil, replaced, nil, nil)
-            //            }
-            return (nil, replaced, nil, nil)
-        } else {
-            //ipv4 address or domain
-            let hostAndPortComponents = destiComponents[2].components(separatedBy: ":")
-            if hostAndPortComponents.count == 2 {
-                host = hostAndPortComponents[0]
-                port = UInt16(hostAndPortComponents[1])
-            } else {
-                host = hostAndPortComponents[0]
+        if destiComponents[0] == "http:" {
+            if destiComponents.count < 3 {
+                DDLogError("H\(intTag)H extractHostAndPortWithRepost: \(ConnectionError.URLComponentAnalysisError)")
+                return (nil, replaced, nil, nil)
             }
+            
+            if destiComponents[2].hasPrefix("[") {
+                //ipv6 address
+                let hostAndPortComponents = destiComponents[2].components(separatedBy: "]")
+                if hostAndPortComponents.count == 2 {
+                    host = hostAndPortComponents[0]
+                    host.remove(at: host.startIndex)
+                    var _port = hostAndPortComponents[1]
+                    if _port.hasPrefix(":") {
+                        _port.remove(at: _port.startIndex)
+                    }
+                    port = UInt16(_port)
+                } else {
+                    DDLogError("H\(intTag)H extractHostAndPortWithRepost: \(ConnectionError.IPV6AnalysisError)")
+                    return (nil, replaced, nil, nil)
+                }
+//                return (nil, replaced, nil, nil)
+            } else {
+                //ipv4 address or domain
+                let hostAndPortComponents = destiComponents[2].components(separatedBy: ":")
+                if hostAndPortComponents.count == 2 {
+                    host = hostAndPortComponents[0]
+                    port = UInt16(hostAndPortComponents[1])
+                } else {
+                    host = hostAndPortComponents[0]
+                }
+            }
+            
+            destiComponents.removeSubrange(0..<3)
+        } else {
+            destiComponents.removeFirst()
         }
-
-        destiComponents.removeSubrange(0..<3)
         destiReqComponents[1] = "/\(destiComponents.joined(separator: "/"))"
         requestComponents[0] = destiReqComponents.joined(separator: " ")
         let repostRequest = requestComponents.joined(separator: "\r\n")

@@ -150,7 +150,7 @@ class HistoryOptionTableViewController: UITableViewController {
         case 1:
             return 2
         case 2:
-            return 2
+            return 3
         default:
             break
         }
@@ -195,37 +195,45 @@ class HistoryOptionTableViewController: UITableViewController {
                 
                 self.navigationController?.pushViewController(vc, animated: true)
             }else if indexPath.row == -1 {
-                copyPacketTunnelProviderLogToDocument()
-            } else if indexPath.row == -2 {
-                copyPacketTunnelProviderLogToDocument()
-                mergePieceBody()
+                copyPacketTunnelProviderLogToDocument(withCompletion:{
+                    self.shareExported()
+                })
+            } else if indexPath.row == 2 {
+                copyPacketTunnelProviderLogToDocument(withCompletion: {
+                    self.mergePieceBody()
+                })
             }
         default:
             break
         }
     }
 
-    func copyPacketTunnelProviderLogToDocument() {
-        let fileManager = FileManager.default
-        var logUrl = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName)!
-        logUrl.appendPathComponent(PacketTunnelProviderLogFolderName)
-        var newUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
-        newUrl.appendPathComponent(PacketTunnelProviderLogFolderName)
-
-        do {
-            if fileManager.fileExists(atPath: newUrl.path) {
-                try fileManager.removeItem(at: newUrl)
+    func copyPacketTunnelProviderLogToDocument(withCompletion completion: @escaping (() -> Void)) {
+        DispatchQueue.global().async {
+            let fileManager = FileManager.default
+            var logUrl = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName)!
+            logUrl.appendPathComponent(PacketTunnelProviderLogFolderName)
+            var newUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
+            newUrl.appendPathComponent(PacketTunnelProviderLogFolderName)
+            
+            do {
+                if fileManager.fileExists(atPath: newUrl.path) {
+                    try fileManager.removeItem(at: newUrl)
+                }
+                try fileManager.copyItem(at: logUrl, to: newUrl)
+                
+                newUrl.appendPathComponent(databaseFolderName)
+                
+                let databaseUrl = CoreDataController.sharedInstance.getDatabaseUrl()
+                
+                try fileManager.copyItem(at: databaseUrl, to: newUrl)
+                //            CoreDataController.sharedInstance.backupDatabase(toURL: newUrl)
+            } catch {
+                DDLogError("\(error)")
             }
-            try fileManager.copyItem(at: logUrl, to: newUrl)
-
-            newUrl.appendPathComponent(databaseFolderName)
-
-            let databaseUrl = CoreDataController.sharedInstance.getDatabaseUrl()
-
-            try fileManager.copyItem(at: databaseUrl, to: newUrl)
-//            CoreDataController.sharedInstance.backupDatabase(toURL: newUrl)
-        } catch {
-             DDLogError("\(error)")
+            DispatchQueue.main.async {
+                completion()
+            }
         }
     }
 
@@ -235,7 +243,23 @@ class HistoryOptionTableViewController: UITableViewController {
         newUrl.appendPathComponent(PacketTunnelProviderLogFolderName)
         newUrl.appendPathComponent(databaseFolderName)
 //        newUrl.appendPathComponent(databaseFileName)
-        CoreDataController.sharedInstance.mergerPieceBody(atURL: newUrl)
+        CoreDataController.sharedInstance.mergerPieceBody(atURL: newUrl, completion: {
+            self.shareExported()
+        })
+    }
+    
+    func shareExported() {
+        var newUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        newUrl.appendPathComponent(PacketTunnelProviderLogFolderName)
+        
+        let activityViewController = UIActivityViewController(activityItems: [newUrl], applicationActivities: nil)
+        //                if let popoverPresentationController = activityViewController.popoverPresentationController {
+        //                    popoverPresentationController.barButtonItem = sender
+        //                }
+        DispatchQueue.main.async {
+            self.present(activityViewController, animated: true, completion: nil)
+        }
+        print("done")
     }
 
 

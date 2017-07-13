@@ -316,14 +316,20 @@ class Rule {
 
             if let realSuffixRules = suffixRules {
                 for suffixRule in realSuffixRules {
-                    var pieceDomains = domain.components(separatedBy: ".")
-
-                    while !pieceDomains.isEmpty {
-                        let madeDomain = pieceDomains.joined(separator: ".")
-                        if madeDomain == suffixRule.key {
-                            return suffixRule.value
+                    var found = false
+                    autoreleasepool(invoking: { () -> Void in
+                        var pieceDomains = domain.components(separatedBy: ".")
+                        while !pieceDomains.isEmpty {
+                            let madeDomain = pieceDomains.joined(separator: ".")
+                            if madeDomain == suffixRule.key {
+                                found = true
+                                break
+                            }
+                            pieceDomains.removeFirst()
                         }
-                        pieceDomains.removeFirst()
+                    })
+                    if found {
+                        return suffixRule.value
                     }
                 }
             }

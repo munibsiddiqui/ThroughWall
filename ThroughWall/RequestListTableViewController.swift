@@ -99,20 +99,9 @@ class RequestListTableViewController: UITableViewController {
             let parseDirectory = CoreDataController.sharedInstance.getDatabaseUrl().appendingPathComponent(parseFolderName)
             for hostTraffic in hostTraffics {
                 if hostTraffic.inProcessing == false {
-                    if let requestBodies = hostTraffic.requestBodies?.allObjects as? [RequestBodyPiece] {
-                        for requestBody in requestBodies {
-                            let filePath = parseDirectory.appendingPathComponent(requestBody.fileName!)
-                            do {
-                                try FileManager.default.removeItem(at: filePath)
-                            } catch {
-                                DDLogError("\(error)")
-                            }
-                        }
-                    }
-
-                    if let responseBodies = hostTraffic.requestBodies?.allObjects as? [RequestBodyPiece] {
-                        for responseBody in responseBodies {
-                            let filePath = parseDirectory.appendingPathComponent(responseBody.fileName!)
+                    if let bodies = hostTraffic.bodies?.allObjects as? [Body] {
+                        for body in bodies {
+                            let filePath = parseDirectory.appendingPathComponent(body.fileName!)
                             do {
                                 try FileManager.default.removeItem(at: filePath)
                             } catch {
@@ -202,14 +191,20 @@ class RequestListTableViewController: UITableViewController {
                 attributeDescription.append(NSAttributedString(string: " "))
             }
         }
-
-        if let requestHead = hostTraffic.requestHead?.head {
-            let requestType = requestHead.components(separatedBy: " ")[0]
-
-            let attributeRequestType = NSAttributedString(string: requestType, attributes: [NSForegroundColorAttributeName: UIColor.white, NSBackgroundColorAttributeName: UIColor.init(red: 0.24, green: 0.545, blue: 0.153, alpha: 1.0)])
-
-            attributeDescription.append(attributeRequestType)
-            attributeDescription.append(NSAttributedString(string: " "))
+        
+        if let heads =  hostTraffic.heads?.allObjects as? [Head] {
+            for head in heads {
+                if head.type == HTTPRequestHead || head.type == HTTPSRequestHead {
+                    if let requestHead = head.head {
+                        let requestType = requestHead.components(separatedBy: " ")[0]
+                        
+                        let attributeRequestType = NSAttributedString(string: requestType, attributes: [NSForegroundColorAttributeName: UIColor.white, NSBackgroundColorAttributeName: UIColor.init(red: 0.24, green: 0.545, blue: 0.153, alpha: 1.0)])
+                        
+                        attributeDescription.append(attributeRequestType)
+                        attributeDescription.append(NSAttributedString(string: " "))
+                    }
+                }
+            }
         }
 
         if hostTraffic.inProcessing == true {

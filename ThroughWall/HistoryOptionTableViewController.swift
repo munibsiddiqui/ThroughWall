@@ -200,7 +200,8 @@ class HistoryOptionTableViewController: UITableViewController {
                 })
             } else if indexPath.row == 2 {
                 copyPacketTunnelProviderLogToDocument(withCompletion: {
-                    self.mergePieceBody()
+//                    self.mergePieceBody()
+                    self.shareExported()
                 })
             }
         default:
@@ -237,16 +238,16 @@ class HistoryOptionTableViewController: UITableViewController {
         }
     }
 
-    func mergePieceBody() {
-        let fileManager = FileManager.default
-        var newUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
-        newUrl.appendPathComponent(PacketTunnelProviderLogFolderName)
-        newUrl.appendPathComponent(databaseFolderName)
-//        newUrl.appendPathComponent(databaseFileName)
-        CoreDataController.sharedInstance.mergerPieceBody(atURL: newUrl, completion: {
-            self.shareExported()
-        })
-    }
+//    func mergePieceBody() {
+//        let fileManager = FileManager.default
+//        var newUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
+//        newUrl.appendPathComponent(PacketTunnelProviderLogFolderName)
+//        newUrl.appendPathComponent(databaseFolderName)
+////        newUrl.appendPathComponent(databaseFileName)
+//        CoreDataController.sharedInstance.mergerPieceBody(atURL: newUrl, completion: {
+//            self.shareExported()
+//        })
+//    }
     
     func shareExported() {
         var newUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!

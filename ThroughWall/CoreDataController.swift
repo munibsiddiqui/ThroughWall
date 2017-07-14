@@ -11,16 +11,16 @@ import CoreData
 import CocoaLumberjack
 
 class CoreDataController: NSObject {
-    
+
     static let sharedInstance = CoreDataController()
-    
+
     var toRefreshObjInMain = [NSManagedObject]()
     var toRefreshObjInPriv = [NSManagedObject]()
     let handleRefreshLock = NSLock()
     let maxCount = 20
-    
+
     // MARK: - Core Data stack
-    
+
     lazy var persistentContainer: NSPersistentContainer = {
         /*
          The persistent container for the application. This implementation
@@ -35,12 +35,12 @@ class CoreDataController: NSObject {
         description.shouldInferMappingModelAutomatically = true
         description.shouldMigrateStoreAutomatically = true
         container.persistentStoreDescriptions = [NSPersistentStoreDescription.init(url: url), description]
-        
+
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
                 // Replace this implementation with code to handle the error appropriately.
                 // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                
+
                 /*
                  Typical reasons for an error here include:
                  * The parent directory does not exist, cannot be created, or disallows writing.
@@ -55,21 +55,21 @@ class CoreDataController: NSObject {
         })
         return container
     }()
-    
+
     lazy var privateContext: NSManagedObjectContext = {
         var managedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         managedObjectContext.parent = self.persistentContainer.viewContext
-        
+
         return managedObjectContext
     }()
-    
-    
+
+
     func getDatabaseUrl() -> URL {
         let fileManager = FileManager.default
         var isDir: ObjCBool = false
         var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName)!
         url.appendPathComponent(databaseFolderName)
-        
+
         if fileManager.fileExists(atPath: url.path, isDirectory: &isDir) {
             if isDir.boolValue {
                 // file exists and is a directory
@@ -92,22 +92,24 @@ class CoreDataController: NSObject {
                 DDLogError("create folder \(url) failed. \(error)")
             }
         }
-        
+
         return url
     }
-    
+
     func getContext() -> NSManagedObjectContext {
         return persistentContainer.viewContext
     }
-    
+
     func getPrivateContext() -> NSManagedObjectContext {
         return privateContext
     }
-    
+
     func addToRefreshList(withObj obj: NSManagedObject, andContext context: NSManagedObjectContext) {
         handleRefreshLock.lock()
         if context == getContext() {
-            toRefreshObjInMain.append(obj)
+            if !toRefreshObjInMain.contains(obj) {
+                toRefreshObjInMain.append(obj)
+            }
             if toRefreshObjInMain.count >= maxCount {
                 saveContext()
                 for object in toRefreshObjInMain {
@@ -117,7 +119,9 @@ class CoreDataController: NSObject {
                 DDLogVerbose("obj removed")
             }
         } else if context == getPrivateContext() {
-            toRefreshObjInPriv.append(obj)
+            if !toRefreshObjInPriv.contains(obj) {
+                toRefreshObjInPriv.append(obj)
+            }
             if toRefreshObjInPriv.count >= maxCount {
                 savePrivateContext()
                 for object in toRefreshObjInPriv {
@@ -128,128 +132,128 @@ class CoreDataController: NSObject {
         }
         handleRefreshLock.unlock()
     }
-    
-    func backupDatabase(toURL url: URL) {
-        
-        let psc = NSPersistentStoreCoordinator(managedObjectModel: persistentContainer.managedObjectModel)
-        let oldURL = getDatabaseUrl()
-        DDLogDebug("\(oldURL)")
-        DDLogDebug("\(url)")
-        do {
-            let oldStore = try psc.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: oldURL, options: nil)
-            try psc.migratePersistentStore(oldStore, to: url, options: nil, withType: NSSQLiteStoreType)
-        } catch {
-            DDLogError("\(error)")
-        }
-    }
-    
-    func mergerPieceBody(atURL url: URL, completion: @escaping (() -> Void)) {
-        
-        let container = NSPersistentContainer(name: "ThroughWall")
-        let databaseURL = url.appendingPathComponent(databaseFileName)
-        let parseURL = url.appendingPathComponent(parseFolderName)
-        container.persistentStoreDescriptions = [NSPersistentStoreDescription.init(url: databaseURL)]
-        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
-            if let error = error as NSError? {
-                fatalError("Unresolved error \(error), \(error.userInfo)")
-            }
-        })
-        let context = container.viewContext
-        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        privateContext.parent = context
-        
-        DispatchQueue.global().async {
-            self._mergerPieceBody(atParseURL: parseURL, usingContext: privateContext)
-            completion()
-        }
-    }
-    
-    func _mergerPieceBody(atParseURL parseURL: URL, usingContext privateContext: NSManagedObjectContext) {
-        let fetch: NSFetchRequest<HostTraffic> = HostTraffic.fetchRequest()
-        fetch.includesPropertyValues = false
-        fetch.includesSubentities = false
-        
-        do {
-            let results = try privateContext.fetch(fetch)
-            for result in results {
-                
-                if let bodies = result.requestBodies {
-                    var requestBody = Data()
-                    if var _bodies = bodies.allObjects as? [RequestBodyPiece] {
-                        _bodies.sort() {
-                            return $0.timeStamp!.timeIntervalSince1970 < $1.timeStamp!.timeIntervalSince1970
-                        }
-                        if _bodies.count > 0 {
-                            let _requestBody = RequestBody(context: privateContext)
-                            
-                            for body in _bodies {
-                                let fileName = body.fileName!
-                                do {
-                                    let filePath = parseURL.appendingPathComponent(fileName)
-                                    let data = try Data(contentsOf: filePath)
-                                    requestBody.append(data)
-                                    let requestStamp = RequestBodyStamp(context: privateContext)
-                                    requestStamp.timeStamp = body.timeStamp
-                                    requestStamp.size = Int32(data.count)
-                                    requestStamp.belongToRequestBody = _requestBody
-                                    try FileManager.default.removeItem(at: filePath)
-                                } catch {
-                                    DDLogError("read file \(fileName) error. \(error)")
-                                }
-                            }
-                            _requestBody.body = requestBody as NSData
-                            _requestBody.belongToHost = result
-                            saveContext(privateContext)
-                            for body in _bodies {
-                                privateContext.refresh(body, mergeChanges: false)
-                            }
-                            privateContext.refresh(_requestBody, mergeChanges: false)
-                        }
-                    }
-                }
-                if let bodies = result.responseBodies {
-                    var responseBody = Data()
-                    if var _bodies = bodies.allObjects as? [ResponseBodyPiece] {
-                        _bodies.sort() {
-                            return $0.timeStamp!.timeIntervalSince1970 < $1.timeStamp!.timeIntervalSince1970
-                        }
-                        
-                        if _bodies.count > 0 {
-                            let _responseBody = ResponseBody(context: privateContext)
-                            
-                            for body in _bodies {
-                                let fileName = body.fileName!
-                                do {
-                                    let filePath = parseURL.appendingPathComponent(fileName)
-                                    let data = try Data(contentsOf: filePath)
-                                    responseBody.append(data)
-                                    let reponseStamp = ResponseBodyStamp(context: privateContext)
-                                    reponseStamp.timeStamp = body.timeStamp
-                                    reponseStamp.size = Int32(data.count)
-                                    reponseStamp.belongToResponseBody = _responseBody
-                                    try FileManager.default.removeItem(at: filePath)
-                                } catch {
-                                    DDLogError("read file \(fileName) error. \(error)")
-                                }
-                            }
-                            _responseBody.body = responseBody as NSData
-                            _responseBody.belongToHost = result
-                            saveContext(privateContext)
-                            for body in _bodies {
-                                privateContext.refresh(body, mergeChanges: false)
-                            }
-                            privateContext.refresh(_responseBody, mergeChanges: false)
-                        }
-                    }
-                }
-                privateContext.refresh(result, mergeChanges: false)
-            }
-            try FileManager.default.removeItem(at: parseURL)
-        } catch {
-            DDLogError("\(error)")
-        }
-    }
-    
+
+//    func backupDatabase(toURL url: URL) {
+//
+//        let psc = NSPersistentStoreCoordinator(managedObjectModel: persistentContainer.managedObjectModel)
+//        let oldURL = getDatabaseUrl()
+//        DDLogDebug("\(oldURL)")
+//        DDLogDebug("\(url)")
+//        do {
+//            let oldStore = try psc.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: oldURL, options: nil)
+//            try psc.migratePersistentStore(oldStore, to: url, options: nil, withType: NSSQLiteStoreType)
+//        } catch {
+//            DDLogError("\(error)")
+//        }
+//    }
+//
+//    func mergerPieceBody(atURL url: URL, completion: @escaping (() -> Void)) {
+//
+//        let container = NSPersistentContainer(name: "ThroughWall")
+//        let databaseURL = url.appendingPathComponent(databaseFileName)
+//        let parseURL = url.appendingPathComponent(parseFolderName)
+//        container.persistentStoreDescriptions = [NSPersistentStoreDescription.init(url: databaseURL)]
+//        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+//            if let error = error as NSError? {
+//                fatalError("Unresolved error \(error), \(error.userInfo)")
+//            }
+//        })
+//        let context = container.viewContext
+//        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+//        privateContext.parent = context
+//
+//        DispatchQueue.global().async {
+//            self._mergerPieceBody(atParseURL: parseURL, usingContext: privateContext)
+//            completion()
+//        }
+//    }
+//
+//    func _mergerPieceBody(atParseURL parseURL: URL, usingContext privateContext: NSManagedObjectContext) {
+//        let fetch: NSFetchRequest<HostTraffic> = HostTraffic.fetchRequest()
+//        fetch.includesPropertyValues = false
+//        fetch.includesSubentities = false
+//
+//        do {
+//            let results = try privateContext.fetch(fetch)
+//            for result in results {
+//
+//                if let bodies = result.requestBodies {
+//                    var requestBody = Data()
+//                    if var _bodies = bodies.allObjects as? [RequestBodyPiece] {
+//                        _bodies.sort() {
+//                            return $0.timeStamp!.timeIntervalSince1970 < $1.timeStamp!.timeIntervalSince1970
+//                        }
+//                        if _bodies.count > 0 {
+//                            let _requestBody = RequestBody(context: privateContext)
+//
+//                            for body in _bodies {
+//                                let fileName = body.fileName!
+//                                do {
+//                                    let filePath = parseURL.appendingPathComponent(fileName)
+//                                    let data = try Data(contentsOf: filePath)
+//                                    requestBody.append(data)
+//                                    let requestStamp = RequestBodyStamp(context: privateContext)
+//                                    requestStamp.timeStamp = body.timeStamp
+//                                    requestStamp.size = Int32(data.count)
+//                                    requestStamp.belongToRequestBody = _requestBody
+//                                    try FileManager.default.removeItem(at: filePath)
+//                                } catch {
+//                                    DDLogError("read file \(fileName) error. \(error)")
+//                                }
+//                            }
+//                            _requestBody.body = requestBody as NSData
+//                            _requestBody.belongToHost = result
+//                            saveContext(privateContext)
+//                            for body in _bodies {
+//                                privateContext.refresh(body, mergeChanges: false)
+//                            }
+//                            privateContext.refresh(_requestBody, mergeChanges: false)
+//                        }
+//                    }
+//                }
+//                if let bodies = result.responseBodies {
+//                    var responseBody = Data()
+//                    if var _bodies = bodies.allObjects as? [ResponseBodyPiece] {
+//                        _bodies.sort() {
+//                            return $0.timeStamp!.timeIntervalSince1970 < $1.timeStamp!.timeIntervalSince1970
+//                        }
+//
+//                        if _bodies.count > 0 {
+//                            let _responseBody = ResponseBody(context: privateContext)
+//
+//                            for body in _bodies {
+//                                let fileName = body.fileName!
+//                                do {
+//                                    let filePath = parseURL.appendingPathComponent(fileName)
+//                                    let data = try Data(contentsOf: filePath)
+//                                    responseBody.append(data)
+//                                    let reponseStamp = ResponseBodyStamp(context: privateContext)
+//                                    reponseStamp.timeStamp = body.timeStamp
+//                                    reponseStamp.size = Int32(data.count)
+//                                    reponseStamp.belongToResponseBody = _responseBody
+//                                    try FileManager.default.removeItem(at: filePath)
+//                                } catch {
+//                                    DDLogError("read file \(fileName) error. \(error)")
+//                                }
+//                            }
+//                            _responseBody.body = responseBody as NSData
+//                            _responseBody.belongToHost = result
+//                            saveContext(privateContext)
+//                            for body in _bodies {
+//                                privateContext.refresh(body, mergeChanges: false)
+//                            }
+//                            privateContext.refresh(_responseBody, mergeChanges: false)
+//                        }
+//                    }
+//                }
+//                privateContext.refresh(result, mergeChanges: false)
+//            }
+//            try FileManager.default.removeItem(at: parseURL)
+//        } catch {
+//            DDLogError("\(error)")
+//        }
+//    }
+
     func closeCrashLogs() {
         let defaults = UserDefaults.init(suiteName: groupName)
         if let oldDate = defaults?.value(forKey: currentTime) as? Date {
@@ -262,13 +266,13 @@ class CoreDataController: NSObject {
             }
         }
     }
-    
+
     private func closeCrashLogs(withDisconnectTime disconnectTime: Date) {
         let fetch: NSFetchRequest<HostTraffic> = HostTraffic.fetchRequest()
         fetch.includesPropertyValues = false
         fetch.includesSubentities = false
         let context = self.getContext()
-        
+
         do {
             let results = try context.fetch(fetch)
             for result in results {
@@ -283,8 +287,8 @@ class CoreDataController: NSObject {
             DDLogError("closeCrashLogs error: \(error)")
         }
     }
-    
-    
+
+
     func saveContext(_ context: NSManagedObjectContext) {
         if context.hasChanges {
             do {
@@ -299,10 +303,10 @@ class CoreDataController: NSObject {
             }
         }
     }
-    
-    
+
+
     // MARK: - Core Data Saving support
-    
+
     func saveContext () {
         let context = persistentContainer.viewContext
         if context.hasChanges {
@@ -318,7 +322,7 @@ class CoreDataController: NSObject {
             }
         }
     }
-    
+
     func savePrivateContext() {
         if privateContext.hasChanges {
             do {

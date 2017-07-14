@@ -417,6 +417,7 @@
 		34765C871E10D8810055C294 /* SelectionFieldCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectionFieldCell.swift; sourceTree = "<group>"; };
 		34765C941E1116780055C294 /* RequestListTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestListTableViewController.swift; sourceTree = "<group>"; };
 		3479CFFF1EC1D61200AD3458 /* OperationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationView.swift; sourceTree = "<group>"; };
+		347A865D1F17560B003E976F /* ThroughWall 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "ThroughWall 3.xcdatamodel"; sourceTree = "<group>"; };
 		347B233F1EBCCE1400AFE057 /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		3482A2B01E9F0D9700A6B202 /* RuleProxySelectionTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleProxySelectionTableViewController.swift; sourceTree = "<group>"; };
 		348AC2431E8A9C910072AB1B /* ThroughWall-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ThroughWall-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -3660,10 +3661,11 @@
 		3474EC811DDC926C00EBF3C5 /* ThroughWall.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				347A865D1F17560B003E976F /* ThroughWall 3.xcdatamodel */,
 				340329CD1ECD8AAA00651955 /* ThroughWall 2.xcdatamodel */,
 				3474EC821DDC926C00EBF3C5 /* ThroughWall.xcdatamodel */,
 			);
-			currentVersion = 340329CD1ECD8AAA00651955 /* ThroughWall 2.xcdatamodel */;
+			currentVersion = 347A865D1F17560B003E976F /* ThroughWall 3.xcdatamodel */;
 			path = ThroughWall.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

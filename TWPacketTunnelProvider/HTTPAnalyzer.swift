@@ -93,6 +93,44 @@ class HTTPAnalyzer: NSObject {
         return hostTraffic
     }()
 
+    private var hasRequestBody = false
+
+    fileprivate lazy var requestBody: Body = {
+        let context = CoreDataController.sharedInstance.getContext()
+        let reqBody = Body(context: context)
+        reqBody.bodyType = Int16(RequestBodyType)
+        reqBody.fileName = self.createRandomFile(atURL: self.baseParseURL)
+        do {
+            self.requestBodyFileHandle = try FileHandle(forUpdating: self.baseParseURL.appendingPathComponent(reqBody.fileName!))
+        } catch {
+            DDLogError("failed create requestfilehandle: \(error)")
+        }
+        reqBody.belongToHost = self.hostTraffic
+        self.hasRequestBody = true
+        return reqBody
+    }()
+
+    fileprivate var requestBodyFileHandle: FileHandle?
+
+    private var hasResponseBody = false
+
+    fileprivate lazy var responseBody: Body = {
+        let context = CoreDataController.sharedInstance.getContext()
+        let resBody = Body(context: context)
+        resBody.bodyType = Int16(ResponseBodyType)
+        resBody.fileName = self.createRandomFile(atURL: self.baseParseURL)
+        do {
+            self.responseBodyFileHandle = try FileHandle(forUpdating: self.baseParseURL.appendingPathComponent(resBody.fileName!))
+        } catch {
+            DDLogError("failed create responsefilehandle: \(error)")
+        }
+        resBody.belongToHost = self.hostTraffic
+        self.hasResponseBody = true
+        return resBody
+    }()
+
+    fileprivate var responseBodyFileHandle: FileHandle?
+
     fileprivate var inCount = 0 {
         willSet {
             DispatchQueue.main.async {
@@ -175,15 +213,24 @@ class HTTPAnalyzer: NSObject {
 
     private func _saveInOutCount() {
         if shouldParseTraffic {
-            if let hostInfo = self.hostTraffic.hostConnectInfo {
+            if let hostInfo = hostTraffic.hostConnectInfo {
                 if hostInfo.requestTime != nil {
-                    DDLogVerbose("H\(self.intTag)H saveInOutCount")
-                    self.hostTraffic.inCount = Int64(self.inCount)
-                    self.hostTraffic.outCount = Int64(self.outCount)
-                    self.hostTraffic.inProcessing = false
-                    self.hostTraffic.disconnectTime = NSDate()
-                    self.hostTraffic.forceDisconnect = self.isForceDisconnect
-                    CoreDataController.sharedInstance.addToRefreshList(withObj: self.hostTraffic, andContext: CoreDataController.sharedInstance.getContext())
+                    let context = CoreDataController.sharedInstance.getContext()
+                    DDLogVerbose("H\(intTag)H saveInOutCount")
+                    hostTraffic.inCount = Int64(inCount)
+                    hostTraffic.outCount = Int64(outCount)
+                    hostTraffic.inProcessing = false
+                    hostTraffic.disconnectTime = NSDate()
+                    hostTraffic.forceDisconnect = isForceDisconnect
+                    CoreDataController.sharedInstance.addToRefreshList(withObj: hostTraffic, andContext: context)
+                    if hasResponseBody {
+                        responseBodyFileHandle?.synchronizeFile()
+                        CoreDataController.sharedInstance.addToRefreshList(withObj: responseBody, andContext: context)
+                    }
+                    if hasRequestBody {
+                        requestBodyFileHandle?.synchronizeFile()
+                        CoreDataController.sharedInstance.addToRefreshList(withObj: requestBody, andContext: context)
+                    }
                     return
                 }
             }
@@ -229,56 +276,60 @@ class HTTPAnalyzer: NSObject {
     }
 
     fileprivate func recordRequestBody(withData data: Data) {
-//        DispatchQueue.main.async {
-//            if self.shouldParseTraffic {
-//                let length = data.count
-//                let fileName = self.createRandomFile(atURL: self.baseParseURL, withContent: data)
-//                DDLogVerbose("H\(self.intTag)H data count: \(length)")
-//
-//                let context = CoreDataController.sharedInstance.getContext()
-//                let pieceBody = RequestBodyPiece(context: context)
-//                pieceBody.timeStamp = NSDate()
-//                pieceBody.fileName = fileName
-//                pieceBody.belongToTraffic = self.hostTraffic
-////                CoreDataController.sharedInstance.saveContext()
-////                context.refresh(pieceBody, mergeChanges: false)
-//                CoreDataController.sharedInstance.addToRefreshList(withObj: pieceBody, andContext: context)
-//                DDLogVerbose("H\(self.intTag)H Record \(length)")
-//            }
-//        }
+        DispatchQueue.main.async {
+            if self.shouldParseTraffic {
+                let length = data.count
+                let context = CoreDataController.sharedInstance.getContext()
+                let bodyStamp = BodyStamp(context: context)
+                bodyStamp.size = Int64(length)
+                bodyStamp.timeStamp = NSDate()
+                bodyStamp.belongToBody = self.requestBody
+
+                if let fileHandle = self.requestBodyFileHandle {
+                    fileHandle.write(data)
+                }
+                DDLogVerbose("H\(self.intTag)H data count: \(length)")
+            }
+        }
     }
 
     fileprivate func recordResponseBody(withData data: Data) {
-//        DispatchQueue.main.async {
-//            if self.shouldParseTraffic {
-//                let length = data.count
-//                let fileName = self.createRandomFile(atURL: self.baseParseURL, withContent: data)
-//                DDLogVerbose("H\(self.intTag)H data count: \(length)")
-//
-//                let context = CoreDataController.sharedInstance.getContext()
-//                let pieceBody = ResponseBodyPiece(context: context)
-//                pieceBody.timeStamp = NSDate()
-//                pieceBody.fileName = fileName
-//                pieceBody.belongToTraffic = self.hostTraffic
-////                CoreDataController.sharedInstance.saveContext()
-////                context.refresh(pieceBody, mergeChanges: false)
-//                CoreDataController.sharedInstance.addToRefreshList(withObj: pieceBody, andContext: context)
-//                DDLogVerbose("H\(self.intTag)H Record \(length)")
-//            }
-//        }
+        DispatchQueue.main.async {
+            if self.shouldParseTraffic {
+                let length = data.count
+                let context = CoreDataController.sharedInstance.getContext()
+                let bodyStamp = BodyStamp(context: context)
+                bodyStamp.size = Int64(length)
+                bodyStamp.timeStamp = NSDate()
+                bodyStamp.belongToBody = self.responseBody
+
+                if let fileHandle = self.responseBodyFileHandle {
+                    fileHandle.write(data)
+                }
+                DDLogVerbose("H\(self.intTag)H Record \(length)")
+            }
+        }
     }
 
-    private func createRandomFile(atURL url: URL, withContent content: Data) -> String {
+    private func createRandomFile(atURL url: URL) -> String {
         var randomFileName = ""
         let fileManager = FileManager.default
         randomFileName = "\(Int(Date().timeIntervalSince1970 * 1000))" + String.random()
-
-        DispatchQueue.global(qos: .default).async {
-            fileManager.createFile(atPath: url.appendingPathComponent(randomFileName).path, contents: content, attributes: nil)
-            DDLogVerbose("H\(self.intTag)H Store \(content.count)")
-        }
+        fileManager.createFile(atPath: url.appendingPathComponent(randomFileName).path, contents: nil, attributes: nil)
         return randomFileName
     }
+
+//    private func createRandomFile(atURL url: URL, withContent content: Data) -> String {
+//        var randomFileName = ""
+//        let fileManager = FileManager.default
+//        randomFileName = "\(Int(Date().timeIntervalSince1970 * 1000))" + String.random()
+//
+//        DispatchQueue.global(qos: .default).async {
+//            fileManager.createFile(atPath: url.appendingPathComponent(randomFileName).path, contents: content, attributes: nil)
+//            DDLogVerbose("H\(self.intTag)H Store \(content.count)")
+//        }
+//        return randomFileName
+//    }
 
 }
 // MARK: - GCDAsyncSocketDelegate
@@ -467,22 +518,24 @@ extension HTTPAnalyzer {
                 port = portNumber ?? 443
             }
 
-            if host != nil {
-                DispatchQueue.main.async {
-                    if self.shouldParseTraffic {
-                        let context = CoreDataController.sharedInstance.getContext()
-                        let requestHead = RequestHead(context: context)
-                        requestHead.head = request
-                        requestHead.belongToHost = self.hostTraffic
-                        CoreDataController.sharedInstance.addToRefreshList(withObj: requestHead, andContext: context)
-                    }
-                }
-                tryConnect(toHost: host!, port: port!)
-            } else {
+            guard host != nil else {
                 DDLogError("H\(intTag)H handleHTTPSRequest \(ConnectionError.HostNilError)")
                 forceDisconnect()
                 return
             }
+            DispatchQueue.main.async {
+                if self.shouldParseTraffic {
+                    let context = CoreDataController.sharedInstance.getContext()
+                    let requestHead = Head(context: context)
+                    requestHead.head = request
+                    requestHead.size = 0
+                    requestHead.type = Int16(HTTPSRequestHead)
+                    requestHead.belongToHost = self.hostTraffic
+                    CoreDataController.sharedInstance.addToRefreshList(withObj: requestHead, andContext: context)
+                }
+            }
+            tryConnect(toHost: host!, port: port!)
+
         } else {
             tryConnect(toHost: host!, port: port!)
         }
@@ -512,25 +565,27 @@ extension HTTPAnalyzer {
             port = portNumber ?? 80
         }
 
-        if host != nil && repostRequest != nil {
-            DispatchQueue.main.async {
-                if self.shouldParseTraffic {
-
-                    let context = CoreDataController.sharedInstance.getContext()
-                    let requestHead = RequestHead(context: context)
-                    requestHead.head = repostRequest
-                    requestHead.belongToHost = self.hostTraffic
-                    CoreDataController.sharedInstance.addToRefreshList(withObj: requestHead, andContext: context)
-                }
-            }
-            DDLogVerbose("H\(intTag)H repost \(repostRequest!)")
-            repostData = repostRequest?.data(using: String.Encoding.utf8)
-            tryConnect(toHost: host!, port: port!)
-        } else {
+        guard host != nil, repostRequest != nil else {
             DDLogError("H\(intTag)H handleHTTPSRequest \(ConnectionError.HostNilError)")
             forceDisconnect()
             return
         }
+
+        DispatchQueue.main.async {
+            if self.shouldParseTraffic {
+
+                let context = CoreDataController.sharedInstance.getContext()
+                let requestHead = Head(context: context)
+                requestHead.head = repostRequest
+                requestHead.size = Int64(repostRequest!.characters.count)
+                requestHead.type = Int16(HTTPRequestHead)
+                requestHead.belongToHost = self.hostTraffic
+                CoreDataController.sharedInstance.addToRefreshList(withObj: requestHead, andContext: context)
+            }
+        }
+        DDLogVerbose("H\(intTag)H repost \(repostRequest!)")
+        repostData = repostRequest?.data(using: String.Encoding.utf8)
+        tryConnect(toHost: host!, port: port!)
     }
 
     private func getHostAndPort(fromHostComponentOfRequest request: String) -> (String?, UInt16?) {
@@ -642,7 +697,7 @@ extension HTTPAnalyzer {
                 DDLogError("H\(intTag)H extractHostAndPortWithRepost: \(ConnectionError.URLComponentAnalysisError)")
                 return (nil, replaced, nil, nil)
             }
-            
+
             if destiComponents[2].hasPrefix("[") {
                 //ipv6 address
                 let hostAndPortComponents = destiComponents[2].components(separatedBy: "]")
@@ -669,7 +724,7 @@ extension HTTPAnalyzer {
                     host = hostAndPortComponents[0]
                 }
             }
-            
+
             destiComponents.removeSubrange(0..<3)
         } else {
             destiComponents.removeFirst()
@@ -707,9 +762,8 @@ extension HTTPAnalyzer {
                 hostInfo.port = Int32(port)
                 hostInfo.rule = self.proxyType
                 hostInfo.requestTime = NSDate()
+                hostInfo.flag = Int64(self.intTag)
                 hostInfo.belongToHost = self.hostTraffic
-                //                CoreDataController.sharedInstance.saveContext()
-                //                context.refresh(hostInfo, mergeChanges: false)
                 CoreDataController.sharedInstance.addToRefreshList(withObj: hostInfo, andContext: context)
             }
         }
@@ -844,13 +898,16 @@ extension HTTPAnalyzer: OutgoingTransmitDelegate {
 
     internal func outgoingSocket(didConnectToHost host: String, port: UInt16) {
         DDLogVerbose("H\(intTag)H didConnect \(host):\(port)")
+        let timeStamp = NSDate()
         if isConnectRequest {
             DispatchQueue.main.async {
                 if self.shouldParseTraffic {
                     let context = CoreDataController.sharedInstance.getContext()
-                    let responseHead = ResponseHead(context: context)
+                    let responseHead = Head(context: context)
                     responseHead.head = ConnectionResponseStr
-                    responseHead.time = NSDate()
+                    responseHead.timeStamp = timeStamp
+                    responseHead.size = 0
+                    responseHead.type = Int16(HTTPSResponseHead)
                     responseHead.belongToHost = self.hostTraffic
                     CoreDataController.sharedInstance.addToRefreshList(withObj: responseHead, andContext: context)
                 }
@@ -882,15 +939,17 @@ extension HTTPAnalyzer: OutgoingTransmitDelegate {
 
     private func retrievedOutgoingSocket(host: String, port: UInt16) {
         DDLogVerbose("H\(intTag)H retrievedOutgoingSocket \(host):\(port)")
-
+        let timeStamp = NSDate()
         if isConnectRequest {
             DispatchQueue.main.async {
                 if self.shouldParseTraffic {
 
                     let context = CoreDataController.sharedInstance.getContext()
-                    let responseHead = ResponseHead(context: context)
+                    let responseHead = Head(context: context)
                     responseHead.head = ConnectionResponseStr
-                    responseHead.time = NSDate()
+                    responseHead.timeStamp = timeStamp
+                    responseHead.size = 0
+                    responseHead.type = Int16(HTTPSResponseHead)
                     responseHead.belongToHost = self.hostTraffic
                     //                    CoreDataController.sharedInstance.saveContext()
                     //                    context.refresh(responseHead, mergeChanges: false)
@@ -1017,9 +1076,11 @@ extension HTTPAnalyzer {
             if self.shouldParseTraffic {
 
                 let context = CoreDataController.sharedInstance.getContext()
-                let responseHead = ResponseHead(context: context)
+                let responseHead = Head(context: context)
                 responseHead.head = serverResponseString
-                responseHead.time = NSDate()
+                responseHead.timeStamp = NSDate()
+                responseHead.type = Int16(HTTPResponseHead)
+                responseHead.size = Int64(serverResponseString.characters.count)
                 responseHead.belongToHost = self.hostTraffic
                 CoreDataController.sharedInstance.addToRefreshList(withObj: responseHead, andContext: context)
             }

@@ -57,8 +57,8 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
         viewWidthConstraint.constant = CGFloat(duringTime * Double(horiScaller) + 48)
         drawTraffic(fromTime: beginTime, toTime: endTime)
         drawTimelineRuler(fromTime: beginTime, toTime: endTime)
-        requestResponseTraffic()
-        drawResponseTraffic()
+        getTrafficStream()
+        drawTrafficStream()
     }
 
     override func didReceiveMemoryWarning() {
@@ -202,7 +202,16 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
                     }
 
                     if let rule = rowTraffic.hostConnectInfo?.rule?.lowercased() {
-                        tView.setIndicatorColor(withReqT: reqTime, ResT: rowTraffic.responseHead?.time as Date?, DisT: disTime, andRule: rule)
+                        var resTime: Date? = nil
+                        if let headers = rowTraffic.heads?.allObjects as? [Head] {
+                            for head in headers {
+                                if head.type == HTTPResponseHead || head.type == HTTPSResponseHead {
+                                    resTime = head.timeStamp as Date?
+                                    break
+                                }
+                            }
+                        }
+                        tView.setIndicatorColor(withReqT: reqTime, ResT: resTime, DisT: disTime, andRule: rule)
                     }
 
                     if let host = rowTraffic.hostConnectInfo?.name {
@@ -210,7 +219,6 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
                             tView.set(HostPort: "\(host):\(port)")
                         }
                     }
-
                     baseView.addSubview(tView)
                 }
             }
@@ -254,14 +262,15 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
         }
     }
 
-    func requestResponseTraffic() {
-        let fetch: NSFetchRequest<ResponseBodyPiece> = ResponseBodyPiece.fetchRequest()
+    func getTrafficStream() {
+        let fetch: NSFetchRequest<BodyStamp> = BodyStamp.fetchRequest()
         fetch.sortDescriptors = [NSSortDescriptor.init(key: "timeStamp", ascending: true)]
+
         do {
-            let responsePieces = try CoreDataController.sharedInstance.getContext().fetch(fetch)
-            transferResponsePiecesIntoTraffic(withPieces: responsePieces)
-            for piece in responsePieces {
-                CoreDataController.sharedInstance.getContext().refresh(piece, mergeChanges: false)
+            let bodyStamps = try CoreDataController.sharedInstance.getContext().fetch(fetch)
+            transferBodyStampsIntoTraffic(withbodies: bodyStamps)
+            for body in bodyStamps {
+                CoreDataController.sharedInstance.getContext().refresh(body, mergeChanges: false)
             }
         } catch {
             DDLogError("\(error)")
@@ -269,10 +278,10 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
     }
 
 
-    func transferResponsePiecesIntoTraffic(withPieces resPieces: [ResponseBodyPiece]) {
+    func transferBodyStampsIntoTraffic(withbodies boides: [BodyStamp]) {
         var fT = beginTime
         var tT = fT.addingTimeInterval(0.1)
-        var resPieces = resPieces
+        var boides = boides
 
 
 //        let localFormatter = DateFormatter()
@@ -281,19 +290,17 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
 
         while fT < endTime {
             var count = 0
-            while let first = resPieces.first {
+            while let first = boides.first {
                 if let time = first.timeStamp as Date? {
                     if time >= tT {
                         break
                     }
                     if time >= fT && time < tT {
-                        if let fileName = first.fileName {
-                            count = count + getRecordFileSize(withFileName: fileName)
-                        }
+                        count = count + Int(first.size)
                     }
-                    resPieces.removeFirst()
+                    boides.removeFirst()
                 } else {
-                    resPieces.removeFirst()
+                    boides.removeFirst()
                 }
             }
 
@@ -322,7 +329,7 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
     }
 
 
-    func drawResponseTraffic() {
+    func drawTrafficStream() {
         let shapeLayer = CAShapeLayer()
         let duringTime = endTime.timeIntervalSince(beginTime)
         let width = Int(duringTime * Double(horiScaller))
@@ -354,7 +361,6 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
     func drawSpeedRuler(withHeight height: Int) {
         drawSpeedLine(withHeight: height)
     }
-
 
     func drawSpeedLine(withHeight height: Int) {
         let verticalLine = CALayer()

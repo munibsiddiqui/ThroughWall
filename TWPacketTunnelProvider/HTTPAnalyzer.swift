@@ -95,10 +95,9 @@ class HTTPAnalyzer: NSObject {
 
     private var hasRequestBody = false
 
-    fileprivate lazy var requestBody: Body = {
+    fileprivate lazy var requestBody: RequestBody = {
         let context = CoreDataController.sharedInstance.getContext()
-        let reqBody = Body(context: context)
-        reqBody.bodyType = Int16(RequestBodyType)
+        let reqBody = RequestBody(context: context)
         reqBody.fileName = self.createRandomFile(atURL: self.baseParseURL)
         do {
             self.requestBodyFileHandle = try FileHandle(forUpdating: self.baseParseURL.appendingPathComponent(reqBody.fileName!))
@@ -114,10 +113,9 @@ class HTTPAnalyzer: NSObject {
 
     private var hasResponseBody = false
 
-    fileprivate lazy var responseBody: Body = {
+    fileprivate lazy var responseBody: ResponseBody = {
         let context = CoreDataController.sharedInstance.getContext()
-        let resBody = Body(context: context)
-        resBody.bodyType = Int16(ResponseBodyType)
+        let resBody = ResponseBody(context: context)
         resBody.fileName = self.createRandomFile(atURL: self.baseParseURL)
         do {
             self.responseBodyFileHandle = try FileHandle(forUpdating: self.baseParseURL.appendingPathComponent(resBody.fileName!))
@@ -280,10 +278,10 @@ class HTTPAnalyzer: NSObject {
             if self.shouldParseTraffic {
                 let length = data.count
                 let context = CoreDataController.sharedInstance.getContext()
-                let bodyStamp = BodyStamp(context: context)
+                let bodyStamp = RequestBodyStamp(context: context)
                 bodyStamp.size = Int64(length)
                 bodyStamp.timeStamp = NSDate()
-                bodyStamp.belongToBody = self.requestBody
+                bodyStamp.belongToRequestBody = self.requestBody
 
                 if let fileHandle = self.requestBodyFileHandle {
                     fileHandle.write(data)
@@ -298,10 +296,10 @@ class HTTPAnalyzer: NSObject {
             if self.shouldParseTraffic {
                 let length = data.count
                 let context = CoreDataController.sharedInstance.getContext()
-                let bodyStamp = BodyStamp(context: context)
+                let bodyStamp = ResponseBodyStamp(context: context)
                 bodyStamp.size = Int64(length)
                 bodyStamp.timeStamp = NSDate()
-                bodyStamp.belongToBody = self.responseBody
+                bodyStamp.belongToResponseBody = self.responseBody
 
                 if let fileHandle = self.responseBodyFileHandle {
                     fileHandle.write(data)
@@ -526,10 +524,9 @@ extension HTTPAnalyzer {
             DispatchQueue.main.async {
                 if self.shouldParseTraffic {
                     let context = CoreDataController.sharedInstance.getContext()
-                    let requestHead = Head(context: context)
+                    let requestHead = RequestHead(context: context)
                     requestHead.head = request
                     requestHead.size = 0
-                    requestHead.type = Int16(HTTPSRequestHead)
                     requestHead.belongToHost = self.hostTraffic
                     CoreDataController.sharedInstance.addToRefreshList(withObj: requestHead, andContext: context)
                 }
@@ -575,10 +572,9 @@ extension HTTPAnalyzer {
             if self.shouldParseTraffic {
 
                 let context = CoreDataController.sharedInstance.getContext()
-                let requestHead = Head(context: context)
+                let requestHead = RequestHead(context: context)
                 requestHead.head = repostRequest
                 requestHead.size = Int64(repostRequest!.characters.count)
-                requestHead.type = Int16(HTTPRequestHead)
                 requestHead.belongToHost = self.hostTraffic
                 CoreDataController.sharedInstance.addToRefreshList(withObj: requestHead, andContext: context)
             }
@@ -762,7 +758,7 @@ extension HTTPAnalyzer {
                 hostInfo.port = Int32(port)
                 hostInfo.rule = self.proxyType
                 hostInfo.requestTime = NSDate()
-                hostInfo.flag = Int64(self.intTag)
+                hostInfo.tag = Int64(self.intTag)
                 hostInfo.belongToHost = self.hostTraffic
                 CoreDataController.sharedInstance.addToRefreshList(withObj: hostInfo, andContext: context)
             }
@@ -903,11 +899,10 @@ extension HTTPAnalyzer: OutgoingTransmitDelegate {
             DispatchQueue.main.async {
                 if self.shouldParseTraffic {
                     let context = CoreDataController.sharedInstance.getContext()
-                    let responseHead = Head(context: context)
+                    let responseHead = ResponseHead(context: context)
                     responseHead.head = ConnectionResponseStr
-                    responseHead.timeStamp = timeStamp
+                    responseHead.time = timeStamp
                     responseHead.size = 0
-                    responseHead.type = Int16(HTTPSResponseHead)
                     responseHead.belongToHost = self.hostTraffic
                     CoreDataController.sharedInstance.addToRefreshList(withObj: responseHead, andContext: context)
                 }
@@ -945,11 +940,10 @@ extension HTTPAnalyzer: OutgoingTransmitDelegate {
                 if self.shouldParseTraffic {
 
                     let context = CoreDataController.sharedInstance.getContext()
-                    let responseHead = Head(context: context)
+                    let responseHead = ResponseHead(context: context)
                     responseHead.head = ConnectionResponseStr
-                    responseHead.timeStamp = timeStamp
+                    responseHead.time = timeStamp
                     responseHead.size = 0
-                    responseHead.type = Int16(HTTPSResponseHead)
                     responseHead.belongToHost = self.hostTraffic
                     //                    CoreDataController.sharedInstance.saveContext()
                     //                    context.refresh(responseHead, mergeChanges: false)
@@ -1074,12 +1068,10 @@ extension HTTPAnalyzer {
 
         DispatchQueue.main.async {
             if self.shouldParseTraffic {
-
                 let context = CoreDataController.sharedInstance.getContext()
-                let responseHead = Head(context: context)
+                let responseHead = ResponseHead(context: context)
                 responseHead.head = serverResponseString
-                responseHead.timeStamp = NSDate()
-                responseHead.type = Int16(HTTPResponseHead)
+                responseHead.time = NSDate()
                 responseHead.size = Int64(serverResponseString.characters.count)
                 responseHead.belongToHost = self.hostTraffic
                 CoreDataController.sharedInstance.addToRefreshList(withObj: responseHead, andContext: context)

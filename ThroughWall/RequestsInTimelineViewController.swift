@@ -203,13 +203,8 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
 
                     if let rule = rowTraffic.hostConnectInfo?.rule?.lowercased() {
                         var resTime: Date? = nil
-                        if let headers = rowTraffic.heads?.allObjects as? [Head] {
-                            for head in headers {
-                                if head.type == HTTPResponseHead || head.type == HTTPSResponseHead {
-                                    resTime = head.timeStamp as Date?
-                                    break
-                                }
-                            }
+                        if let responseHead = rowTraffic.responseHead {
+                            resTime = responseHead.time as Date?
                         }
                         tView.setIndicatorColor(withReqT: reqTime, ResT: resTime, DisT: disTime, andRule: rule)
                     }
@@ -263,7 +258,7 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
     }
 
     func getTrafficStream() {
-        let fetch: NSFetchRequest<BodyStamp> = BodyStamp.fetchRequest()
+        let fetch: NSFetchRequest<ResponseBodyStamp> = ResponseBodyStamp.fetchRequest()
         fetch.sortDescriptors = [NSSortDescriptor.init(key: "timeStamp", ascending: true)]
 
         do {
@@ -278,11 +273,10 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
     }
 
 
-    func transferBodyStampsIntoTraffic(withbodies boides: [BodyStamp]) {
+    func transferBodyStampsIntoTraffic(withbodies boides: [ResponseBodyStamp]) {
         var fT = beginTime
         var tT = fT.addingTimeInterval(0.1)
         var boides = boides
-
 
 //        let localFormatter = DateFormatter()
 //        localFormatter.locale = Locale.current

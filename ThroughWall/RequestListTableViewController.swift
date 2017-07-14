@@ -25,7 +25,7 @@ class RequestListTableViewController: UITableViewController {
 
         tableView.tableFooterView = UIView()
         tableView.backgroundColor = veryLightGrayUIColor
-        
+
         let defaults = UserDefaults()
         if let vpnStatus = defaults.value(forKey: kCurrentManagerStatus) as? String {
             if vpnStatus == "Disconnected" {
@@ -99,14 +99,21 @@ class RequestListTableViewController: UITableViewController {
             let parseDirectory = CoreDataController.sharedInstance.getDatabaseUrl().appendingPathComponent(parseFolderName)
             for hostTraffic in hostTraffics {
                 if hostTraffic.inProcessing == false {
-                    if let bodies = hostTraffic.bodies?.allObjects as? [Body] {
-                        for body in bodies {
-                            let filePath = parseDirectory.appendingPathComponent(body.fileName!)
-                            do {
-                                try FileManager.default.removeItem(at: filePath)
-                            } catch {
-                                DDLogError("\(error)")
-                            }
+                    if let requestBody = hostTraffic.requestWholeBody {
+                        let filePath = parseDirectory.appendingPathComponent(requestBody.fileName!)
+                        do {
+                            try FileManager.default.removeItem(at: filePath)
+                        } catch {
+                            DDLogError("\(error)")
+                        }
+                    }
+
+                    if let responseBody = hostTraffic.responseWholeBody {
+                        let filePath = parseDirectory.appendingPathComponent(responseBody.fileName!)
+                        do {
+                            try FileManager.default.removeItem(at: filePath)
+                        } catch {
+                            DDLogError("\(error)")
                         }
                     }
 
@@ -167,7 +174,6 @@ class RequestListTableViewController: UITableViewController {
 
     }
 
-
     func makeAttributeDescription(fromHostTraffic hostTraffic: HostTraffic) -> NSAttributedString {
         let localFormatter = DateFormatter()
         localFormatter.locale = Locale.current
@@ -191,20 +197,12 @@ class RequestListTableViewController: UITableViewController {
                 attributeDescription.append(NSAttributedString(string: " "))
             }
         }
-        
-        if let heads =  hostTraffic.heads?.allObjects as? [Head] {
-            for head in heads {
-                if head.type == HTTPRequestHead || head.type == HTTPSRequestHead {
-                    if let requestHead = head.head {
-                        let requestType = requestHead.components(separatedBy: " ")[0]
-                        
-                        let attributeRequestType = NSAttributedString(string: requestType, attributes: [NSForegroundColorAttributeName: UIColor.white, NSBackgroundColorAttributeName: UIColor.init(red: 0.24, green: 0.545, blue: 0.153, alpha: 1.0)])
-                        
-                        attributeDescription.append(attributeRequestType)
-                        attributeDescription.append(NSAttributedString(string: " "))
-                    }
-                }
-            }
+
+        if let requestHead = hostTraffic.requestHead?.head {
+            let requestType = requestHead.components(separatedBy: " ")[0]
+            let attributeRequestType = NSAttributedString(string: requestType, attributes: [NSForegroundColorAttributeName: UIColor.white, NSBackgroundColorAttributeName: UIColor.init(red: 0.24, green: 0.545, blue: 0.153, alpha: 1.0)])
+            attributeDescription.append(attributeRequestType)
+            attributeDescription.append(NSAttributedString(string: " "))
         }
 
         if hostTraffic.inProcessing == true {

@@ -13,8 +13,6 @@ import CocoaLumberjack
 class RequestDetailTableViewController: UITableViewController {
 
     var hostRequest: HostTraffic!
-    var requestHead: Head?
-    var responseHead: Head?
     var prototypeCell: UITableViewCell!
 
     var outgoing = OutGoing()
@@ -29,16 +27,6 @@ class RequestDetailTableViewController: UITableViewController {
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
         prototypeCell = tableView.dequeueReusableCell(withIdentifier: "trafficHeader")
 //        outgoingConnection = GCDAsyncSocket(delegate: self, delegateQueue: DispatchQueue.global())
-        
-        if let heads = hostRequest.heads?.allObjects as? [Head] {
-            for head in heads {
-                if head.type == HTTPRequestHead || head.type == HTTPSRequestHead {
-                    requestHead = head
-                }else {
-                    responseHead = head
-                }
-            }
-        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -121,8 +109,8 @@ class RequestDetailTableViewController: UITableViewController {
 
             } else if indexPath.row == 1 {
                 cell.textLabel?.text = "Response Time"
-                if let responseHead = responseHead {
-                    if let timeStamp = responseHead.timeStamp{
+                if let responseHead = hostRequest.responseHead {
+                    if let timeStamp = responseHead.time{
                         cell.detailTextLabel?.text = localFormatter.string(from: timeStamp as Date)
                         return cell
                     }
@@ -158,9 +146,9 @@ class RequestDetailTableViewController: UITableViewController {
             let cell = tableView.dequeueReusableCell(withIdentifier: "trafficHeader", for: indexPath)
             let textView = cell.viewWithTag(103) as! UITextView
             if indexPath.row == 0 {
-                textView.text = requestHead?.head
+                textView.text = hostRequest.requestHead?.head
             } else {
-                textView.text = responseHead?.head
+                textView.text = hostRequest.responseHead?.head
             }
             return cell
         }
@@ -173,9 +161,9 @@ class RequestDetailTableViewController: UITableViewController {
         } else {
             let textView = prototypeCell.viewWithTag(103) as! UITextView
             if indexPath.row == 0 {
-                textView.text = requestHead?.head
+                textView.text = hostRequest.requestHead?.head
             } else {
-                textView.text = responseHead?.head
+                textView.text = hostRequest.responseHead?.head
             }
             let contentSize = textView.sizeThatFits(self.view.bounds.size)
             return contentSize.height

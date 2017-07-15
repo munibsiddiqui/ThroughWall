@@ -63,15 +63,6 @@ let saveContextNotification = "Bingo.TWPacketTunnelProvider.saveContext"
 let shouldParseTrafficKey = "Bingo.ShouldParseTraffic"
 let logLevelKey = "Bingo.LogLevel"
 
-
-let HTTPRequestHead = 0
-let HTTPSRequestHead = 1
-let HTTPResponseHead = 2
-let HTTPSResponseHead = 3
-
-let ResponseBodyType = 0
-let RequestBodyType = 1
-
 enum DarwinNotifications: String {
     case updateWidget = "updataWidget"
 }

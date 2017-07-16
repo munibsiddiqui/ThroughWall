@@ -74,7 +74,7 @@ class Socks2HTTPS: NSObject, GCDAsyncSocketDelegate, Socks2HTTPSConverterDelegat
         newClient.socksOpen()
         lockQueue.async {
             self.converts?.append(newClient)
-            DDLogVerbose("S\(newClient.getIntTag())S added into array")
+            DDLogVerbose("S\(tag)S added into array")
         }
     }
 
@@ -128,8 +128,10 @@ class Socks2HTTPSConverter: NSObject, GCDAsyncSocketDelegate {
 
     func socket(_ sock: GCDAsyncSocket, didWriteDataWithTag tag: Int) {
         if tag == SOCKS_OUTGOING_WRITE {
+            DDLogVerbose("S\(intTag)S SOCKS_OUTGOING_WRITE")
             socksConnection?.readData(withTimeout: -1, tag: SOCKS_INCOMING_READ)
         } else if tag == SOCKS_INCOMING_WRITE {
+            DDLogVerbose("S\(intTag)S SOCKS_OUTGOING_WRITE")
             outGoing?.readData(withTimeout: -1, tag: SOCKS_OUTGOING_READ)
         }
     }
@@ -179,7 +181,7 @@ class Socks2HTTPSConverter: NSObject, GCDAsyncSocketDelegate {
             // Address Type = 3 (1=IPv4, 3=DomainName 4=IPv6)
             // Address      = P:D (P=LengthOfDomain D=DomainWithoutNullTermination)
             // Port         = 0
-            DDLogVerbose("S\(intTag) SOCKS_CONNECT_INIT")
+            DDLogVerbose("S\(intTag)S SOCKS_CONNECT_INIT")
             let buffer = [UInt8](data)
             let addressType = buffer[3];
             responseData = [addressType]
@@ -224,7 +226,7 @@ class Socks2HTTPSConverter: NSObject, GCDAsyncSocketDelegate {
             let buffer = [UInt8](data)
             responseData?.append(contentsOf: buffer)
             port = UInt16(buffer[0]) * 256 + UInt16(buffer[1])
-            DDLogVerbose("S\(intTag)S port: \(port)")
+            DDLogVerbose("S\(intTag)S port: \(port!)")
             do {
                 outGoing = GCDAsyncSocket(delegate: self, delegateQueue: DispatchQueue.global())
                 try outGoing?.connect(toHost: "127.0.0.1", onPort: httpPort)
@@ -246,7 +248,6 @@ class Socks2HTTPSConverter: NSObject, GCDAsyncSocketDelegate {
     }
 
     internal func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
-
         if sock == outGoing {
             DDLogVerbose("S\(intTag)S HTTP side disconnect")
             outGoing = nil

@@ -35,6 +35,8 @@ let ST_READ_RESPONSE_HEAD_FROM_SERVER = 1
 let ST_READ_LEFT_RESPONSE_HEAD_FROM_SERVER = 2
 let ST_READ_RESPONSE_BODY_FROM_SERVER = 3
 
+let TrafficStep = 0.01
+
 enum ConnectionError: Error {
     case UnReadableDataError
     case NoHostInRequestError
@@ -73,6 +75,11 @@ class HTTPAnalyzer: NSObject {
     fileprivate var pendingClientDisconnect = false
     fileprivate var outBusy = false
     fileprivate var timerForReadTimeout: DispatchSourceTimer? = nil
+
+    private var requestTimestamp: Date?
+    private var responseTimestamp: Date?
+    private var requestLength = 0
+    private var responseLength = 0
 
     private lazy var baseParseURL: URL = {
         let url = CoreDataController.sharedInstance.getDatabaseUrl().appendingPathComponent(parseFolderName)
@@ -277,11 +284,29 @@ class HTTPAnalyzer: NSObject {
         DispatchQueue.main.async {
             if self.shouldParseTraffic {
                 let length = data.count
-                let context = CoreDataController.sharedInstance.getContext()
-                let bodyStamp = RequestBodyStamp(context: context)
-                bodyStamp.size = Int64(length)
-                bodyStamp.timeStamp = NSDate()
-                bodyStamp.belongToRequestBody = self.requestBody
+                let timestamp = Date()
+
+                if let reqTimestamp = self.requestTimestamp {
+                    if timestamp.timeIntervalSince(reqTimestamp) >= TrafficStep {
+                        //save and set new timestamp and length
+                        let context = CoreDataController.sharedInstance.getContext()
+                        let bodyStamp = RequestBodyStamp(context: context)
+                        bodyStamp.size = Int64(self.requestLength)
+                        bodyStamp.timeStamp = NSDate()
+                        bodyStamp.belongToRequestBody = self.requestBody
+                        CoreDataController.sharedInstance.addToRefreshList(withObj: bodyStamp, andContext: context)
+
+                        self.requestLength = length
+                        self.requestTimestamp = timestamp
+                    } else {
+                        self.requestLength = self.requestLength + length
+                    }
+                } else {
+                    if let _ = self.requestBody.fileName {
+                        self.requestLength = length
+                        self.requestTimestamp = timestamp
+                    }
+                }
 
                 if let fileHandle = self.requestBodyFileHandle {
                     fileHandle.write(data)
@@ -295,11 +320,29 @@ class HTTPAnalyzer: NSObject {
         DispatchQueue.main.async {
             if self.shouldParseTraffic {
                 let length = data.count
-                let context = CoreDataController.sharedInstance.getContext()
-                let bodyStamp = ResponseBodyStamp(context: context)
-                bodyStamp.size = Int64(length)
-                bodyStamp.timeStamp = NSDate()
-                bodyStamp.belongToResponseBody = self.responseBody
+                let timestamp = Date()
+
+                if let resTimestamp = self.responseTimestamp {
+                    if timestamp.timeIntervalSince(resTimestamp) >= TrafficStep {
+                        //save and set new timestamp and length
+                        let context = CoreDataController.sharedInstance.getContext()
+                        let bodyStamp = ResponseBodyStamp(context: context)
+                        bodyStamp.size = Int64(length)
+                        bodyStamp.timeStamp = NSDate()
+                        bodyStamp.belongToResponseBody = self.responseBody
+                        CoreDataController.sharedInstance.addToRefreshList(withObj: bodyStamp, andContext: context)
+
+                        self.responseLength = length
+                        self.responseTimestamp = timestamp
+                    } else {
+                        self.responseLength = self.responseLength + length
+                    }
+                } else {
+                    if let _ = self.responseBody.fileName {
+                        self.responseLength = length
+                        self.responseTimestamp = timestamp
+                    }
+                }
 
                 if let fileHandle = self.responseBodyFileHandle {
                     fileHandle.write(data)
@@ -965,7 +1008,9 @@ extension HTTPAnalyzer: OutgoingTransmitDelegate {
     }
 
     internal func outgoingSocketDidDisconnect(_ outgoing: OutgoingSide) {
-        outgoingDisconnectSchedule()
+        DispatchQueue.global().asyncAfter(deadline: .now() + 0.1) {
+            self.outgoingDisconnectSchedule()
+        }
     }
 
     private func outgoingDisconnectSchedule() {

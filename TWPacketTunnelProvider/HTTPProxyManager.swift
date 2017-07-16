@@ -327,10 +327,10 @@ extension HTTPProxyManager: HTTPAnalyzerDelegate {
     func didDownloadFromServer(dataSize size: Int, proxyType proxy: String) {
         downloadLock.lock()
 //        self.downloadCount = self.downloadCount + size
-        switch proxy {
-        case "Proxy":
+        switch proxy.lowercased() {
+        case "proxy":
             self.proxyDownloadCount = self.proxyDownloadCount + size
-        case "Direct":
+        case "direct":
             self.directDownloadCount = self.directDownloadCount + size
         default:
             break
@@ -341,10 +341,10 @@ extension HTTPProxyManager: HTTPAnalyzerDelegate {
     func didUploadToServer(dataSize size: Int, proxyType proxy: String) {
         uploadLock.lock()
 //        self.uploadCount = self.uploadCount + size
-        switch proxy {
-        case "Proxy":
+        switch proxy.lowercased() {
+        case "proxy":
             self.proxyUploadCount = self.proxyUploadCount + size
-        case "Direct":
+        case "direct":
             self.directUploadCount = self.directUploadCount + size
         default:
             break

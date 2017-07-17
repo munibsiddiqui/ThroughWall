@@ -561,8 +561,8 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
 
         let textLabel = cell.viewWithTag(1) as! UILabel
         textLabel.text = proxyConfigs[indexPath.row].getValue(byItem: "description")
-        let detailTextLabel = cell.viewWithTag(2) as! UILabel
-        detailTextLabel.text = (proxyConfigs[indexPath.row].getValue(byItem: "server") ?? "")
+//        let detailTextLabel = cell.viewWithTag(2) as! UILabel
+//        detailTextLabel.text = (proxyConfigs[indexPath.row].getValue(byItem: "server") ?? "")
         let delayLabel = cell.viewWithTag(3) as! UILabel
 
         if let delayValue = proxyConfigs[indexPath.row].getValue(byItem: "delay") {
@@ -582,7 +582,6 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
         } else {
             delayLabel.attributedText = NSAttributedString(string: "? ms", attributes: [NSForegroundColorAttributeName: UIColor.orange])
         }
-
 
         if indexPath.row == selectedServerIndex {
             if let manager = currentVPNManager {

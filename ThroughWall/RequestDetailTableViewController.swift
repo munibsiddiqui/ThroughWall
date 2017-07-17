@@ -16,7 +16,7 @@ class RequestDetailTableViewController: UITableViewController {
     var prototypeCell: UITableViewCell!
 
     var outgoing = OutGoing()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -26,6 +26,10 @@ class RequestDetailTableViewController: UITableViewController {
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
         prototypeCell = tableView.dequeueReusableCell(withIdentifier: "trafficHeader")
+//        tableView.estimatedRowHeight = 48
+        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.tableFooterView = UIView()
+        tableView.backgroundColor = veryLightGrayUIColor
 //        outgoingConnection = GCDAsyncSocket(delegate: self, delegateQueue: DispatchQueue.global())
     }
 
@@ -42,7 +46,7 @@ class RequestDetailTableViewController: UITableViewController {
 //            self.outgoing.connect2(toHost: host, andPort: UInt16(port))
 //        }
 //    }
-    
+
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -110,7 +114,7 @@ class RequestDetailTableViewController: UITableViewController {
             } else if indexPath.row == 1 {
                 cell.textLabel?.text = "Response Time"
                 if let responseHead = hostRequest.responseHead {
-                    if let timeStamp = responseHead.time{
+                    if let timeStamp = responseHead.time {
                         cell.detailTextLabel?.text = localFormatter.string(from: timeStamp as Date)
                         return cell
                     }
@@ -220,20 +224,20 @@ class RequestDetailTableViewController: UITableViewController {
 
 
 class OutGoing: NSObject, GCDAsyncSocketDelegate {
-    
+
     var outgoingConnection: GCDAsyncSocket?
 
     func connect(toHost host: String, andPort port: UInt16) {
         outgoingConnection = GCDAsyncSocket(delegate: self, delegateQueue: DispatchQueue.global())
-        
+
         do {
             try outgoingConnection?.connect(toHost: host, onPort: port)
             DDLogDebug("connecting \(host):\(port)")
-        }catch {
+        } catch {
             DDLogError("\(error)")
         }
     }
-    
+
     func connect2(toHost host: String, andPort port: UInt16) {
         DDLogInfo("Start")
         var hints = addrinfo(
@@ -245,13 +249,13 @@ class OutGoing: NSObject, GCDAsyncSocketDelegate {
             ai_canonname: nil,
             ai_addr: nil,
             ai_next: nil)
-        
+
 //        let host:CString = "www.apple.com"
 //        let port:CString = "http" //could use "80" here
         var result: UnsafeMutablePointer<addrinfo>? = nil
-        
+
         let error = getaddrinfo(host, "\(port)", &hints, &result)
-        
+
         DDLogDebug("error \(error)")
 
         var info = result
@@ -261,42 +265,42 @@ class OutGoing: NSObject, GCDAsyncSocketDelegate {
             print(message)
             info = info!.pointee.ai_next
         }
-        
+
         //free the chain
         freeaddrinfo(result)
-        
+
     }
-    
-    
+
+
     func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16) {
         DDLogDebug("Connected \(host):\(port)")
     }
-    
-    
+
+
     func sockaddrDescription(addr: UnsafePointer<sockaddr>) -> (String?, String?) {
-        
-        var host : String?
-        var service : String?
-        
+
+        var host: String?
+        var service: String?
+
         var hostBuffer = [CChar](repeating: 0, count: Int(NI_MAXHOST))
         var serviceBuffer = [CChar](repeating: 0, count: Int(NI_MAXSERV))
-        
+
         if getnameinfo(
-            addr,
-            socklen_t(addr.pointee.sa_len),
-            &hostBuffer,
-            socklen_t(hostBuffer.count),
-            &serviceBuffer,
-            socklen_t(serviceBuffer.count),
-            NI_NUMERICHOST | NI_NUMERICSERV)
-            
+                addr,
+                socklen_t(addr.pointee.sa_len),
+                    &hostBuffer,
+                socklen_t(hostBuffer.count),
+                    &serviceBuffer,
+                socklen_t(serviceBuffer.count),
+                NI_NUMERICHOST | NI_NUMERICSERV)
+
             == 0 {
-            
+
             host = String(cString: hostBuffer)
             service = String(cString: serviceBuffer)
         }
         return (host, service)
-        
+
     }
-    
+
 }

@@ -199,10 +199,10 @@ class HistoryOptionTableViewController: UITableViewController {
                     self.shareExported()
                 })
             } else if indexPath.row == 2 {
-//                copyPacketTunnelProviderLogToDocument(withCompletion: {
+                copyPacketTunnelProviderLogToDocument(withCompletion: {
 //                    self.mergePieceBody()
                     self.shareExported()
-//                })
+                })
             }
         default:
             break

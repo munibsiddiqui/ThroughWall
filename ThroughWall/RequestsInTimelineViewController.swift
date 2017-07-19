@@ -52,11 +52,13 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
 
         requestHostTraffic()
         classifyTraffic()
+
         viewHeightConstraint.constant = CGFloat((classifiedTrafficsInRow.count + 1) * 48)
         let duringTime = endTime.timeIntervalSince(beginTime)
         viewWidthConstraint.constant = CGFloat(duringTime * Double(horiScaller) + 48)
         drawTraffic(fromTime: beginTime, toTime: endTime)
         drawTimelineRuler(fromTime: beginTime, toTime: endTime)
+
         getTrafficStream()
         drawTrafficStream()
     }
@@ -66,19 +68,9 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
         // Dispose of any resources that can be recreated.
     }
 
-//    @IBAction func shouldScaleView(_ sender: UIPinchGestureRecognizer) {
-//        horiScaller =  backupScaller * Double(sender.scale)
-//        if sender.state  == .ended {
-//            backupScaller = horiScaller
-//        }
-//        print(horiScaller)
-//        clearDrawedTraffics()
-//        let duringTime = endTime.timeIntervalSince(beginTime)
-//        viewWidthConstraint.constant = CGFloat(duringTime * horiScaller)
-//        drawTraffic(fromTime: beginTime, toTime: endTime)
-//
-//        view.setNeedsLayout()
-//    }
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+//        newScrollOffset(withValue: scrollView.contentOffset.x)
+    }
 
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return baseView
@@ -109,7 +101,10 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
         do {
             hostTraffics = try CoreDataController.sharedInstance.getContext().fetch(fetch)
             hostTraffics.sort(by: { (first, second) -> Bool in
-                guard let firstTime = first.hostConnectInfo?.requestTime, let secondTime = second.hostConnectInfo?.requestTime else {
+                guard let firstTime = first.hostConnectInfo?.requestTime else {
+                    return false
+                }
+                guard let secondTime = second.hostConnectInfo?.requestTime else {
                     return true
                 }
                 if firstTime.timeIntervalSince(secondTime as Date) > 0 {
@@ -143,7 +138,7 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
             var inserted = false
             for (rowIndex, row) in classifiedTrafficsInRow.enumerated() {
                 if let lastInRow = row.last {
-                    var lastInRowDisTime = NSDate()
+                    let lastInRowDisTime: NSDate
                     if let _lastInRowDisTime = lastInRow.disconnectTime {
                         lastInRowDisTime = _lastInRowDisTime
                     } else {
@@ -175,10 +170,19 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
         }
     }
 
+
+    func newScrollOffset(withValue value: CGFloat) {
+        let offset = Double(value)
+        let ft = beginTime.addingTimeInterval( ((offset - 48) >= 0 ? (offset - 48) : 0) / Double(horiScaller))
+        let tT = beginTime.addingTimeInterval( (offset + Double(view.frame.width)) / Double(horiScaller))
+        drawTraffic(fromTime: ft, toTime: tT)
+    }
+
+
     func drawTraffic(fromTime fT: Date, toTime tT: Date) {
         for (rowIndex, rowTraffics) in classifiedTrafficsInRow.enumerated() {
             for rowTraffic in rowTraffics {
-                var disTime = Date()
+                let disTime: Date
                 if let _disTime = rowTraffic.disconnectTime {
                     disTime = _disTime as Date
                 } else {
@@ -186,11 +190,12 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
                 }
                 if let reqTime = rowTraffic.hostConnectInfo?.requestTime as Date? {
                     if reqTime > tT {
-                        continue
+                        break
                     }
                     if disTime < fT {
                         continue
                     }
+                    
                     // draw
                     let offsetTime = reqTime.timeIntervalSince(beginTime)
                     let length = disTime.timeIntervalSince(reqTime)

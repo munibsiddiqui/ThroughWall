@@ -110,8 +110,8 @@ class HomeViewController: UIViewController {
 //        DDLog.add(DDASLLogger.sharedInstance) // ASL = Apple System Logs
 
         let fileLogger: DDFileLogger = DDFileLogger() // File Logger
-        fileLogger.rollingFrequency = TimeInterval(60 * 60) // 24 hours
-        fileLogger.logFileManager.maximumNumberOfLogFiles = 7
+        fileLogger.rollingFrequency = TimeInterval(60 * 60) // 1 hour
+        fileLogger.logFileManager.maximumNumberOfLogFiles = 2
         DDLog.add(fileLogger)
 
         DDLogInfo("------App Log Start------")

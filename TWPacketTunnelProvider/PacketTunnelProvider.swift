@@ -26,67 +26,70 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         // Add code here to start the process of connecting the tunnel.
         Fabric.with([Crashlytics.self])
         Answers.logCustomEvent(withName: "Start", customAttributes: ["time": "\(Date())"])
-        
+
         setupDDLog()
         DDLogVerbose("Going to start VPN")
         pendingStartCompletion = completionHandler
 
         CoreDataController.sharedInstance.closeCrashLogs()
-        
-//        DDLogVerbose("\(Date().timeIntervalSince1970)")
-        Rule.sharedInstance.analyzeRuleFile()
-//        DDLogVerbose("\(Date().timeIntervalSince1970)")
 
-        addObserver(self, forKeyPath: "defaultPath", options: NSKeyValueObservingOptions.initial, context: nil)
+        Rule.sharedInstance.analyzeRuleFile()
+
+        addObserver(self, forKeyPath: "defaultPath", options: NSKeyValueObservingOptions.new, context: nil)
 
         //Start shadowsocks_libev
-        startShodowsocksClient { (ShadowLibSocksPort, error) in
+
+        startShodowsocksClient { (shadowLibSocksPort, error) in
             if error != nil {
                 self.pendingStartCompletion?(error)
                 return
             }
-            DDLogVerbose("shadowsocks port: \(ShadowLibSocksPort)")
-//            DDLogVerbose("\(Date().timeIntervalSince1970)")
+            DDLogVerbose("shadowsocks port: \(shadowLibSocksPort)")
+
             NotificationCenter.default.addObserver(self, selector: #selector(PacketTunnelProvider.onShadowsocksClientClosed), name: NSNotification.Name(rawValue: Tun2SocksStoppedNotification), object: nil)
+            self.startProxyManager(withSSPort: shadowLibSocksPort)
+        }
+    }
 
-            //HTTP/HTTPS Proxy Setting
-            HTTPProxyManager.shardInstance.startProxy(bindToPort: ShadowLibSocksPort, callback: { (httpProxyPort, error) in
+    func startProxyManager(withSSPort ShadowLibSocksPort: Int) {
+        //HTTP/HTTPS Proxy Setting
+        HTTPProxyManager.shardInstance.startProxy(bindToPort: ShadowLibSocksPort, callback: { (httpProxyPort, error) in
 
-                if error != nil {
+            if error != nil {
+                self.pendingStartCompletion?(error)
+                return
+            }
+            DDLogVerbose("http(s) port: \(httpProxyPort)")
+            //                DDLogVerbose("\(Date().timeIntervalSince1970)")
+            self.httpPort = httpProxyPort
+
+            //socksTohttp
+            Socks2HTTPS.sharedInstance.start(bindToPort: UInt16(httpProxyPort), callback: { (socksPortToHTTP, error) in
+                DDLogVerbose("socksToHTTP port: \(socksPortToHTTP)")
+                //                    DDLogVerbose("\(Date().timeIntervalSince1970)")
+                //TunnelSetting
+                self.setupTunnelWith(proxyPort: httpProxyPort, completionHandle: { (error) in
+                    //Forward IP Packets
+                    let error = TunnelManager.sharedInterface().startTunnel(withShadowsocksPort: socksPortToHTTP as NSNumber!, packetTunnelFlow: self.packetFlow)
+                    //                        [weakSelf addObserver:weakSelf forKeyPath:@"defaultPath" options:NSKeyValueObservingOptionInitial context:nil];
+                    if let _error = error {
+                        DDLogVerbose("complete with \(_error)")
+                    } else {
+                        DDLogVerbose("complete")
+                        Answers.logCustomEvent(withName: "StartComplete", customAttributes: nil)
+                        self.startTime = Date()
+                    }
+                    //                        DDLogVerbose("\(Date().timeIntervalSince1970)")
                     self.pendingStartCompletion?(error)
-                    return
-                }
-                DDLogVerbose("http(s) port: \(httpProxyPort)")
-//                DDLogVerbose("\(Date().timeIntervalSince1970)")
-                self.httpPort = httpProxyPort
-
-                //socksTohttp
-                Socks2HTTPS.sharedInstance.start(bindToPort: UInt16(httpProxyPort), callback: { (socksPortToHTTP, error) in
-                    DDLogVerbose("socksToHTTP port: \(socksPortToHTTP)")
-//                    DDLogVerbose("\(Date().timeIntervalSince1970)")
-                    //TunnelSetting
-                    self.setupTunnelWith(proxyPort: httpProxyPort, completionHandle: { (error) in
-                        //Forward IP Packets
-                        let error = TunnelManager.sharedInterface().startTunnel(withShadowsocksPort: socksPortToHTTP as NSNumber!, packetTunnelFlow: self.packetFlow)
-                        //                        [weakSelf addObserver:weakSelf forKeyPath:@"defaultPath" options:NSKeyValueObservingOptionInitial context:nil];
-                        if let _error = error {
-                            DDLogVerbose("complete with \(_error)")
-                        } else {
-                            DDLogVerbose("complete")
-                            Answers.logCustomEvent(withName: "StartComplete", customAttributes: nil)
-                            self.startTime = Date()
-                        }
-//                        DDLogVerbose("\(Date().timeIntervalSince1970)")
-                        self.pendingStartCompletion?(error)
-
-                    })
 
                 })
 
             })
-        }
+
+        })
     }
-    
+
+
     func setupDDLog() {
         DDLog.add(DDASLLogger.sharedInstance, with: DDLogLevel.warning)// ASL = Apple System Logs
 
@@ -97,7 +100,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         let logFileManager = DDLogFileManagerDefault(logsDirectory: url.path)
         let fileLogger: DDFileLogger = DDFileLogger(logFileManager: logFileManager) // File Logger
         fileLogger.rollingFrequency = TimeInterval(60 * 60) // 1 hours
-        fileLogger.logFileManager.maximumNumberOfLogFiles = 6  // 6 files
+        fileLogger.logFileManager.maximumNumberOfLogFiles = 6 // 6 files
         fileLogger.maximumFileSize = 0
         DDLog.add(fileLogger)
 
@@ -145,41 +148,40 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         let protocol_ssr: String
         if let _protocol = conf["protocol"] as? String {
             protocol_ssr = _protocol
-        }else{
+        } else {
             protocol_ssr = ""
         }
         let pro_param: String
         if let _pro_param = conf["proto_param"] as? String {
             pro_param = _pro_param
-        }else{
+        } else {
             pro_param = ""
         }
         let obfs: String
         if let _obfs = conf["obfs"] as? String {
             obfs = _obfs
-        }else{
+        } else {
             obfs = ""
         }
         let obfs_param: String
         if let _obfs_param = conf["obfs_param"] as? String {
             obfs_param = _obfs_param
-        }else{
+        } else {
             obfs_param = ""
         }
 //        BOOL ota = [json[@"ota"] boolValue];
-        
+
         ssrControler.startShodowsocksClientWithhostAddress(server, hostPort: NSNumber(value: port!), hostPassword: password, authscheme: method, protocol: protocol_ssr, pro_para: pro_param, obfs: obfs, obfs_para: obfs_param) { (port, error) in
             callback(Int(port), error)
         }
     }
 
     func setupTunnelWith(proxyPort port: Int, completionHandle: @escaping (Error?) -> Void) {
-        let settings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: "192.0.2.2")
-
-        let ipv4Setting = NEIPv4Settings(addresses: ["192.0.2.1"], subnetMasks: ["255.255.255.0"])
+        let settings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: "192.0.8.5")
+        let ipv4Setting = NEIPv4Settings(addresses: ["192.0.8.1"], subnetMasks: ["255.255.255.0"])
         ipv4Setting.includedRoutes = [NEIPv4Route.default()]
-        ipv4Setting.excludedRoutes = generateExcludedRoutes()        
-        
+        ipv4Setting.excludedRoutes = generateExcludedRoutes()
+
         settings.iPv4Settings = ipv4Setting
         settings.mtu = 1600
 
@@ -199,7 +201,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             completionHandle(error)
         }
     }
-    
+
     func generateExcludedRoutes() -> [NEIPv4Route] {
         let bypassTunRules = Rule.sharedInstance.getBypassTunRule()
         var result = [NEIPv4Route]()
@@ -208,37 +210,51 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         }
         return result
     }
-    
+
 
     func onShadowsocksClientClosed() {
         DDLogDebug("onShadowsocksClientClosed")
         HTTPProxyManager.shardInstance.stopProxy()
         DDLogDebug("StopCompletion")
         DDLog.flushLog()
-        
+
         if pendingStopCompletion != nil {
             pendingStopCompletion!()
         }
-        exit(EXIT_SUCCESS);
+//        exit(EXIT_SUCCESS);
     }
 
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
-        if keyPath == "defaultPath" {
-            DDLogDebug("defaultPath")
-            if defaultPath?.status == NWPathStatus.satisfied && defaultPath != lastPath {
-                if lastPath == nil {
-                    lastPath = defaultPath
-                } else {
-                    DDLogDebug("received network change notification")
-                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1, execute: {
-                        self.setupTunnelWith(proxyPort: self.httpPort, completionHandle: { (_) in
 
-                        })
-                    })
-                }
-            } else {
+        if keyPath == "defaultPath" {
+            if defaultPath?.status != .satisfied {
+                DDLogVerbose("defaultPath: not satisfied")
                 lastPath = defaultPath
+                return
             }
+
+            DDLogVerbose("defaultPath: isExpensive \(defaultPath!.isExpensive)")
+
+            if let _lastPath = lastPath {
+                if !defaultPath!.isEqual(to: _lastPath) {
+                    DDLogVerbose("defaultPath: received network change notification")
+                    reasserting = true
+                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1, execute: {
+                        self.setupTunnelWith(proxyPort: self.httpPort, completionHandle: { (_) in
+                            DDLogVerbose("defaultPath: change done")
+                        })
+                        self.reasserting = false
+                    })
+//                    stopTunnel(with: .none, completionHandler: {
+//                        DDLogVerbose("defaultPath: tunnel stopped")
+//                        self.startTunnel(options: nil, completionHandler: { (error) in
+//                            DDLogVerbose("defaultPath: tunnel started")
+//                        })
+//                    })
+                }
+            }
+            lastPath = defaultPath
+            DDLogVerbose("defaultPath: finish")
         }
     }
 

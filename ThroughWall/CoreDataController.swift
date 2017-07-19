@@ -73,7 +73,7 @@ class CoreDataController: NSObject {
         if fileManager.fileExists(atPath: url.path, isDirectory: &isDir) {
             if isDir.boolValue {
                 // file exists and is a directory
-                DDLogVerbose("\(url) exists and is a directory")
+//                DDLogVerbose("\(url) exists and is a directory")
             } else {
                 // file exists and is not a directory
                 do {
@@ -132,127 +132,6 @@ class CoreDataController: NSObject {
         }
         handleRefreshLock.unlock()
     }
-
-//    func backupDatabase(toURL url: URL) {
-//
-//        let psc = NSPersistentStoreCoordinator(managedObjectModel: persistentContainer.managedObjectModel)
-//        let oldURL = getDatabaseUrl()
-//        DDLogDebug("\(oldURL)")
-//        DDLogDebug("\(url)")
-//        do {
-//            let oldStore = try psc.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: oldURL, options: nil)
-//            try psc.migratePersistentStore(oldStore, to: url, options: nil, withType: NSSQLiteStoreType)
-//        } catch {
-//            DDLogError("\(error)")
-//        }
-//    }
-//
-//    func mergerPieceBody(atURL url: URL, completion: @escaping (() -> Void)) {
-//
-//        let container = NSPersistentContainer(name: "ThroughWall")
-//        let databaseURL = url.appendingPathComponent(databaseFileName)
-//        let parseURL = url.appendingPathComponent(parseFolderName)
-//        container.persistentStoreDescriptions = [NSPersistentStoreDescription.init(url: databaseURL)]
-//        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
-//            if let error = error as NSError? {
-//                fatalError("Unresolved error \(error), \(error.userInfo)")
-//            }
-//        })
-//        let context = container.viewContext
-//        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-//        privateContext.parent = context
-//
-//        DispatchQueue.global().async {
-//            self._mergerPieceBody(atParseURL: parseURL, usingContext: privateContext)
-//            completion()
-//        }
-//    }
-//
-//    func _mergerPieceBody(atParseURL parseURL: URL, usingContext privateContext: NSManagedObjectContext) {
-//        let fetch: NSFetchRequest<HostTraffic> = HostTraffic.fetchRequest()
-//        fetch.includesPropertyValues = false
-//        fetch.includesSubentities = false
-//
-//        do {
-//            let results = try privateContext.fetch(fetch)
-//            for result in results {
-//
-//                if let bodies = result.requestBodies {
-//                    var requestBody = Data()
-//                    if var _bodies = bodies.allObjects as? [RequestBodyPiece] {
-//                        _bodies.sort() {
-//                            return $0.timeStamp!.timeIntervalSince1970 < $1.timeStamp!.timeIntervalSince1970
-//                        }
-//                        if _bodies.count > 0 {
-//                            let _requestBody = RequestBody(context: privateContext)
-//
-//                            for body in _bodies {
-//                                let fileName = body.fileName!
-//                                do {
-//                                    let filePath = parseURL.appendingPathComponent(fileName)
-//                                    let data = try Data(contentsOf: filePath)
-//                                    requestBody.append(data)
-//                                    let requestStamp = RequestBodyStamp(context: privateContext)
-//                                    requestStamp.timeStamp = body.timeStamp
-//                                    requestStamp.size = Int32(data.count)
-//                                    requestStamp.belongToRequestBody = _requestBody
-//                                    try FileManager.default.removeItem(at: filePath)
-//                                } catch {
-//                                    DDLogError("read file \(fileName) error. \(error)")
-//                                }
-//                            }
-//                            _requestBody.body = requestBody as NSData
-//                            _requestBody.belongToHost = result
-//                            saveContext(privateContext)
-//                            for body in _bodies {
-//                                privateContext.refresh(body, mergeChanges: false)
-//                            }
-//                            privateContext.refresh(_requestBody, mergeChanges: false)
-//                        }
-//                    }
-//                }
-//                if let bodies = result.responseBodies {
-//                    var responseBody = Data()
-//                    if var _bodies = bodies.allObjects as? [ResponseBodyPiece] {
-//                        _bodies.sort() {
-//                            return $0.timeStamp!.timeIntervalSince1970 < $1.timeStamp!.timeIntervalSince1970
-//                        }
-//
-//                        if _bodies.count > 0 {
-//                            let _responseBody = ResponseBody(context: privateContext)
-//
-//                            for body in _bodies {
-//                                let fileName = body.fileName!
-//                                do {
-//                                    let filePath = parseURL.appendingPathComponent(fileName)
-//                                    let data = try Data(contentsOf: filePath)
-//                                    responseBody.append(data)
-//                                    let reponseStamp = ResponseBodyStamp(context: privateContext)
-//                                    reponseStamp.timeStamp = body.timeStamp
-//                                    reponseStamp.size = Int32(data.count)
-//                                    reponseStamp.belongToResponseBody = _responseBody
-//                                    try FileManager.default.removeItem(at: filePath)
-//                                } catch {
-//                                    DDLogError("read file \(fileName) error. \(error)")
-//                                }
-//                            }
-//                            _responseBody.body = responseBody as NSData
-//                            _responseBody.belongToHost = result
-//                            saveContext(privateContext)
-//                            for body in _bodies {
-//                                privateContext.refresh(body, mergeChanges: false)
-//                            }
-//                            privateContext.refresh(_responseBody, mergeChanges: false)
-//                        }
-//                    }
-//                }
-//                privateContext.refresh(result, mergeChanges: false)
-//            }
-//            try FileManager.default.removeItem(at: parseURL)
-//        } catch {
-//            DDLogError("\(error)")
-//        }
-//    }
 
     func closeCrashLogs() {
         let defaults = UserDefaults.init(suiteName: groupName)

@@ -38,7 +38,6 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         backgroundView = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
         backgroundView.center = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
         backgroundView.backgroundColor = UIColor.darkGray
-        view.addSubview(backgroundView)
 
         downloadIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
         downloadIndicator.center = CGPoint(x: 50, y: 50)
@@ -47,16 +46,13 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         downloadIndicator.startAnimating()
 
         backgroundView.isHidden = true
-
-//        downloadProgress = UITextField(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
-//        downloadProgress.center = CGPoint(x: 50, y: 80)
-//        downloadProgress.textAlignment = .center
-//        backgroundView.addSubview(downloadProgress)
-
     }
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        if !view.subviews.contains(backgroundView) {
+            view.addSubview(backgroundView)
+        }
         backgroundView.center = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
     }
 

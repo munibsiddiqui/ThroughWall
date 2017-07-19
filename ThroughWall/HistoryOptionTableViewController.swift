@@ -15,7 +15,9 @@ class HistoryOptionTableViewController: UITableViewController {
     var totalCount = 0
     var date = ""
     let logRequestSwitch = UISwitch()
-
+    var backgroundView = UIView()
+    var downloadIndicator = UIActivityIndicatorView()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -56,6 +58,28 @@ class HistoryOptionTableViewController: UITableViewController {
             }
         }, name as CFString, nil, .deliverImmediately)
 
+        
+        backgroundView = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+        backgroundView.center = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
+        backgroundView.backgroundColor = UIColor.darkGray
+        
+        
+        downloadIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
+        downloadIndicator.center = CGPoint(x: 50, y: 50)
+        downloadIndicator.activityIndicatorViewStyle = .whiteLarge
+        backgroundView.addSubview(downloadIndicator)
+        downloadIndicator.startAnimating()
+        
+        backgroundView.isHidden = true
+        
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if !view.subviews.contains(backgroundView) {
+            view.addSubview(backgroundView)
+        }        
+        backgroundView.center = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -120,16 +144,16 @@ class HistoryOptionTableViewController: UITableViewController {
     func trigerLogFunction() {
         if logRequestSwitch.isOn {
             let alertController = UIAlertController(title: "Caution", message: "Logs will NOT be deleted automatically. You should delete logs manually.", preferredStyle: .alert)
-            
+
             let dismissAction = UIAlertAction(title: "Dismmiss", style: .default, handler: { (_) in
-                
+
             })
 
             alertController.addAction(dismissAction)
-            
+
             self.present(alertController, animated: true, completion: nil)
         }
-        
+
         let defaults = UserDefaults(suiteName: groupName)
         defaults?.set(logRequestSwitch.isOn, forKey: shouldParseTrafficKey)
         defaults?.synchronize()
@@ -159,6 +183,7 @@ class HistoryOptionTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        let rect = tableView.rectForRow(at: indexPath)
         switch indexPath.section {
         case 0:
             if indexPath.row == 1 {
@@ -174,34 +199,30 @@ class HistoryOptionTableViewController: UITableViewController {
             if indexPath.row == 0 {
                 let storyboard = UIStoryboard(name: "Main", bundle: nil)
                 let vc = storyboard.instantiateViewController(withIdentifier: "LogTXTView") as! LogViewController
-                
+
                 let fileManager = FileManager.default
                 var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName)!
                 url.appendPathComponent(PacketTunnelProviderLogFolderName)
-                
+
                 let logFileManager = DDLogFileManagerDefault(logsDirectory: url.path)
                 let fileLogger: DDFileLogger = DDFileLogger(logFileManager: logFileManager) // File Logger
-                vc.filePaths =  fileLogger.logFileManager.sortedLogFilePaths
+                vc.filePaths = fileLogger.logFileManager.sortedLogFilePaths
                 vc.shouldAddLogLevelAction = true
                 vc.fileLogger = fileLogger
-                
+
                 self.navigationController?.pushViewController(vc, animated: true)
-            }else if indexPath.row == 1 {
+            } else if indexPath.row == 1 {
                 let storyboard = UIStoryboard(name: "Main", bundle: nil)
                 let vc = storyboard.instantiateViewController(withIdentifier: "LogTXTView") as! LogViewController
-                
-                vc.filePaths =  DDFileLogger().logFileManager.sortedLogFilePaths
+
+                vc.filePaths = DDFileLogger().logFileManager.sortedLogFilePaths
                 vc.shouldAddLogLevelAction = false
-                
+
                 self.navigationController?.pushViewController(vc, animated: true)
-            }else if indexPath.row == -1 {
-                copyPacketTunnelProviderLogToDocument(withCompletion:{
-                    self.shareExported()
-                })
             } else if indexPath.row == 2 {
-                copyPacketTunnelProviderLogToDocument(withCompletion: {
-//                    self.mergePieceBody()
-                    self.shareExported()
+                backgroundView.isHidden = false
+                copyPacketTunnelProviderLogToTempDir(withCompletion: {
+                    self.shareExported(withRect: rect)
                 })
             }
         default:
@@ -209,58 +230,50 @@ class HistoryOptionTableViewController: UITableViewController {
         }
     }
 
-    func copyPacketTunnelProviderLogToDocument(withCompletion completion: @escaping (() -> Void)) {
+    func copyPacketTunnelProviderLogToTempDir(withCompletion completion: @escaping (() -> Void)) {
         DispatchQueue.global().async {
             let fileManager = FileManager.default
             var logUrl = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName)!
             logUrl.appendPathComponent(PacketTunnelProviderLogFolderName)
-            var newUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
-            newUrl.appendPathComponent(PacketTunnelProviderLogFolderName)
-            
+
+            let tmpurl = URL(fileURLWithPath: NSTemporaryDirectory())
+            var newUrl = tmpurl.appendingPathComponent(PacketTunnelProviderLogFolderName)
+
             do {
                 if fileManager.fileExists(atPath: newUrl.path) {
                     try fileManager.removeItem(at: newUrl)
                 }
                 try fileManager.copyItem(at: logUrl, to: newUrl)
-                
+
                 newUrl.appendPathComponent(databaseFolderName)
-                
+
                 let databaseUrl = CoreDataController.sharedInstance.getDatabaseUrl()
-                
+
                 try fileManager.copyItem(at: databaseUrl, to: newUrl)
                 //            CoreDataController.sharedInstance.backupDatabase(toURL: newUrl)
+
+                DispatchQueue.main.sync {
+                    completion()
+                }
             } catch {
                 DDLogError("\(error)")
-            }
-            DispatchQueue.main.async {
-                completion()
             }
         }
     }
 
-//    func mergePieceBody() {
-//        let fileManager = FileManager.default
-//        var newUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
-//        newUrl.appendPathComponent(PacketTunnelProviderLogFolderName)
-//        newUrl.appendPathComponent(databaseFolderName)
-////        newUrl.appendPathComponent(databaseFileName)
-//        CoreDataController.sharedInstance.mergerPieceBody(atURL: newUrl, completion: {
-//            self.shareExported()
-//        })
-//    }
-    
-    func shareExported() {
-        var newUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        newUrl.appendPathComponent(PacketTunnelProviderLogFolderName)
-        
+    func shareExported(withRect rect: CGRect) {
+        let tmpurl = URL(fileURLWithPath: NSTemporaryDirectory())
+        let newUrl = tmpurl.appendingPathComponent(PacketTunnelProviderLogFolderName)
+
         let activityViewController = UIActivityViewController(activityItems: [newUrl], applicationActivities: nil)
-        //                if let popoverPresentationController = activityViewController.popoverPresentationController {
-        //                    popoverPresentationController.barButtonItem = sender
-        //                }
+        if let popoverPresentationController = activityViewController.popoverPresentationController {
+            popoverPresentationController.sourceView = view
+            popoverPresentationController.sourceRect = rect
+        }
         DispatchQueue.main.async {
             self.present(activityViewController, animated: true, completion: nil)
+            self.backgroundView.isHidden = true
         }
-        print("done")
     }
 
 
@@ -335,11 +348,11 @@ class HistoryOptionTableViewController: UITableViewController {
         case 2:
             if indexPath.row == 0 {
                 cell.textLabel?.text = "Network's Log"
-            }else if indexPath.row == 1 {
+            } else if indexPath.row == 1 {
                 cell.textLabel?.text = "App's Log"
-            }else if indexPath.row == 2 {
+            } else if indexPath.row == 2 {
                 cell.textLabel?.text = "Export All Logs"
-            }else if indexPath.row == -3 {
+            } else if indexPath.row == -3 {
                 cell.textLabel?.text = "Merge to Document"
             } else if indexPath.row == -2 {
                 cell.textLabel?.text = "AirDrop"

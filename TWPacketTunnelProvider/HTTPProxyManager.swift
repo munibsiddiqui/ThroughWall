@@ -90,6 +90,7 @@ class HTTPProxyManager: NSObject {
 
         DDLogVerbose("wait for all disconnected")
         clientEmptySemaphore?.wait()
+        clientEmptySemaphore = nil
         DDLogVerbose("continue~~~")
         
         saveTrafficTimer?.cancel()

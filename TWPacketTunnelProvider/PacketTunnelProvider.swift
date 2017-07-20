@@ -51,9 +51,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
 
-    func startProxyManager(withSSPort ShadowLibSocksPort: Int) {
+    func startProxyManager(withSSPort shadowLibSocksPort: Int) {
         //HTTP/HTTPS Proxy Setting
-        HTTPProxyManager.shardInstance.startProxy(bindToPort: ShadowLibSocksPort, callback: { (httpProxyPort, error) in
+        HTTPProxyManager.shardInstance.startProxy(bindToPort: shadowLibSocksPort, callback: { (httpProxyPort, error) in
 
             if error != nil {
                 self.pendingStartCompletion?(error)
@@ -71,7 +71,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 self.setupTunnelWith(proxyPort: httpProxyPort, completionHandle: { (error) in
                     //Forward IP Packets
                     let error = TunnelManager.sharedInterface().startTunnel(withShadowsocksPort: socksPortToHTTP as NSNumber!, packetTunnelFlow: self.packetFlow)
-                    //                        [weakSelf addObserver:weakSelf forKeyPath:@"defaultPath" options:NSKeyValueObservingOptionInitial context:nil];
+
                     if let _error = error {
                         DDLogVerbose("complete with \(_error)")
                     } else {
@@ -192,6 +192,16 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         proxySettings.httpsServer = NEProxyServer(address: "localhost", port: port)
         proxySettings.excludeSimpleHostnames = true
 
+        proxySettings.exceptionList = ["api.smoot.apple.com",
+            "configuration.apple.com",
+            "xp.apple.com",
+            "smp-device-content.apple.com",
+            "guzzoni.apple.com",
+            "captive.apple.com",
+            "*.ess.apple.com",
+            "*.push.apple.com",
+            "*.push-apple.com.akadns.net"]
+
         settings.proxySettings = proxySettings
         let dnsSetting = NEDNSSettings.init(servers: DNSConfig.getSystemDnsServers() as! [String])
         dnsSetting.matchDomains = [""]
@@ -255,6 +265,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             }
             lastPath = defaultPath
             DDLogVerbose("defaultPath: finish")
+        } else {
+            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
     }
 

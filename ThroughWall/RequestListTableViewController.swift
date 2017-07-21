@@ -33,6 +33,10 @@ class RequestListTableViewController: UITableViewController {
             }
         }
     }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -52,7 +56,7 @@ class RequestListTableViewController: UITableViewController {
                 self.performSegue(withIdentifier: "showTimeline", sender: nil)
             }
         }
-        listController.addAction(showTimelineAction)
+//        listController.addAction(showTimelineAction)
 
         let clearLog = UIAlertAction(title: "Clear Completed Logs", style: .destructive) { (_) in
             DispatchQueue.main.async {

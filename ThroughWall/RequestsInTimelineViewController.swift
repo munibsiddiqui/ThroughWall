@@ -63,6 +63,10 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
         drawTrafficStream()
     }
 
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -333,6 +337,9 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
         let duringTime = endTime.timeIntervalSince(beginTime)
         let width = Int(duringTime * Double(horiScaller))
         let height = classifiedTrafficsInRow.count * 48
+        if height == 0 {
+            return
+        }
         shapeLayer.frame = CGRect(x: 48, y: 48, width: width, height: height)
         baseView.layer.addSublayer(shapeLayer)
         if let maxValue = responseTraffic.max() {

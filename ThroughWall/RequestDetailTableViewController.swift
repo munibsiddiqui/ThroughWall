@@ -33,6 +33,10 @@ class RequestDetailTableViewController: UITableViewController {
 //        outgoingConnection = GCDAsyncSocket(delegate: self, delegateQueue: DispatchQueue.global())
     }
 
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.

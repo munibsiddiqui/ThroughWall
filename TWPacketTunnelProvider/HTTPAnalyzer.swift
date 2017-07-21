@@ -281,75 +281,75 @@ class HTTPAnalyzer: NSObject {
     }
 
     fileprivate func recordRequestBody(withData data: Data) {
-        DispatchQueue.main.async {
-            if self.shouldParseTraffic {
-                let length = data.count
-                let timestamp = Date()
-
-                if let reqTimestamp = self.requestTimestamp {
-                    if timestamp.timeIntervalSince(reqTimestamp) >= TrafficStep {
-                        //save and set new timestamp and length
-                        let context = CoreDataController.sharedInstance.getContext()
-                        let bodyStamp = RequestBodyStamp(context: context)
-                        bodyStamp.size = Int64(self.requestLength)
-                        bodyStamp.timeStamp = NSDate()
-                        bodyStamp.belongToRequestBody = self.requestBody
-                        CoreDataController.sharedInstance.addToRefreshList(withObj: bodyStamp, andContext: context)
-
-                        self.requestLength = length
-                        self.requestTimestamp = timestamp
-                    } else {
-                        self.requestLength = self.requestLength + length
-                    }
-                } else {
-                    if let _ = self.requestBody.fileName {
-                        self.requestLength = length
-                        self.requestTimestamp = timestamp
-                    }
-                }
-
-                if let fileHandle = self.requestBodyFileHandle {
-                    fileHandle.write(data)
-                }
-                DDLogVerbose("H\(self.intTag)H data count: \(length)")
-            }
-        }
+//        DispatchQueue.main.async {
+//            if self.shouldParseTraffic {
+//                let length = data.count
+//                let timestamp = Date()
+//
+//                if let reqTimestamp = self.requestTimestamp {
+//                    if timestamp.timeIntervalSince(reqTimestamp) >= TrafficStep {
+//                        //save and set new timestamp and length
+//                        let context = CoreDataController.sharedInstance.getContext()
+//                        let bodyStamp = RequestBodyStamp(context: context)
+//                        bodyStamp.size = Int64(self.requestLength)
+//                        bodyStamp.timeStamp = NSDate()
+//                        bodyStamp.belongToRequestBody = self.requestBody
+//                        CoreDataController.sharedInstance.addToRefreshList(withObj: bodyStamp, andContext: context)
+//
+//                        self.requestLength = length
+//                        self.requestTimestamp = timestamp
+//                    } else {
+//                        self.requestLength = self.requestLength + length
+//                    }
+//                } else {
+//                    if let _ = self.requestBody.fileName {
+//                        self.requestLength = length
+//                        self.requestTimestamp = timestamp
+//                    }
+//                }
+//
+//                if let fileHandle = self.requestBodyFileHandle {
+//                    fileHandle.write(data)
+//                }
+//                DDLogVerbose("H\(self.intTag)H data count: \(length)")
+//            }
+//        }
     }
 
     fileprivate func recordResponseBody(withData data: Data) {
-        DispatchQueue.main.async {
-            if self.shouldParseTraffic {
-                let length = data.count
-                let timestamp = Date()
-
-                if let resTimestamp = self.responseTimestamp {
-                    if timestamp.timeIntervalSince(resTimestamp) >= TrafficStep {
-                        //save and set new timestamp and length
-                        let context = CoreDataController.sharedInstance.getContext()
-                        let bodyStamp = ResponseBodyStamp(context: context)
-                        bodyStamp.size = Int64(length)
-                        bodyStamp.timeStamp = NSDate()
-                        bodyStamp.belongToResponseBody = self.responseBody
-                        CoreDataController.sharedInstance.addToRefreshList(withObj: bodyStamp, andContext: context)
-
-                        self.responseLength = length
-                        self.responseTimestamp = timestamp
-                    } else {
-                        self.responseLength = self.responseLength + length
-                    }
-                } else {
-                    if let _ = self.responseBody.fileName {
-                        self.responseLength = length
-                        self.responseTimestamp = timestamp
-                    }
-                }
-
-                if let fileHandle = self.responseBodyFileHandle {
-                    fileHandle.write(data)
-                }
-                DDLogVerbose("H\(self.intTag)H Record \(length)")
-            }
-        }
+//        DispatchQueue.main.async {
+//            if self.shouldParseTraffic {
+//                let length = data.count
+//                let timestamp = Date()
+//
+//                if let resTimestamp = self.responseTimestamp {
+//                    if timestamp.timeIntervalSince(resTimestamp) >= TrafficStep {
+//                        //save and set new timestamp and length
+//                        let context = CoreDataController.sharedInstance.getContext()
+//                        let bodyStamp = ResponseBodyStamp(context: context)
+//                        bodyStamp.size = Int64(length)
+//                        bodyStamp.timeStamp = NSDate()
+//                        bodyStamp.belongToResponseBody = self.responseBody
+//                        CoreDataController.sharedInstance.addToRefreshList(withObj: bodyStamp, andContext: context)
+//
+//                        self.responseLength = length
+//                        self.responseTimestamp = timestamp
+//                    } else {
+//                        self.responseLength = self.responseLength + length
+//                    }
+//                } else {
+//                    if let _ = self.responseBody.fileName {
+//                        self.responseLength = length
+//                        self.responseTimestamp = timestamp
+//                    }
+//                }
+//
+//                if let fileHandle = self.responseBodyFileHandle {
+//                    fileHandle.write(data)
+//                }
+//                DDLogVerbose("H\(self.intTag)H Record \(length)")
+//            }
+//        }
     }
 
     private func createRandomFile(atURL url: URL) -> String {
@@ -359,19 +359,6 @@ class HTTPAnalyzer: NSObject {
         fileManager.createFile(atPath: url.appendingPathComponent(randomFileName).path, contents: nil, attributes: nil)
         return randomFileName
     }
-
-//    private func createRandomFile(atURL url: URL, withContent content: Data) -> String {
-//        var randomFileName = ""
-//        let fileManager = FileManager.default
-//        randomFileName = "\(Int(Date().timeIntervalSince1970 * 1000))" + String.random()
-//
-//        DispatchQueue.global(qos: .default).async {
-//            fileManager.createFile(atPath: url.appendingPathComponent(randomFileName).path, contents: content, attributes: nil)
-//            DDLogVerbose("H\(self.intTag)H Store \(content.count)")
-//        }
-//        return randomFileName
-//    }
-
 }
 // MARK: - GCDAsyncSocketDelegate
 

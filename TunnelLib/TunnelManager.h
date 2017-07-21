@@ -18,6 +18,7 @@
 
 + (TunnelManager *)sharedInterface;
 - (NSError *)startTunnelWithShadowsocksPort:(NSNumber *)shadowsocksPort PacketTunnelFlow:(NEPacketTunnelFlow *)packetFlow;
+- (NSError *)restartUDP;
 + (void)writePacket: (NSData *)packet;
 - (void)stop;
 

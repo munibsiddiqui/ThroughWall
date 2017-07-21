@@ -60,15 +60,25 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 return
             }
             DDLogVerbose("http(s) port: \(httpProxyPort)")
-            //                DDLogVerbose("\(Date().timeIntervalSince1970)")
+
             self.httpPort = httpProxyPort
 
             //socksTohttp
             Socks2HTTPS.sharedInstance.start(bindToPort: UInt16(httpProxyPort), callback: { (socksPortToHTTP, error) in
+                if error != nil {
+                    self.pendingStartCompletion?(error)
+                    return
+                }
+
                 DDLogVerbose("socksToHTTP port: \(socksPortToHTTP)")
-                //                    DDLogVerbose("\(Date().timeIntervalSince1970)")
+
                 //TunnelSetting
                 self.setupTunnelWith(proxyPort: httpProxyPort, completionHandle: { (error) in
+                    if error != nil {
+                        self.pendingStartCompletion?(error)
+                        return
+                    }
+
                     //Forward IP Packets
                     let error = TunnelManager.sharedInterface().startTunnel(withShadowsocksPort: socksPortToHTTP as NSNumber!, packetTunnelFlow: self.packetFlow)
 
@@ -79,9 +89,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                         Answers.logCustomEvent(withName: "StartComplete", customAttributes: nil)
                         self.startTime = Date()
                     }
-                    //                        DDLogVerbose("\(Date().timeIntervalSince1970)")
                     self.pendingStartCompletion?(error)
-
+                    self.pendingStartCompletion = nil
                 })
 
             })
@@ -203,7 +212,10 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             "*.push-apple.com.akadns.net"]
 
         settings.proxySettings = proxySettings
-        let dnsSetting = NEDNSSettings.init(servers: DNSConfig.getSystemDnsServers() as! [String])
+
+        let dnsServers = DNSConfig.getSystemDnsServers() as! [String]
+        DDLogVerbose("DNS servers: \(dnsServers)")
+        let dnsSetting = NEDNSSettings(servers: dnsServers)
         dnsSetting.matchDomains = [""]
         settings.dnsSettings = dnsSetting
 
@@ -238,7 +250,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
 
         if keyPath == "defaultPath" {
             if defaultPath?.status != .satisfied {
-                DDLogVerbose("defaultPath: not satisfied")
                 lastPath = defaultPath
                 return
             }
@@ -247,24 +258,20 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
 
             if let _lastPath = lastPath {
                 if !defaultPath!.isEqual(to: _lastPath) {
-                    DDLogVerbose("defaultPath: received network change notification")
-                    reasserting = true
-                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1, execute: {
+                    DDLogVerbose("defaultPath: IF changed")
+                    setTunnelNetworkSettings(nil) { (error) in
+                        if let error = error {
+                            DDLogError("setTunnelNetworkSettings to nil failed: \(error)")
+                            return
+                        }
                         self.setupTunnelWith(proxyPort: self.httpPort, completionHandle: { (_) in
-                            DDLogVerbose("defaultPath: change done")
+                            TunnelManager.sharedInterface().restartUDP()
+                            DDLogVerbose("defaultPath: change is done")
                         })
-                        self.reasserting = false
-                    })
-//                    stopTunnel(with: .none, completionHandler: {
-//                        DDLogVerbose("defaultPath: tunnel stopped")
-//                        self.startTunnel(options: nil, completionHandler: { (error) in
-//                            DDLogVerbose("defaultPath: tunnel started")
-//                        })
-//                    })
+                    }
                 }
             }
             lastPath = defaultPath
-            DDLogVerbose("defaultPath: finish")
         } else {
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }

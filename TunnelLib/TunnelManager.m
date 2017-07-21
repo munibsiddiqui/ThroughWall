@@ -83,6 +83,27 @@ static const DDLogLevel ddLogLevel = DDLogLevelDebug;
     return nil;
 }
 
+- (NSError *)restartUDP {
+    NSError *error = NULL;
+    GCDAsyncUdpSocket *udpSocket = [TunnelManager sharedInterface].udpSocket;
+    [udpSocket close];
+    
+    [TunnelManager sharedInterface].udpSession = [NSMutableDictionary dictionaryWithCapacity:5];
+    [TunnelManager sharedInterface].udpSocket =  [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_queue_create("udp", NULL)];
+    
+    udpSocket = [TunnelManager sharedInterface].udpSocket;
+    
+    [udpSocket bindToPort:0 error:&error];
+    if (error) {
+        return error;
+    }
+    [udpSocket beginReceiving:&error];
+    if (error) {
+        return error;
+    }
+    return error;
+}
+
 - (void)startTun2Socks: (int)socksServerPort {
     [NSThread detachNewThreadSelector:@selector(_startTun2Socks:) toTarget:[TunnelManager sharedInterface] withObject:@(socksServerPort)];
 }
@@ -207,6 +228,9 @@ static const DDLogLevel ddLogLevel = DDLogLevelDebug;
     ip_addr_p_t dest ={ addr->sin_addr.s_addr };
     in_port_t dest_port = addr->sin_port;
     NSString *strHostPort = self.udpSession[[self strForHost:dest.addr port:dest_port]];
+    if (strHostPort == nil) {
+        return;
+    }
     NSArray *hostPortArray = [strHostPort componentsSeparatedByString:@":"];
     int src_ip = [hostPortArray[0] intValue];
     int src_port = [hostPortArray[1] intValue];

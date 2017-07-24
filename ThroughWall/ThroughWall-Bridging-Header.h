@@ -3,6 +3,7 @@
 //
 
 #import "SimplePing.h"
+#import "PAirSandbox.h"
 #import <openssl/pkcs7.h>
 #import <openssl/x509.h>
 #import <openssl/asn1.h>

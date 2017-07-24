@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		341F7FA01F24C8DA00CDCEDD /* PAirSandbox.m in Sources */ = {isa = PBXBuildFile; fileRef = 341F7F9E1F24C81C00CDCEDD /* PAirSandbox.m */; };
 		3423C7651DF00C60002B5AE8 /* OutgoingSide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3423C7641DF00C60002B5AE8 /* OutgoingSide.swift */; };
 		343352891DF93FAD00CF7281 /* ThroughWall.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3474EC811DDC926C00EBF3C5 /* ThroughWall.xcdatamodeld */; };
 		3433528D1DF943D100CF7281 /* CoreDataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3433528C1DF943D100CF7281 /* CoreDataController.swift */; };
@@ -369,6 +370,8 @@
 		172477E3A4C2AE264451794D /* Pods-ThroughWall.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThroughWall.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ThroughWall/Pods-ThroughWall.debug.xcconfig"; sourceTree = "<group>"; };
 		2570E6ECDA38476866EA39BB /* Pods_TWPacketTunnelProvider.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TWPacketTunnelProvider.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		340329CD1ECD8AAA00651955 /* ThroughWall 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "ThroughWall 2.xcdatamodel"; sourceTree = "<group>"; };
+		341F7F9E1F24C81C00CDCEDD /* PAirSandbox.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PAirSandbox.m; sourceTree = "<group>"; };
+		341F7F9F1F24C81C00CDCEDD /* PAirSandbox.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PAirSandbox.h; sourceTree = "<group>"; };
 		3423C7641DF00C60002B5AE8 /* OutgoingSide.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutgoingSide.swift; sourceTree = "<group>"; };
 		3433528C1DF943D100CF7281 /* CoreDataController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataController.swift; sourceTree = "<group>"; };
 		3439FA051DEEB7A000F8CE59 /* Rule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Rule.swift; sourceTree = "<group>"; };
@@ -1242,6 +1245,8 @@
 			children = (
 				348AC2461E8A9CBF0072AB1B /* SimplePing.h */,
 				348AC2441E8A9C910072AB1B /* SimplePing.m */,
+				341F7F9F1F24C81C00CDCEDD /* PAirSandbox.h */,
+				341F7F9E1F24C81C00CDCEDD /* PAirSandbox.m */,
 			);
 			name = tool;
 			sourceTree = "<group>";
@@ -2901,6 +2906,7 @@
 				346FBAF51EC2EEA2007E9B8D /* BackgroundView.swift in Sources */,
 				3433528D1DF943D100CF7281 /* CoreDataController.swift in Sources */,
 				3464BF6E1EC49F0400D81663 /* QRViewController.swift in Sources */,
+				341F7FA01F24C8DA00CDCEDD /* PAirSandbox.m in Sources */,
 				345ECB871DF8F5C100F70ACC /* Rule.swift in Sources */,
 				3474EC7B1DDC926C00EBF3C5 /* AppDelegate.swift in Sources */,
 				343B9E7A1EE8EC88003B7320 /* AboutViewController.swift in Sources */,

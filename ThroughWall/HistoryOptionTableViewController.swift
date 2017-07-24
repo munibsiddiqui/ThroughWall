@@ -17,7 +17,7 @@ class HistoryOptionTableViewController: UITableViewController {
     let logRequestSwitch = UISwitch()
     var backgroundView = UIView()
     var downloadIndicator = UIActivityIndicatorView()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -58,27 +58,30 @@ class HistoryOptionTableViewController: UITableViewController {
             }
         }, name as CFString, nil, .deliverImmediately)
 
-        
+
         backgroundView = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
         backgroundView.center = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
         backgroundView.backgroundColor = UIColor.darkGray
-        
-        
+
+
         downloadIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
         downloadIndicator.center = CGPoint(x: 50, y: 50)
         downloadIndicator.activityIndicatorViewStyle = .whiteLarge
         backgroundView.addSubview(downloadIndicator)
         downloadIndicator.startAnimating()
-        
+
         backgroundView.isHidden = true
-        
+
+        #if DEBUG
+            PAirSandbox.sharedInstance().enableSwipe()
+        #endif
     }
-    
+
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         if !view.subviews.contains(backgroundView) {
             view.addSubview(backgroundView)
-        }        
+        }
         backgroundView.center = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
     }
 

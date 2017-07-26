@@ -36,7 +36,7 @@ class RequestDetailTableViewController: UITableViewController {
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
-    
+
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -92,9 +92,12 @@ class RequestDetailTableViewController: UITableViewController {
         switch indexPath.section {
         case 0:
             let cell = tableView.dequeueReusableCell(withIdentifier: "timeDetail", for: indexPath)
+            let privateContext = CoreDataController.sharedInstance.getPrivateContext()
 
             cell.textLabel?.text = "Rule"
-            cell.detailTextLabel?.text = hostRequest.hostConnectInfo?.rule
+            privateContext.performAndWait {
+                cell.detailTextLabel?.text = self.hostRequest.hostConnectInfo?.rule
+            }
 
             return cell
         case 1:
@@ -103,61 +106,75 @@ class RequestDetailTableViewController: UITableViewController {
             localFormatter.dateFormat = "HH:mm:ss:SSS"
 
             let cell = tableView.dequeueReusableCell(withIdentifier: "timeDetail", for: indexPath)
+            let privateContext = CoreDataController.sharedInstance.getPrivateContext()
 
-            if indexPath.row == 0 {
-                cell.textLabel?.text = "Request Time"
-                if let hostInfo = hostRequest.hostConnectInfo {
-                    if hostInfo.requestTime != nil {
-                        cell.detailTextLabel?.text = localFormatter.string(from: hostInfo.requestTime! as Date)
-                        return cell
+            privateContext.performAndWait {
+                if indexPath.row == 0 {
+                    cell.textLabel?.text = "Request Time"
+                    if let hostInfo = self.hostRequest.hostConnectInfo {
+                        if hostInfo.requestTime != nil {
+                            cell.detailTextLabel?.text = localFormatter.string(from: hostInfo.requestTime! as Date)
+                        }
                     }
-                }
 
-                cell.detailTextLabel?.text = ""
-
-            } else if indexPath.row == 1 {
-                cell.textLabel?.text = "Response Time"
-                if let responseHead = hostRequest.responseHead {
-                    if let timeStamp = responseHead.time {
-                        cell.detailTextLabel?.text = localFormatter.string(from: timeStamp as Date)
-                        return cell
-                    }
-                }
-                cell.detailTextLabel?.text = ""
-            } else {
-                cell.textLabel?.text = "Disconnect Time"
-                if hostRequest.disconnectTime != nil {
-                    cell.detailTextLabel?.text = localFormatter.string(from: hostRequest.disconnectTime! as Date)
-                } else {
                     cell.detailTextLabel?.text = ""
+
+                } else if indexPath.row == 1 {
+                    cell.textLabel?.text = "Response Time"
+                    if let responseHead = self.hostRequest.responseHead {
+                        if let timeStamp = responseHead.time {
+                            cell.detailTextLabel?.text = localFormatter.string(from: timeStamp as Date)
+                        }
+                    }
+                    cell.detailTextLabel?.text = ""
+                } else {
+                    cell.textLabel?.text = "Disconnect Time"
+                    if self.hostRequest.disconnectTime != nil {
+                        cell.detailTextLabel?.text = localFormatter.string(from: self.hostRequest.disconnectTime! as Date)
+                    } else {
+                        cell.detailTextLabel?.text = ""
+                    }
                 }
             }
+
             return cell
         case 2:
             let cell = tableView.dequeueReusableCell(withIdentifier: "timeDetail", for: indexPath)
-            if indexPath.row == 0 {
-                cell.textLabel?.text = "Upload"
-                cell.detailTextLabel?.text = "\(hostRequest.outCount)B"
-            } else if indexPath.row == 1 {
-                cell.textLabel?.text = "Download"
-                cell.detailTextLabel?.text = "\(hostRequest.inCount)B"
+            let privateContext = CoreDataController.sharedInstance.getPrivateContext()
+            privateContext.performAndWait {
+                if indexPath.row == 0 {
+                    cell.textLabel?.text = "Upload"
+                    cell.detailTextLabel?.text = "\(self.hostRequest.outCount)B"
+                } else if indexPath.row == 1 {
+                    cell.textLabel?.text = "Download"
+                    cell.detailTextLabel?.text = "\(self.hostRequest.inCount)B"
+                }
             }
             return cell
         case 3:
             let cell = tableView.dequeueReusableCell(withIdentifier: "timeDetail", for: indexPath)
-
+            let privateContext = CoreDataController.sharedInstance.getPrivateContext()
+            
             cell.textLabel?.text = "Status"
-            cell.detailTextLabel?.text = hostRequest.inProcessing ? "Incomplete" : "Complete"
+            privateContext.performAndWait {
+                 cell.detailTextLabel?.text = self.hostRequest.inProcessing ? "Incomplete" : "Complete"
+            }
+           
 
             return cell
         default:
             let cell = tableView.dequeueReusableCell(withIdentifier: "trafficHeader", for: indexPath)
+            let privateContext = CoreDataController.sharedInstance.getPrivateContext()
+            
             let textView = cell.viewWithTag(103) as! UITextView
-            if indexPath.row == 0 {
-                textView.text = hostRequest.requestHead?.head
-            } else {
-                textView.text = hostRequest.responseHead?.head
+            privateContext.performAndWait {
+                if indexPath.row == 0 {
+                    textView.text = self.hostRequest.requestHead?.head
+                } else {
+                    textView.text = self.hostRequest.responseHead?.head
+                }
             }
+            
             return cell
         }
 
@@ -168,11 +185,16 @@ class RequestDetailTableViewController: UITableViewController {
             return 38
         } else {
             let textView = prototypeCell.viewWithTag(103) as! UITextView
-            if indexPath.row == 0 {
-                textView.text = hostRequest.requestHead?.head
-            } else {
-                textView.text = hostRequest.responseHead?.head
+            let privateContext = CoreDataController.sharedInstance.getPrivateContext()
+            
+            privateContext.performAndWait {
+                if indexPath.row == 0 {
+                    textView.text = self.hostRequest.requestHead?.head
+                } else {
+                    textView.text = self.hostRequest.responseHead?.head
+                }
             }
+            
             let contentSize = textView.sizeThatFits(self.view.bounds.size)
             return contentSize.height
         }

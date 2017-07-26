@@ -13,7 +13,10 @@ import CocoaLumberjack
 class RequestListTableViewController: UITableViewController {
 
     var hostTraffics = [HostTraffic]()
-
+    
+    var backgroundView = UIView()
+    var downloadIndicator = UIActivityIndicatorView()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -32,20 +35,37 @@ class RequestListTableViewController: UITableViewController {
                 CoreDataController.sharedInstance.closeCrashLogs()
             }
         }
+
+        DispatchQueue.global().async {
+            self.requestHostTraffic()
+        }
+        
+        backgroundView = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+        backgroundView.center = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
+        backgroundView.backgroundColor = UIColor.darkGray
+        
+        downloadIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
+        downloadIndicator.center = CGPoint(x: 50, y: 50)
+        downloadIndicator.activityIndicatorViewStyle = .whiteLarge
+        backgroundView.addSubview(downloadIndicator)
+        downloadIndicator.startAnimating()
     }
-    
+
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
 
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if !view.subviews.contains(backgroundView) {
+            view.addSubview(backgroundView)
+        }
+        backgroundView.center = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
-    }
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        requestHostTraffic()
     }
 
     @IBAction func actionsToTake(_ sender: UIBarButtonItem) {
@@ -56,7 +76,7 @@ class RequestListTableViewController: UITableViewController {
                 self.performSegue(withIdentifier: "showTimeline", sender: nil)
             }
         }
-//        listController.addAction(showTimelineAction)
+        listController.addAction(showTimelineAction)
 
         let clearLog = UIAlertAction(title: "Clear Completed Logs", style: .destructive) { (_) in
             DispatchQueue.main.async {
@@ -86,58 +106,73 @@ class RequestListTableViewController: UITableViewController {
         }
 
         if vpnStatus == "Disconnected" {
-            for hostTraffic in self.hostTraffics {
-                CoreDataController.sharedInstance.getContext().delete(hostTraffic)
+            let privateContext = CoreDataController.sharedInstance.getPrivateContext()
+            privateContext.performAndWait {
+                for hostTraffic in self.hostTraffics {
+                    privateContext.delete(hostTraffic)
+                }
+                let parseDirectory = CoreDataController.sharedInstance.getDatabaseUrl().appendingPathComponent(parseFolderName)
+                do {
+                    try FileManager.default.removeItem(at: parseDirectory)
+                } catch {
+                    DDLogError("\(error)")
+                }
+                CoreDataController.sharedInstance.saveContext(privateContext)
             }
-            let parseDirectory = CoreDataController.sharedInstance.getDatabaseUrl().appendingPathComponent(parseFolderName)
-            do {
-                try FileManager.default.removeItem(at: parseDirectory)
-            } catch {
-                DDLogError("\(error)")
-            }
-            CoreDataController.sharedInstance.saveContext()
             requestHostTraffic()
 
-            tableView.reloadData()
+//            tableView.reloadData()
         } else {
             let parseDirectory = CoreDataController.sharedInstance.getDatabaseUrl().appendingPathComponent(parseFolderName)
-            for hostTraffic in hostTraffics {
-                if hostTraffic.inProcessing == false {
-                    if let requestBody = hostTraffic.requestWholeBody {
-                        let filePath = parseDirectory.appendingPathComponent(requestBody.fileName!)
-                        do {
-                            try FileManager.default.removeItem(at: filePath)
-                        } catch {
-                            DDLogError("\(error)")
+            let privateContext = CoreDataController.sharedInstance.getPrivateContext()
+            privateContext.performAndWait {
+                for hostTraffic in self.hostTraffics {
+                    if hostTraffic.inProcessing == false {
+                        if let requestBody = hostTraffic.requestWholeBody {
+                            let filePath = parseDirectory.appendingPathComponent(requestBody.fileName!)
+                            do {
+                                try FileManager.default.removeItem(at: filePath)
+                            } catch {
+                                DDLogError("\(error)")
+                            }
                         }
-                    }
-
-                    if let responseBody = hostTraffic.responseWholeBody {
-                        let filePath = parseDirectory.appendingPathComponent(responseBody.fileName!)
-                        do {
-                            try FileManager.default.removeItem(at: filePath)
-                        } catch {
-                            DDLogError("\(error)")
+                        
+                        if let responseBody = hostTraffic.responseWholeBody {
+                            let filePath = parseDirectory.appendingPathComponent(responseBody.fileName!)
+                            do {
+                                try FileManager.default.removeItem(at: filePath)
+                            } catch {
+                                DDLogError("\(error)")
+                            }
                         }
+                        privateContext.delete(hostTraffic)
                     }
-
-                    CoreDataController.sharedInstance.getContext().delete(hostTraffic)
                 }
+                CoreDataController.sharedInstance.saveContext(privateContext)
             }
-            CoreDataController.sharedInstance.saveContext()
             requestHostTraffic()
-            tableView.reloadData()
         }
     }
 
     func requestHostTraffic() {
-        let fetch: NSFetchRequest<HostTraffic> = HostTraffic.fetchRequest()
-//        fetch.sortDescriptors = [NSSortDescriptor.init(key: "requestTime", ascending: true)]
+        let privateContext = CoreDataController.sharedInstance.getPrivateContext()
 
-        do {
-            hostTraffics = try CoreDataController.sharedInstance.getContext().fetch(fetch)
-            hostTraffics.sort(by: { (first, second) -> Bool in
-                guard let firstTime = first.hostConnectInfo?.requestTime, let secondTime = second.hostConnectInfo?.requestTime else {
+        privateContext.perform {
+            let fetch: NSFetchRequest<HostTraffic> = HostTraffic.fetchRequest()
+            fetch.includesPropertyValues = false
+            fetch.includesSubentities = false
+            
+            do {
+                self.hostTraffics = try privateContext.fetch(fetch)
+            } catch {
+                DDLogError("\(error)")
+            }
+
+            self.hostTraffics.sort(by: { (first, second) -> Bool in
+                guard let firstTime = first.hostConnectInfo?.requestTime else {
+                    return false
+                }
+                guard let secondTime = second.hostConnectInfo?.requestTime else {
                     return true
                 }
                 if firstTime.timeIntervalSince(secondTime as Date) > 0 {
@@ -145,9 +180,15 @@ class RequestListTableViewController: UITableViewController {
                 }
                 return true
             })
-        } catch {
-            DDLogError("\(error)")
+            
+            DispatchQueue.main.async {
+                self.backgroundView.isHidden = true
+                self.tableView.reloadData()
+            }
+
         }
+
+
     }
 
 
@@ -168,12 +209,16 @@ class RequestListTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "requestList", for: indexPath)
 
         // Configure the cell...
-        cell.textLabel?.text = (hostTraffics[indexPath.row].hostConnectInfo?.name ?? "") + ":\(hostTraffics[indexPath.row].hostConnectInfo?.port ?? 0)"
-        if hostTraffics[indexPath.row].hostConnectInfo?.requestTime != nil {
-            cell.detailTextLabel?.attributedText = makeAttributeDescription(fromHostTraffic: hostTraffics[indexPath.row])
-        } else {
-            cell.detailTextLabel?.text = "Error \(hostTraffics[indexPath.row].inProcessing) P"
+        let privateContext = CoreDataController.sharedInstance.getPrivateContext()
+        privateContext.performAndWait {
+            cell.textLabel?.text = (self.hostTraffics[indexPath.row].hostConnectInfo?.name ?? "") + ":\(self.hostTraffics[indexPath.row].hostConnectInfo?.port ?? 0)"
+            if self.hostTraffics[indexPath.row].hostConnectInfo?.requestTime != nil {
+                cell.detailTextLabel?.attributedText = makeAttributeDescription(fromHostTraffic: self.hostTraffics[indexPath.row])
+            } else {
+                cell.detailTextLabel?.text = "Error \(self.hostTraffics[indexPath.row].inProcessing) P"
+            }
         }
+        
         return cell
 
     }

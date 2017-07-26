@@ -29,7 +29,10 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
     var endTime = Date()
     var horiScaller = 100
     var responseTraffic = [Int]()
-//    var backupScaller = 100.0
+    var currentShownTraffics = [HostTraffic: UIView]()
+    var timeLineRulerView = UIView()
+    var backgroundView = UIView()
+    var downloadIndicator = UIActivityIndicatorView()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,30 +53,54 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
             }
         }
 
-        requestHostTraffic()
-        classifyTraffic()
+        backgroundView = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+        backgroundView.center = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
+        backgroundView.backgroundColor = UIColor.darkGray
 
-        viewHeightConstraint.constant = CGFloat((classifiedTrafficsInRow.count + 1) * 48)
-        let duringTime = endTime.timeIntervalSince(beginTime)
-        viewWidthConstraint.constant = CGFloat(duringTime * Double(horiScaller) + 48)
-        drawTraffic(fromTime: beginTime, toTime: endTime)
-        drawTimelineRuler(fromTime: beginTime, toTime: endTime)
+        downloadIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
+        downloadIndicator.center = CGPoint(x: 50, y: 50)
+        downloadIndicator.activityIndicatorViewStyle = .whiteLarge
+        backgroundView.addSubview(downloadIndicator)
+        downloadIndicator.startAnimating()
 
-        getTrafficStream()
-        drawTrafficStream()
+        DispatchQueue.global().async {
+            self.requestHostTraffic()
+            self.classifyTraffic()
+            self.getTrafficStream()
+
+            DispatchQueue.main.async {
+                self.viewHeightConstraint.constant = CGFloat((self.classifiedTrafficsInRow.count + 1) * 48)
+                let duringTime = self.endTime.timeIntervalSince(self.beginTime)
+                self.viewWidthConstraint.constant = CGFloat(duringTime * Double(self.horiScaller) + 48)
+
+                self.newScrollOffset(withValue: 0)
+
+                self.backgroundView.isHidden = true
+            }
+        }
+    }
+
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if !view.subviews.contains(backgroundView) {
+            view.addSubview(backgroundView)
+        }
+        backgroundView.center = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
-    
+
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-//        newScrollOffset(withValue: scrollView.contentOffset.x)
+//        clearDrawedTraffics()
+        newScrollOffset(withValue: scrollView.contentOffset.x)
     }
 
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
@@ -98,30 +125,41 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
     }
 
     func requestHostTraffic() {
-        let fetch: NSFetchRequest<HostTraffic> = HostTraffic.fetchRequest()
-//        fetch.sortDescriptors = [NSSortDescriptor.init(key: "requestTime", ascending: true)]
-        fetch.includesPropertyValues = false
-        fetch.includesSubentities = false
-        do {
-            hostTraffics = try CoreDataController.sharedInstance.getContext().fetch(fetch)
-            hostTraffics.sort(by: { (first, second) -> Bool in
-                guard let firstTime = first.hostConnectInfo?.requestTime else {
-                    return false
-                }
-                guard let secondTime = second.hostConnectInfo?.requestTime else {
+        let privateContext = CoreDataController.sharedInstance.getPrivateContext()
+
+        privateContext.performAndWait {
+            let fetch: NSFetchRequest<HostTraffic> = HostTraffic.fetchRequest()
+            fetch.includesPropertyValues = false
+            fetch.includesSubentities = false
+
+            do {
+                self.hostTraffics = try privateContext.fetch(fetch)
+                self.hostTraffics.sort(by: { (first, second) -> Bool in
+                    guard let firstTime = first.hostConnectInfo?.requestTime else {
+                        return false
+                    }
+                    guard let secondTime = second.hostConnectInfo?.requestTime else {
+                        return true
+                    }
+                    if firstTime.timeIntervalSince(secondTime as Date) > 0 {
+                        return false
+                    }
                     return true
-                }
-                if firstTime.timeIntervalSince(secondTime as Date) > 0 {
-                    return false
-                }
-                return true
-            })
-        } catch {
-            DDLogError("\(error)")
+                })
+            } catch {
+                DDLogError("\(error)")
+            }
         }
     }
 
     func classifyTraffic() {
+        let privateContext = CoreDataController.sharedInstance.getPrivateContext()
+        privateContext.performAndWait {
+            self._classifyTraffic()
+        }
+    }
+
+    func _classifyTraffic() {
         classifiedTrafficsInRow.removeAll()
 
         if let first = hostTraffics.first {
@@ -167,7 +205,6 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
         }
     }
 
-
     func clearDrawedTraffics() {
         for view in baseView.subviews {
             view.removeFromSuperview()
@@ -177,13 +214,23 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
 
     func newScrollOffset(withValue value: CGFloat) {
         let offset = Double(value)
-        let ft = beginTime.addingTimeInterval( ((offset - 48) >= 0 ? (offset - 48) : 0) / Double(horiScaller))
-        let tT = beginTime.addingTimeInterval( (offset + Double(view.frame.width)) / Double(horiScaller))
+        let ft = beginTime.addingTimeInterval( offset / Double(horiScaller) / Double(baseScrollView.zoomScale))
+        let tT = beginTime.addingTimeInterval( (offset + Double(view.frame.width)) / Double(horiScaller) / Double(baseScrollView.zoomScale))
         drawTraffic(fromTime: ft, toTime: tT)
+        drawTimelineRuler(fromTime: ft, toTime: tT)
+        baseView.layoutIfNeeded()
     }
 
 
     func drawTraffic(fromTime fT: Date, toTime tT: Date) {
+        let privateContext = CoreDataController.sharedInstance.getPrivateContext()
+        privateContext.performAndWait {
+            self._drawTraffic(fromTime: fT, toTime: tT)
+        }
+    }
+    func _drawTraffic(fromTime fT: Date, toTime tT: Date) {
+        var shouldShownTraffics = [HostTraffic: Int]()
+        
         for (rowIndex, rowTraffics) in classifiedTrafficsInRow.enumerated() {
             for rowTraffic in rowTraffics {
                 let disTime: Date
@@ -199,85 +246,142 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
                     if disTime < fT {
                         continue
                     }
-                    
-                    // draw
-                    let offsetTime = reqTime.timeIntervalSince(beginTime)
-                    let length = disTime.timeIntervalSince(reqTime)
-                    let frame = CGRect(x: offsetTime * Double(horiScaller) + 48, y: Double(48 * rowIndex) + 48.0, width: length * Double(horiScaller), height: 48.0)
-                    let tView = TimelineCellView(frame: frame)
-
-                    tView.touchedCallback = {
-                        self.performSegue(withIdentifier: "showRequestDetail", sender: rowTraffic)
-                    }
-
-                    if let rule = rowTraffic.hostConnectInfo?.rule?.lowercased() {
-                        var resTime: Date? = nil
-                        if let responseHead = rowTraffic.responseHead {
-                            resTime = responseHead.time as Date?
-                        }
-                        tView.setIndicatorColor(withReqT: reqTime, ResT: resTime, DisT: disTime, andRule: rule)
-                    }
-
-                    if let host = rowTraffic.hostConnectInfo?.name {
-                        if let port = rowTraffic.hostConnectInfo?.port {
-                            tView.set(HostPort: "\(host):\(port)")
-                        }
-                    }
-                    baseView.addSubview(tView)
+                    shouldShownTraffics[rowTraffic] = rowIndex
                 }
             }
         }
+        
+        _drawTraffic(withTraffics: shouldShownTraffics)
     }
+    
+    func _drawTraffic(withTraffics traffics: [HostTraffic: Int]) {
+    
+        let newTraffics = removeUnshownAndGetNewTraffics(usingShouldShown: Array(traffics.keys))
+        
+        for newTraffic in newTraffics {
+            drawNewTraffic(with: (newTraffic,traffics[newTraffic]!))
+        }
+    }
+
+    func removeUnshownAndGetNewTraffics(usingShouldShown shouldShownTraffics: [HostTraffic]) -> [HostTraffic] {
+        var shouldShown = shouldShownTraffics
+        for current in currentShownTraffics {
+            if let index = shouldShown.index(of: current.key) {
+                shouldShown.remove(at: index)
+            }else {
+                currentShownTraffics.removeValue(forKey: current.key)
+                current.value.removeFromSuperview()
+            }
+        }
+        return shouldShown
+    }
+    
+    func drawNewTraffic(with newTraffic: (HostTraffic, Int))  {
+        let rowTraffic = newTraffic.0
+        let rowIndex = newTraffic.1
+        
+        // draw
+        let reqTime = rowTraffic.hostConnectInfo!.requestTime! as Date
+        let disTime: Date
+        if let _disTime = rowTraffic.disconnectTime {
+            disTime = _disTime as Date
+        } else {
+            disTime = endTime
+        }
+        let offsetTime = reqTime.timeIntervalSince(beginTime)
+        let length = disTime.timeIntervalSince(reqTime)
+        let frame = CGRect(x: offsetTime * Double(horiScaller), y: Double(48 * rowIndex) + 48.0, width: length * Double(horiScaller), height: 48.0)
+        let tView = TimelineCellView(frame: frame)
+        
+        tView.touchedCallback = {
+            self.performSegue(withIdentifier: "showRequestDetail", sender: rowTraffic)
+        }
+        
+        if let rule = rowTraffic.hostConnectInfo?.rule?.lowercased() {
+            var resTime: Date? = nil
+            if let responseHead = rowTraffic.responseHead {
+                resTime = responseHead.time as Date?
+            }
+            tView.setIndicatorColor(withReqT: reqTime, ResT: resTime, DisT: disTime, andRule: rule)
+        }
+        
+        if let host = rowTraffic.hostConnectInfo?.name {
+            if let port = rowTraffic.hostConnectInfo?.port {
+                tView.set(HostPort: "\(host):\(port)")
+            }
+        }
+        
+        currentShownTraffics[rowTraffic] = tView
+        
+        DispatchQueue.main.async {
+            self.baseView.addSubview(tView)
+        }
+    }
+
 
     func drawTimelineRuler(fromTime ft: Date, toTime tT: Date) {
+        let offsetTime = ft.timeIntervalSince(beginTime)
+        let length = tT.timeIntervalSince(ft)
+        let frame = CGRect(x: offsetTime * Double(horiScaller), y: 0, width: length * Double(horiScaller), height: 48.0)
+        timeLineRulerView.removeFromSuperview()
+        timeLineRulerView = UIView(frame: frame)
 
-        let duringTime = tT.timeIntervalSince(ft)
-        let repCount = Int(duringTime + 1)
-        drawStraightLine(withRepeat: repCount)
-        drawTimeStamp(fromTime: ft, toTime: tT, withTotalCount: repCount)
+        _drawTimelineRuler(fromTime: ft, toTime: tT, inView: timeLineRulerView)
+        baseView.addSubview(timeLineRulerView)
     }
 
-    func drawStraightLine(withRepeat repCount: Int) {
+    func _drawTimelineRuler(fromTime ft: Date, toTime tT: Date, inView timelineView: UIView) {
+        let duringTime = tT.timeIntervalSince(ft)
+        let repCount = Int(duringTime + 1)
+        drawSectorLines(withRepeatCount: repCount, inView: timelineView)
+        drawTimeStamp(fromTime: ft, withTotalCount: repCount, inView: timelineView)
+    }
+
+    func drawSectorLines(withRepeatCount repCount: Int, inView timelineView: UIView) {
         let repLayer = CAReplicatorLayer()
         repLayer.frame = CGRect(origin: .zero, size: CGSize(width: 2, height: 48.0))
 
-        baseView.layer.addSublayer(repLayer)
+        timelineView.layer.addSublayer(repLayer)
 
         let singleLine = CALayer()
-        singleLine.frame = CGRect(x: 47, y: 18, width: 2, height: 30)
+        singleLine.frame = CGRect(x: 0, y: 18, width: 2, height: 30)
         singleLine.backgroundColor = UIColor.black.cgColor
 
         repLayer.addSublayer(singleLine)
         repLayer.instanceCount = repCount
         repLayer.instanceTransform = CATransform3DMakeTranslation(CGFloat(horiScaller), 0, 0)
-
     }
 
-    func drawTimeStamp(fromTime ft: Date, toTime tT: Date, withTotalCount repCount: Int) {
+    func drawTimeStamp(fromTime ft: Date, withTotalCount repCount: Int, inView timelineView: UIView) {
         let offset = 3
         let localFormatter = DateFormatter()
         localFormatter.locale = Locale.current
         localFormatter.dateFormat = "HH:mm:ss.SSS"
         for i in 0 ..< repCount {
-            let textView = UITextField(frame: CGRect(x: offset + horiScaller * i + 48, y: 24, width: horiScaller - 10, height: 24))
+            let textView = UITextField(frame: CGRect(x: offset + horiScaller * i, y: 24, width: horiScaller - 10, height: 24))
             textView.text = localFormatter.string(from: ft.addingTimeInterval(1.0 * Double(i)))
             textView.adjustsFontSizeToFitWidth = true
-            baseView.addSubview(textView)
+            timelineView.addSubview(textView)
         }
     }
 
+    
     func getTrafficStream() {
-        let fetch: NSFetchRequest<ResponseBodyStamp> = ResponseBodyStamp.fetchRequest()
-        fetch.sortDescriptors = [NSSortDescriptor.init(key: "timeStamp", ascending: true)]
+        let privateContext = CoreDataController.sharedInstance.getPrivateContext()
 
-        do {
-            let bodyStamps = try CoreDataController.sharedInstance.getContext().fetch(fetch)
-            transferBodyStampsIntoTraffic(withbodies: bodyStamps)
-            for body in bodyStamps {
-                CoreDataController.sharedInstance.getContext().refresh(body, mergeChanges: false)
+        privateContext.performAndWait {
+            let fetch: NSFetchRequest<ResponseBodyStamp> = ResponseBodyStamp.fetchRequest()
+            fetch.sortDescriptors = [NSSortDescriptor.init(key: "timeStamp", ascending: true)]
+
+            do {
+                let bodyStamps = try privateContext.fetch(fetch)
+                transferBodyStampsIntoTraffic(withbodies: bodyStamps)
+                for body in bodyStamps {
+                    privateContext.refresh(body, mergeChanges: false)
+                }
+            } catch {
+                DDLogError("\(error)")
             }
-        } catch {
-            DDLogError("\(error)")
         }
     }
 
@@ -286,10 +390,6 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
         var fT = beginTime
         var tT = fT.addingTimeInterval(0.1)
         var boides = boides
-
-//        let localFormatter = DateFormatter()
-//        localFormatter.locale = Locale.current
-//        localFormatter.dateFormat = "HH:mm:ss.SSS"
 
         while fT < endTime {
             var count = 0
@@ -306,17 +406,10 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
                     boides.removeFirst()
                 }
             }
-
-            //                        print("\(localFormatter.string(from: tT)) count:\(count)")
             responseTraffic.append(count)
             fT = tT
             tT = fT.addingTimeInterval(0.1)
         }
-
-
-//        if count != 0 {
-//            responseTraffic.append(count)
-//        }
     }
 
     func getRecordFileSize(withFileName fileName: String) -> Int {
@@ -342,24 +435,24 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
         }
         shapeLayer.frame = CGRect(x: 48, y: 48, width: width, height: height)
         baseView.layer.addSublayer(shapeLayer)
-        if let maxValue = responseTraffic.max() {
-            let line = UIBezierPath()
-            line.move(to: .zero)
-            for (index, value) in responseTraffic.enumerated() {
-                let x = 0.1 * Double((index + 1) * horiScaller)
-                let y: Int
-                if maxValue == 0 {
-                    y = 0
-                } else {
-                    y = height * value / maxValue
-                }
-                line.addLine(to: CGPoint(x: CGFloat(x), y: CGFloat(y)))
-            }
-            shapeLayer.path = line.cgPath
-            shapeLayer.strokeColor = UIColor.green.cgColor
-            shapeLayer.fillColor = UIColor.clear.cgColor
-            shapeLayer.lineWidth = 2
-        }
+//        if let maxValue = responseTraffic.max() {
+//            let line = UIBezierPath()
+//            line.move(to: .zero)
+//            for (index, value) in responseTraffic.enumerated() {
+//                let x = 0.1 * Double((index + 1) * horiScaller)
+//                let y: Int
+//                if maxValue == 0 {
+//                    y = 0
+//                } else {
+//                    y = height * value / maxValue
+//                }
+//                line.addLine(to: CGPoint(x: CGFloat(x), y: CGFloat(y)))
+//            }
+//            shapeLayer.path = line.cgPath
+//            shapeLayer.strokeColor = UIColor.green.cgColor
+//            shapeLayer.fillColor = UIColor.clear.cgColor
+//            shapeLayer.lineWidth = 2
+//        }
         drawSpeedRuler(withHeight: height)
         responseTraffic.removeAll()
     }

@@ -15,6 +15,7 @@
 		343352891DF93FAD00CF7281 /* ThroughWall.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3474EC811DDC926C00EBF3C5 /* ThroughWall.xcdatamodeld */; };
 		3433528D1DF943D100CF7281 /* CoreDataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3433528C1DF943D100CF7281 /* CoreDataController.swift */; };
 		3433528E1DF943D500CF7281 /* CoreDataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3433528C1DF943D100CF7281 /* CoreDataController.swift */; };
+		3436E04E1F29B333001186E6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3436E04D1F29B333001186E6 /* Assets.xcassets */; };
 		3439FA061DEEB7A000F8CE59 /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3439FA051DEEB7A000F8CE59 /* Rule.swift */; };
 		343B9E7A1EE8EC88003B7320 /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 343B9E791EE8EC88003B7320 /* AboutViewController.swift */; };
 		3441766D1F0A6381001708A4 /* ReadWriteLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3441766C1F0A6381001708A4 /* ReadWriteLock.swift */; };
@@ -390,6 +391,7 @@
 		342F4F961F299CB80059094A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		342F4F971F299CB80059094A /* ChiselLogViewer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ChiselLogViewer.entitlements; sourceTree = "<group>"; };
 		3433528C1DF943D100CF7281 /* CoreDataController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataController.swift; sourceTree = "<group>"; };
+		3436E04D1F29B333001186E6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3439FA051DEEB7A000F8CE59 /* Rule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Rule.swift; sourceTree = "<group>"; };
 		343B9E791EE8EC88003B7320 /* AboutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
 		3441766C1F0A6381001708A4 /* ReadWriteLock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadWriteLock.swift; sourceTree = "<group>"; };
@@ -1134,6 +1136,7 @@
 				3475A3591F29ABCA0092A268 /* HexViewController.swift */,
 				3475A35B1F29ABCA0092A268 /* PictureViewController.swift */,
 				342F4F931F299CB80059094A /* Main.storyboard */,
+				3436E04D1F29B333001186E6 /* Assets.xcassets */,
 				342F4F961F299CB80059094A /* Info.plist */,
 				342F4F971F299CB80059094A /* ChiselLogViewer.entitlements */,
 			);
@@ -2739,6 +2742,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3436E04E1F29B333001186E6 /* Assets.xcassets in Resources */,
 				342F4F951F299CB80059094A /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3264,7 +3268,7 @@
 		342F4F981F299CB80059094A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconForMac;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
@@ -3293,7 +3297,7 @@
 		342F4F991F299CB80059094A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconForMac;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;

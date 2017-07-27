@@ -97,6 +97,7 @@
                                     </subviews>
                                     <constraints>
                                         <constraint firstAttribute="trailingMargin" secondItem="tTw-uA-pCp" secondAttribute="trailing" id="8xu-yP-tHC"/>
+                                        <constraint firstItem="tTw-uA-pCp" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="toc-p8-btR" secondAttribute="trailing" constant="8" symbolic="YES" id="CuI-hl-8Fm"/>
                                         <constraint firstItem="toc-p8-btR" firstAttribute="centerY" secondItem="tPT-sh-hWh" secondAttribute="centerY" id="aiQ-6d-fTg"/>
                                         <constraint firstItem="tTw-uA-pCp" firstAttribute="centerY" secondItem="tPT-sh-hWh" secondAttribute="centerY" id="dyI-Y6-Xtu"/>
                                         <constraint firstItem="toc-p8-btR" firstAttribute="leading" secondItem="tPT-sh-hWh" secondAttribute="leadingMargin" constant="8" id="veT-7y-5cm"/>
@@ -116,7 +117,7 @@
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FEH-G4-81o">
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FEH-G4-81o">
                                             <rect key="frame" x="292" y="11" width="42" height="21"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
@@ -124,6 +125,7 @@
                                         </label>
                                     </subviews>
                                     <constraints>
+                                        <constraint firstItem="FEH-G4-81o" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="exN-Du-m0h" secondAttribute="trailing" constant="8" symbolic="YES" id="QJF-TL-gEf"/>
                                         <constraint firstItem="FEH-G4-81o" firstAttribute="centerY" secondItem="Rtx-S5-oU9" secondAttribute="centerY" id="XU8-uO-ptA"/>
                                         <constraint firstItem="exN-Du-m0h" firstAttribute="centerY" secondItem="Rtx-S5-oU9" secondAttribute="centerY" id="gND-9H-GCf"/>
                                         <constraint firstAttribute="trailingMargin" secondItem="FEH-G4-81o" secondAttribute="trailing" id="wHE-KT-1AE"/>
@@ -805,7 +807,9 @@
                                     <constraint firstAttribute="height" constant="128" id="OVQ-WR-MxQ"/>
                                     <constraint firstItem="UaP-b1-QNO" firstAttribute="centerX" secondItem="qbw-Ia-Iko" secondAttribute="centerX" id="Tf3-4X-C7j"/>
                                     <constraint firstItem="aTL-FN-iKf" firstAttribute="leading" secondItem="UaP-b1-QNO" secondAttribute="trailing" constant="8" symbolic="YES" id="ae0-zB-FvT"/>
+                                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="aTL-FN-iKf" secondAttribute="trailing" constant="20" symbolic="YES" id="cgk-9x-w4s"/>
                                     <constraint firstItem="UaP-b1-QNO" firstAttribute="top" secondItem="aTL-FN-iKf" secondAttribute="bottom" constant="8" symbolic="YES" id="ess-b7-zke"/>
+                                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2Uv-uE-k1W" secondAttribute="trailing" constant="20" symbolic="YES" id="fhN-o0-ugv"/>
                                     <constraint firstItem="UaP-b1-QNO" firstAttribute="centerY" secondItem="qbw-Ia-Iko" secondAttribute="centerY" id="oBG-KZ-fmV"/>
                                     <constraint firstItem="2Uv-uE-k1W" firstAttribute="top" secondItem="UaP-b1-QNO" secondAttribute="bottom" constant="8" symbolic="YES" id="qmq-tb-AdK"/>
                                     <constraint firstItem="2Uv-uE-k1W" firstAttribute="leading" secondItem="emA-hY-mIJ" secondAttribute="trailing" constant="8" symbolic="YES" id="tIR-BZ-RVh"/>
@@ -1110,6 +1114,7 @@
                                         <constraint firstItem="ARi-eJ-406" firstAttribute="centerY" secondItem="PYe-iP-uhM" secondAttribute="centerY" id="52U-gN-dV8"/>
                                         <constraint firstAttribute="trailingMargin" secondItem="Kkc-UT-w2q" secondAttribute="trailing" id="p5T-h1-wNy"/>
                                         <constraint firstItem="ARi-eJ-406" firstAttribute="leading" secondItem="PYe-iP-uhM" secondAttribute="leadingMargin" constant="8" id="tU9-Us-g4H"/>
+                                        <constraint firstItem="Kkc-UT-w2q" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ARi-eJ-406" secondAttribute="trailing" constant="8" symbolic="YES" id="vLb-5h-pGE"/>
                                     </constraints>
                                 </tableViewCellContentView>
                             </tableViewCell>
@@ -1121,16 +1126,13 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <textField opaque="NO" clipsSubviews="YES" tag="2" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Ded-75-wkB">
-                                            <rect key="frame" x="64.5" y="13.5" width="302.5" height="17"/>
+                                            <rect key="frame" x="63.5" y="13.5" width="303.5" height="17"/>
                                             <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                             <textInputTraits key="textInputTraits" returnKeyType="done"/>
                                         </textField>
                                         <label opaque="NO" userInteractionEnabled="NO" tag="1" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="From" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zIQ-oi-pnS">
-                                            <rect key="frame" x="17" y="12" width="39.5" height="21"/>
-                                            <constraints>
-                                                <constraint firstAttribute="width" constant="39.5" id="qkH-a2-sNa"/>
-                                            </constraints>
+                                            <rect key="frame" x="16" y="12" width="39.5" height="21"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
@@ -1138,7 +1140,7 @@
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="zIQ-oi-pnS" firstAttribute="centerY" secondItem="E5G-IF-SqZ" secondAttribute="centerY" id="6hn-39-W2J"/>
-                                        <constraint firstItem="zIQ-oi-pnS" firstAttribute="leading" secondItem="E5G-IF-SqZ" secondAttribute="leadingMargin" constant="9" id="CaC-LV-msd"/>
+                                        <constraint firstItem="zIQ-oi-pnS" firstAttribute="leading" secondItem="E5G-IF-SqZ" secondAttribute="leadingMargin" constant="8" id="CaC-LV-msd"/>
                                         <constraint firstAttribute="trailingMargin" secondItem="Ded-75-wkB" secondAttribute="trailing" id="PUC-UC-6ia"/>
                                         <constraint firstItem="Ded-75-wkB" firstAttribute="leading" secondItem="zIQ-oi-pnS" secondAttribute="trailing" constant="8" id="cSG-Db-ooR"/>
                                         <constraint firstItem="Ded-75-wkB" firstAttribute="centerY" secondItem="E5G-IF-SqZ" secondAttribute="centerY" id="cso-Ov-QIf"/>
@@ -1378,6 +1380,7 @@
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="cm5-cR-Tg3" firstAttribute="leading" secondItem="vDD-u8-MLi" secondAttribute="leadingMargin" constant="40" id="1ET-Hq-oK9"/>
+                                                <constraint firstItem="ynU-j9-9MK" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="cm5-cR-Tg3" secondAttribute="trailing" constant="8" symbolic="YES" id="Cq4-GO-Ure"/>
                                                 <constraint firstItem="ynU-j9-9MK" firstAttribute="centerY" secondItem="vDD-u8-MLi" secondAttribute="centerY" id="E7n-TY-CzG"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="ynU-j9-9MK" secondAttribute="trailing" id="lwL-Fa-PPf"/>
                                                 <constraint firstItem="cm5-cR-Tg3" firstAttribute="centerY" secondItem="vDD-u8-MLi" secondAttribute="centerY" id="rIM-nK-I5B"/>
@@ -1528,7 +1531,7 @@
         <image name="WelcomeTop" width="277" height="277"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="W03-OC-PAp"/>
         <segue reference="hOG-lh-3rX"/>
+        <segue reference="W03-OC-PAp"/>
     </inferredMetricsTieBreakers>
 </document>

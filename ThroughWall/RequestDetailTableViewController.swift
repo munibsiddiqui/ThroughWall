@@ -109,28 +109,26 @@ class RequestDetailTableViewController: UITableViewController {
             let privateContext = CoreDataController.sharedInstance.getPrivateContext()
 
             privateContext.performAndWait {
+                cell.detailTextLabel?.text = ""
+                
                 if indexPath.row == 0 {
                     cell.textLabel?.text = "Request Time"
                     if let hostInfo = self.hostRequest.hostConnectInfo {
-                        if hostInfo.requestTime != nil {
-                            cell.detailTextLabel?.text = localFormatter.string(from: hostInfo.requestTime! as Date)
+                        if let reqTime = hostInfo.requestTime as Date! {
+                            cell.detailTextLabel?.text = localFormatter.string(from: reqTime)
                         }
                     }
-
-                    cell.detailTextLabel?.text = ""
-
                 } else if indexPath.row == 1 {
                     cell.textLabel?.text = "Response Time"
                     if let responseHead = self.hostRequest.responseHead {
-                        if let timeStamp = responseHead.time {
-                            cell.detailTextLabel?.text = localFormatter.string(from: timeStamp as Date)
+                        if let resTime = responseHead.time as Date! {
+                            cell.detailTextLabel?.text = localFormatter.string(from: resTime)
                         }
                     }
-                    cell.detailTextLabel?.text = ""
                 } else {
                     cell.textLabel?.text = "Disconnect Time"
-                    if self.hostRequest.disconnectTime != nil {
-                        cell.detailTextLabel?.text = localFormatter.string(from: self.hostRequest.disconnectTime! as Date)
+                    if let disTime =  self.hostRequest.disconnectTime as Date! {
+                        cell.detailTextLabel?.text = localFormatter.string(from: disTime)
                     } else {
                         cell.detailTextLabel?.text = ""
                     }

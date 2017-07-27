@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		341F7FA01F24C8DA00CDCEDD /* PAirSandbox.m in Sources */ = {isa = PBXBuildFile; fileRef = 341F7F9E1F24C81C00CDCEDD /* PAirSandbox.m */; };
 		3423C7651DF00C60002B5AE8 /* OutgoingSide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3423C7641DF00C60002B5AE8 /* OutgoingSide.swift */; };
+		342F4F8E1F299CB80059094A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 342F4F8D1F299CB80059094A /* AppDelegate.swift */; };
+		342F4F901F299CB80059094A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 342F4F8F1F299CB80059094A /* ViewController.swift */; };
+		342F4F951F299CB80059094A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 342F4F931F299CB80059094A /* Main.storyboard */; };
 		343352891DF93FAD00CF7281 /* ThroughWall.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3474EC811DDC926C00EBF3C5 /* ThroughWall.xcdatamodeld */; };
 		3433528D1DF943D100CF7281 /* CoreDataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3433528C1DF943D100CF7281 /* CoreDataController.swift */; };
 		3433528E1DF943D500CF7281 /* CoreDataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3433528C1DF943D100CF7281 /* CoreDataController.swift */; };
@@ -46,6 +49,13 @@
 		3474ECD11DDC951100EBF3C5 /* TunnelLib.h in Headers */ = {isa = PBXBuildFile; fileRef = 3474ECCF1DDC951100EBF3C5 /* TunnelLib.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3474ECD41DDC951100EBF3C5 /* TunnelLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3474ECCD1DDC951100EBF3C5 /* TunnelLib.framework */; };
 		3474ECD51DDC951100EBF3C5 /* TunnelLib.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3474ECCD1DDC951100EBF3C5 /* TunnelLib.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		3475A3561F29ABB50092A268 /* ThroughWall.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3474EC811DDC926C00EBF3C5 /* ThroughWall.xcdatamodeld */; };
+		3475A35C1F29ABF40092A268 /* CoreDataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3475A3571F29ABCA0092A268 /* CoreDataController.swift */; };
+		3475A35D1F29ABFB0092A268 /* BodyContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3475A3581F29ABCA0092A268 /* BodyContentViewController.swift */; };
+		3475A35E1F29ABFF0092A268 /* HexViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3475A3591F29ABCA0092A268 /* HexViewController.swift */; };
+		3475A35F1F29AC020092A268 /* PictureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3475A35B1F29ABCA0092A268 /* PictureViewController.swift */; };
+		3475A3601F29AC220092A268 /* HeadContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3475A35A1F29ABCA0092A268 /* HeadContentViewController.swift */; };
+		3475A3611F29AC450092A268 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C7E1E10D8810055C294 /* Common.swift */; };
 		34765C881E10D8810055C294 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C7E1E10D8810055C294 /* Common.swift */; };
 		34765C891E10D8810055C294 /* ConfigureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C7F1E10D8810055C294 /* ConfigureViewController.swift */; };
 		34765C8B1E10D8810055C294 /* HistoryFigureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34765C811E10D8810055C294 /* HistoryFigureViewController.swift */; };
@@ -373,6 +383,12 @@
 		341F7F9E1F24C81C00CDCEDD /* PAirSandbox.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PAirSandbox.m; sourceTree = "<group>"; };
 		341F7F9F1F24C81C00CDCEDD /* PAirSandbox.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PAirSandbox.h; sourceTree = "<group>"; };
 		3423C7641DF00C60002B5AE8 /* OutgoingSide.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutgoingSide.swift; sourceTree = "<group>"; };
+		342F4F8B1F299CB80059094A /* ChiselLogViewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChiselLogViewer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		342F4F8D1F299CB80059094A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		342F4F8F1F299CB80059094A /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		342F4F941F299CB80059094A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		342F4F961F299CB80059094A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		342F4F971F299CB80059094A /* ChiselLogViewer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ChiselLogViewer.entitlements; sourceTree = "<group>"; };
 		3433528C1DF943D100CF7281 /* CoreDataController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataController.swift; sourceTree = "<group>"; };
 		3439FA051DEEB7A000F8CE59 /* Rule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Rule.swift; sourceTree = "<group>"; };
 		343B9E791EE8EC88003B7320 /* AboutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
@@ -412,6 +428,11 @@
 		3474ECCD1DDC951100EBF3C5 /* TunnelLib.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TunnelLib.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3474ECCF1DDC951100EBF3C5 /* TunnelLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TunnelLib.h; sourceTree = "<group>"; };
 		3474ECD01DDC951100EBF3C5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3475A3571F29ABCA0092A268 /* CoreDataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataController.swift; sourceTree = "<group>"; };
+		3475A3581F29ABCA0092A268 /* BodyContentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyContentViewController.swift; sourceTree = "<group>"; };
+		3475A3591F29ABCA0092A268 /* HexViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HexViewController.swift; sourceTree = "<group>"; };
+		3475A35A1F29ABCA0092A268 /* HeadContentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadContentViewController.swift; sourceTree = "<group>"; };
+		3475A35B1F29ABCA0092A268 /* PictureViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureViewController.swift; sourceTree = "<group>"; };
 		34765C7E1E10D8810055C294 /* Common.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
 		34765C7F1E10D8810055C294 /* ConfigureViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigureViewController.swift; sourceTree = "<group>"; };
 		34765C811E10D8810055C294 /* HistoryFigureViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoryFigureViewController.swift; sourceTree = "<group>"; };
@@ -1035,6 +1056,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		342F4F881F299CB80059094A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3474EC741DDC926C00EBF3C5 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1095,6 +1123,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		342F4F8C1F299CB80059094A /* ChiselLogViewer */ = {
+			isa = PBXGroup;
+			children = (
+				342F4F8D1F299CB80059094A /* AppDelegate.swift */,
+				342F4F8F1F299CB80059094A /* ViewController.swift */,
+				3475A3581F29ABCA0092A268 /* BodyContentViewController.swift */,
+				3475A3571F29ABCA0092A268 /* CoreDataController.swift */,
+				3475A35A1F29ABCA0092A268 /* HeadContentViewController.swift */,
+				3475A3591F29ABCA0092A268 /* HexViewController.swift */,
+				3475A35B1F29ABCA0092A268 /* PictureViewController.swift */,
+				342F4F931F299CB80059094A /* Main.storyboard */,
+				342F4F961F299CB80059094A /* Info.plist */,
+				342F4F971F299CB80059094A /* ChiselLogViewer.entitlements */,
+			);
+			path = ChiselLogViewer;
+			sourceTree = "<group>";
+		};
 		3433528B1DF943B700CF7281 /* Core Data */ = {
 			isa = PBXGroup;
 			children = (
@@ -1131,6 +1176,7 @@
 				3474ECA91DDC92B900EBF3C5 /* TodayEx */,
 				3474ECCE1DDC951100EBF3C5 /* TunnelLib */,
 				34F124AE1F00BB9C004DEB50 /* SSRLib */,
+				342F4F8C1F299CB80059094A /* ChiselLogViewer */,
 				3474ECA61DDC92B900EBF3C5 /* Frameworks */,
 				3474EC781DDC926C00EBF3C5 /* Products */,
 				A243929DFB680E8018E7CA92 /* Pods */,
@@ -1145,6 +1191,7 @@
 				3474ECA51DDC92B900EBF3C5 /* TodayEx.appex */,
 				3474ECCD1DDC951100EBF3C5 /* TunnelLib.framework */,
 				34F124AD1F00BB9C004DEB50 /* SSRLib.framework */,
+				342F4F8B1F299CB80059094A /* ChiselLogViewer.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2474,6 +2521,23 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		342F4F8A1F299CB80059094A /* ChiselLogViewer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 342F4F9A1F299CB80059094A /* Build configuration list for PBXNativeTarget "ChiselLogViewer" */;
+			buildPhases = (
+				342F4F871F299CB80059094A /* Sources */,
+				342F4F881F299CB80059094A /* Frameworks */,
+				342F4F891F299CB80059094A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ChiselLogViewer;
+			productName = ChiselLogViewer;
+			productReference = 342F4F8B1F299CB80059094A /* ChiselLogViewer.app */;
+			productType = "com.apple.product-type.application";
+		};
 		3474EC761DDC926C00EBF3C5 /* ThroughWall */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3474EC8C1DDC926C00EBF3C5 /* Build configuration list for PBXNativeTarget "ThroughWall" */;
@@ -2585,10 +2649,14 @@
 		3474EC6F1DDC926C00EBF3C5 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0810;
+				LastSwiftUpdateCheck = 0900;
 				LastUpgradeCheck = 0810;
 				ORGANIZATIONNAME = "Wu Bin";
 				TargetAttributes = {
+					342F4F8A1F299CB80059094A = {
+						CreatedOnToolsVersion = 9.0;
+						DevelopmentTeam = JG7P2QYPN7;
+					};
 					3474EC761DDC926C00EBF3C5 = {
 						CreatedOnToolsVersion = 8.1;
 						DevelopmentTeam = JG7P2QYPN7;
@@ -2661,11 +2729,20 @@
 				3474ECA41DDC92B900EBF3C5 /* TodayEx */,
 				3474ECCC1DDC951100EBF3C5 /* TunnelLib */,
 				34F124AC1F00BB9C004DEB50 /* SSRLib */,
+				342F4F8A1F299CB80059094A /* ChiselLogViewer */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		342F4F891F299CB80059094A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				342F4F951F299CB80059094A /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3474EC751DDC926C00EBF3C5 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2890,6 +2967,22 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		342F4F871F299CB80059094A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3475A35D1F29ABFB0092A268 /* BodyContentViewController.swift in Sources */,
+				342F4F901F299CB80059094A /* ViewController.swift in Sources */,
+				342F4F8E1F299CB80059094A /* AppDelegate.swift in Sources */,
+				3475A35C1F29ABF40092A268 /* CoreDataController.swift in Sources */,
+				3475A3611F29AC450092A268 /* Common.swift in Sources */,
+				3475A35F1F29AC020092A268 /* PictureViewController.swift in Sources */,
+				3475A35E1F29ABFF0092A268 /* HexViewController.swift in Sources */,
+				3475A3601F29AC220092A268 /* HeadContentViewController.swift in Sources */,
+				3475A3561F29ABB50092A268 /* ThroughWall.xcdatamodeld in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3474EC731DDC926C00EBF3C5 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3133,6 +3226,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		342F4F931F299CB80059094A /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				342F4F941F299CB80059094A /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
 		3474EC7E1DDC926C00EBF3C5 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -3160,6 +3261,63 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		342F4F981F299CB80059094A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = ChiselLogViewer/ChiselLogViewer.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = JG7P2QYPN7;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = ChiselLogViewer/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				PRODUCT_BUNDLE_IDENTIFIER = click.bingo.ChiselLogViewer;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 4.0;
+			};
+			name = Debug;
+		};
+		342F4F991F299CB80059094A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = ChiselLogViewer/ChiselLogViewer.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = JG7P2QYPN7;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = ChiselLogViewer/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				PRODUCT_BUNDLE_IDENTIFIER = click.bingo.ChiselLogViewer;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 4.0;
+			};
+			name = Release;
+		};
 		3474EC8A1DDC926C00EBF3C5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3607,6 +3765,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		342F4F9A1F299CB80059094A /* Build configuration list for PBXNativeTarget "ChiselLogViewer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				342F4F981F299CB80059094A /* Debug */,
+				342F4F991F299CB80059094A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		3474EC721DDC926C00EBF3C5 /* Build configuration list for PBXProject "ThroughWall" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

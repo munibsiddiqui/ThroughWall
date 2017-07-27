@@ -880,6 +880,7 @@ Gw
                             <constraint firstAttribute="trailing" secondItem="tgY-po-Bps" secondAttribute="trailing" constant="20" symbolic="YES" id="GJr-Sy-rxL"/>
                             <constraint firstItem="tgY-po-Bps" firstAttribute="top" secondItem="KRq-Tn-ty6" secondAttribute="top" constant="20" symbolic="YES" id="KjY-HI-pUk"/>
                             <constraint firstAttribute="bottom" secondItem="OA4-34-b9M" secondAttribute="bottom" constant="20" id="Lhj-iO-cSw"/>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="OA4-34-b9M" secondAttribute="trailing" constant="20" symbolic="YES" id="Nd9-Ac-hYh"/>
                             <constraint firstItem="OA4-34-b9M" firstAttribute="top" secondItem="tgY-po-Bps" secondAttribute="bottom" constant="20" symbolic="YES" id="mrk-X5-EpG"/>
                             <constraint firstItem="OA4-34-b9M" firstAttribute="leading" secondItem="KRq-Tn-ty6" secondAttribute="leading" constant="20" id="qAc-AT-T3J"/>
                             <constraint firstItem="tgY-po-Bps" firstAttribute="leading" secondItem="OA4-34-b9M" secondAttribute="leading" id="ws4-FK-Tx9"/>

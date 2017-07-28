@@ -9,6 +9,11 @@
 			<key>orderHint</key>
 			<integer>13</integer>
 		</dict>
+		<key>SSLib.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>14</integer>
+		</dict>
 		<key>SSRLib.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -38,6 +43,11 @@
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
 		<key>342F4F8A1F299CB80059094A</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>343B0EA41F2B011A00DF2F72</key>
 		<dict>
 			<key>primary</key>
 			<true/>

@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		34076BF01F29C84500A031DE /* encrypt.c in Sources */ = {isa = PBXBuildFile; fileRef = 34076BEF1F29C84000A031DE /* encrypt.c */; };
+		34076BF11F29C85000A031DE /* encryptAPI.m in Sources */ = {isa = PBXBuildFile; fileRef = 34076BEE1F29C84000A031DE /* encryptAPI.m */; };
+		34076BF21F29C85300A031DE /* table.m in Sources */ = {isa = PBXBuildFile; fileRef = 34076BED1F29C84000A031DE /* table.m */; };
 		341F7FA01F24C8DA00CDCEDD /* PAirSandbox.m in Sources */ = {isa = PBXBuildFile; fileRef = 341F7F9E1F24C81C00CDCEDD /* PAirSandbox.m */; };
 		3423C7651DF00C60002B5AE8 /* OutgoingSide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3423C7641DF00C60002B5AE8 /* OutgoingSide.swift */; };
 		342F4F8E1F299CB80059094A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 342F4F8D1F299CB80059094A /* AppDelegate.swift */; };
@@ -146,10 +149,13 @@
 		34CC5FF61DDCA9200061AA44 /* libresolv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 34CC5E7C1DDCA0EA0061AA44 /* libresolv.tbd */; };
 		34D2E4991E88EF31009A07A0 /* RuleMainViewTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34D2E4981E88EF31009A07A0 /* RuleMainViewTableViewController.swift */; };
 		34D369E81F0158BD00D1EAE6 /* SSRLibController.h in Headers */ = {isa = PBXBuildFile; fileRef = 34585E4E1F01510C001380C1 /* SSRLibController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		34D82E211F29C6CD00602AFF /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D82E1F1F29C6CD00602AFF /* libcrypto.a */; };
+		34D82E221F29C6CD00602AFF /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D82E201F29C6CD00602AFF /* libssl.a */; };
 		34E3F1FC1E11428600FAD65C /* RequestDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34E3F1FB1E11428600FAD65C /* RequestDetailTableViewController.swift */; };
 		34ECAEF61F0B48C2006B105A /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34F126381F00CD33004DEB50 /* libcrypto.a */; };
 		34ECAEF71F0B48C2006B105A /* libsodium.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34F1263A1F00CD33004DEB50 /* libsodium.a */; };
 		34ECAEF81F0B48C2006B105A /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34F1263B1F00CD33004DEB50 /* libssl.a */; };
+		34F03DE61F29CC3700A803EA /* libsodium.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34F03DE51F29CC3700A803EA /* libsodium.a */; };
 		34F0B8F01EB2DFED007A286B /* CommonTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34F0B8EF1EB2DFED007A286B /* CommonTool.swift */; };
 		34F0B8F11EB2DFED007A286B /* CommonTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34F0B8EF1EB2DFED007A286B /* CommonTool.swift */; };
 		34F124B11F00BB9C004DEB50 /* SSRLib.h in Headers */ = {isa = PBXBuildFile; fileRef = 34F124AF1F00BB9C004DEB50 /* SSRLib.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -381,6 +387,12 @@
 		172477E3A4C2AE264451794D /* Pods-ThroughWall.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThroughWall.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ThroughWall/Pods-ThroughWall.debug.xcconfig"; sourceTree = "<group>"; };
 		2570E6ECDA38476866EA39BB /* Pods_TWPacketTunnelProvider.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TWPacketTunnelProvider.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		340329CD1ECD8AAA00651955 /* ThroughWall 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "ThroughWall 2.xcdatamodel"; sourceTree = "<group>"; };
+		34076BEA1F29C84000A031DE /* encrypt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = encrypt.h; path = ChiselLogViewer/encrypt.h; sourceTree = SOURCE_ROOT; };
+		34076BEB1F29C84000A031DE /* table.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = table.h; path = ChiselLogViewer/table.h; sourceTree = SOURCE_ROOT; };
+		34076BEC1F29C84000A031DE /* encryptAPI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = encryptAPI.h; path = ChiselLogViewer/encryptAPI.h; sourceTree = SOURCE_ROOT; };
+		34076BED1F29C84000A031DE /* table.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = table.m; path = ChiselLogViewer/table.m; sourceTree = SOURCE_ROOT; };
+		34076BEE1F29C84000A031DE /* encryptAPI.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = encryptAPI.m; path = ChiselLogViewer/encryptAPI.m; sourceTree = SOURCE_ROOT; };
+		34076BEF1F29C84000A031DE /* encrypt.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = encrypt.c; path = ChiselLogViewer/encrypt.c; sourceTree = SOURCE_ROOT; };
 		341F7F9E1F24C81C00CDCEDD /* PAirSandbox.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PAirSandbox.m; sourceTree = "<group>"; };
 		341F7F9F1F24C81C00CDCEDD /* PAirSandbox.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PAirSandbox.h; sourceTree = "<group>"; };
 		3423C7641DF00C60002B5AE8 /* OutgoingSide.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutgoingSide.swift; sourceTree = "<group>"; };
@@ -880,7 +892,11 @@
 		34CC5FFD1DDCAE5F0061AA44 /* ThroughWall.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ThroughWall.entitlements; sourceTree = "<group>"; };
 		34CC5FFE1DDCAEF10061AA44 /* TodayEx.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TodayEx.entitlements; sourceTree = "<group>"; };
 		34D2E4981E88EF31009A07A0 /* RuleMainViewTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuleMainViewTableViewController.swift; sourceTree = "<group>"; };
+		34D82E1F1F29C6CD00602AFF /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = ChiselLogViewer/libcrypto.a; sourceTree = "<group>"; };
+		34D82E201F29C6CD00602AFF /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = ChiselLogViewer/libssl.a; sourceTree = "<group>"; };
+		34D82E231F29C6F100602AFF /* ChiselLogViewer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ChiselLogViewer-Bridging-Header.h"; sourceTree = "<group>"; };
 		34E3F1FB1E11428600FAD65C /* RequestDetailTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestDetailTableViewController.swift; sourceTree = "<group>"; };
+		34F03DE51F29CC3700A803EA /* libsodium.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsodium.a; path = ChiselLogViewer/libsodium.a; sourceTree = "<group>"; };
 		34F0B8EF1EB2DFED007A286B /* CommonTool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommonTool.swift; sourceTree = "<group>"; };
 		34F124AD1F00BB9C004DEB50 /* SSRLib.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SSRLib.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		34F124AF1F00BB9C004DEB50 /* SSRLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SSRLib.h; sourceTree = "<group>"; };
@@ -1062,6 +1078,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				34F03DE61F29CC3700A803EA /* libsodium.a in Frameworks */,
+				34D82E211F29C6CD00602AFF /* libcrypto.a in Frameworks */,
+				34D82E221F29C6CD00602AFF /* libssl.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1125,9 +1144,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		34076BE01F29C7A500A031DE /* security */ = {
+			isa = PBXGroup;
+			children = (
+				34076BEF1F29C84000A031DE /* encrypt.c */,
+				34076BEA1F29C84000A031DE /* encrypt.h */,
+				34076BEC1F29C84000A031DE /* encryptAPI.h */,
+				34076BEE1F29C84000A031DE /* encryptAPI.m */,
+				34076BEB1F29C84000A031DE /* table.h */,
+				34076BED1F29C84000A031DE /* table.m */,
+			);
+			path = security;
+			sourceTree = "<group>";
+		};
 		342F4F8C1F299CB80059094A /* ChiselLogViewer */ = {
 			isa = PBXGroup;
 			children = (
+				34076BE01F29C7A500A031DE /* security */,
 				342F4F8D1F299CB80059094A /* AppDelegate.swift */,
 				342F4F8F1F299CB80059094A /* ViewController.swift */,
 				3475A3581F29ABCA0092A268 /* BodyContentViewController.swift */,
@@ -1139,6 +1172,7 @@
 				3436E04D1F29B333001186E6 /* Assets.xcassets */,
 				342F4F961F299CB80059094A /* Info.plist */,
 				342F4F971F299CB80059094A /* ChiselLogViewer.entitlements */,
+				34D82E231F29C6F100602AFF /* ChiselLogViewer-Bridging-Header.h */,
 			);
 			path = ChiselLogViewer;
 			sourceTree = "<group>";
@@ -1240,6 +1274,9 @@
 		3474ECA61DDC92B900EBF3C5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				34F03DE51F29CC3700A803EA /* libsodium.a */,
+				34D82E1F1F29C6CD00602AFF /* libcrypto.a */,
+				34D82E201F29C6CD00602AFF /* libssl.a */,
 				34F126381F00CD33004DEB50 /* libcrypto.a */,
 				34F126391F00CD33004DEB50 /* libpcre.a */,
 				34F1263A1F00CD33004DEB50 /* libsodium.a */,
@@ -2659,6 +2696,7 @@
 					342F4F8A1F299CB80059094A = {
 						CreatedOnToolsVersion = 9.0;
 						DevelopmentTeam = JG7P2QYPN7;
+						LastSwiftMigration = 0830;
 					};
 					3474EC761DDC926C00EBF3C5 = {
 						CreatedOnToolsVersion = 8.1;
@@ -2978,12 +3016,15 @@
 				3475A35D1F29ABFB0092A268 /* BodyContentViewController.swift in Sources */,
 				342F4F901F299CB80059094A /* ViewController.swift in Sources */,
 				342F4F8E1F299CB80059094A /* AppDelegate.swift in Sources */,
+				34076BF01F29C84500A031DE /* encrypt.c in Sources */,
 				3475A35C1F29ABF40092A268 /* CoreDataController.swift in Sources */,
 				3475A3611F29AC450092A268 /* Common.swift in Sources */,
+				34076BF21F29C85300A031DE /* table.m in Sources */,
 				3475A35F1F29AC020092A268 /* PictureViewController.swift in Sources */,
 				3475A35E1F29ABFF0092A268 /* HexViewController.swift in Sources */,
 				3475A3601F29AC220092A268 /* HeadContentViewController.swift in Sources */,
 				3475A3561F29ABB50092A268 /* ThroughWall.xcdatamodeld in Sources */,
+				34076BF11F29C85000A031DE /* encryptAPI.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3271,6 +3312,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconForMac;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
@@ -3284,12 +3326,22 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = JG7P2QYPN7;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					/usr/local/Cellar/libsodium/1.0.13/include/,
+				);
 				INFOPLIST_FILE = ChiselLogViewer/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/ChiselLogViewer",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_BUNDLE_IDENTIFIER = click.bingo.ChiselLogViewer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = "ChiselLogViewer/ChiselLogViewer-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
@@ -3300,6 +3352,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconForMac;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
@@ -3312,12 +3365,21 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = JG7P2QYPN7;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					/usr/local/Cellar/libsodium/1.0.13/include/,
+				);
 				INFOPLIST_FILE = ChiselLogViewer/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/ChiselLogViewer",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_BUNDLE_IDENTIFIER = click.bingo.ChiselLogViewer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = "ChiselLogViewer/ChiselLogViewer-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 			};
 			name = Release;

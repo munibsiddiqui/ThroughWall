@@ -10,7 +10,7 @@
 #import "simple-obfs/src/simple-obfs.h"
 
 @interface SimpleobfsController()
-@property (nonatomic, copy) SimpleobfsCompletion obfswCompletion;
+@property (nonatomic, copy) SimpleobfsCompletion obfsCompletion;
 @property (nonatomic) int obfsLocalPort;
 @property (nonatomic) profile_t profile;
 @end
@@ -23,13 +23,14 @@ void simpleObfs_handler( void *udata) {
 }
 
 - (void)onObfsCallback {
-    if (self.obfswCompletion) {
-        self.obfswCompletion(self.obfsLocalPort, nil);
+    if (self.obfsCompletion) {
+        self.obfsCompletion(self.obfsLocalPort, nil);
     }
     
 }
 - (void) startSimpleobfsWithHostAddr:(NSString *)hostAddr hostPort:(NSNumber *)port pluginOpts:(NSString *)options completion:(SimpleobfsCompletion)completion {
     _obfsLocalPort = get_local_port();
+    _obfsCompletion = completion;
     
     profile_t profile;
     memset(&profile, 0, sizeof(profile_t));
@@ -40,7 +41,7 @@ void simpleObfs_handler( void *udata) {
     profile.ss_plugin_opts = strdup([options UTF8String]);
     
     _profile = profile;
-    
+
     [NSThread detachNewThreadSelector:@selector(_startSimpleobfs) toTarget:self withObject: nil];
     
 }

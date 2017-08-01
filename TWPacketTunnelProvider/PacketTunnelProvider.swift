@@ -240,14 +240,17 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
 
         let pluginOption: String
         if obfs != "" {
-            pluginOption = "obfs=\(obfs),obfs-host=\(obfs_param)"
-
+            if obfs_param != "" {
+                pluginOption = "obfs=\(obfs),obfs-host=\(obfs_param)"
+            }else{
+                pluginOption = "obfs=\(obfs)"
+            }
         } else {
             pluginOption = ""
         }
 
         if pluginOption == "" {
-            ssController.startSSClientWithhostAddress(server, hostPort: port as! NSNumber , hostPassword: password, authscheme: method) { (port, error) in
+            ssController.startSSClientWithhostAddress(server, hostPort: NSNumber(value: port!) , hostPassword: password, authscheme: method) { (port, error) in
                 callback(Int(port), error)
             }
         }else{

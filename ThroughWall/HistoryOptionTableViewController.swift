@@ -62,7 +62,8 @@ class HistoryOptionTableViewController: UITableViewController {
         backgroundView = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
         backgroundView.center = CGPoint(x: view.bounds.width / 2, y: view.bounds.height / 2)
         backgroundView.backgroundColor = UIColor.darkGray
-
+        backgroundView.layer.cornerRadius = 10
+        backgroundView.clipsToBounds = true
 
         downloadIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
         downloadIndicator.center = CGPoint(x: 50, y: 50)

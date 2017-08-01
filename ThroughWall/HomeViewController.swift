@@ -52,6 +52,7 @@ class HomeViewController: UIViewController {
         tryUpdateRuleFile()
         convertToNewServerStyle()
         registerNotificationWhenLoaded()
+        tryShowWarning()
 //        print(hardwareString())
 //        print(PurchaseValidator().getReceipt())
     }
@@ -395,14 +396,7 @@ class HomeViewController: UIViewController {
         if on {
             do {
                 try manger.connection.startVPNTunnel()
-//                let userDefault = UserDefaults()
-//                if let _hintVersion = userDefault.value(forKey: kHintVersion) as? Int {
-//                    if _hintVersion < hintVersion {
-//                        tryShowWarning()
-//                    }
-//                } else {
-//                    tryShowWarning()
-//                }
+
 
             } catch {
                 showError(error, title: "start vpn")
@@ -417,15 +411,28 @@ class HomeViewController: UIViewController {
     }
 
     func tryShowWarning() {
+        let userDefault = UserDefaults()
+        
+        if let _hintVersion = userDefault.value(forKey: kHintVersion) as? Int {
+            if _hintVersion < hintVersion {
+                _tryShowWarning()
+                userDefault.set(hintVersion, forKey: kHintVersion)
+            }
+        } else {
+            _tryShowWarning()
+            userDefault.set(hintVersion, forKey: kHintVersion)
+        }
+    }
+    
+    func _tryShowWarning() {
         DispatchQueue.main.async {
-            let alertController = UIAlertController(title: "Hint", message: "最近增加了SSR支持，如遇网络连接问题，请联系我。我会尽力修复问题。\nSSR support was added recently. If any networking problem happens, please do not hesitate to contact me. I'll try my best to fix it.", preferredStyle: .alert)
+            let alertController = UIAlertController(title: "WARNING", message: "根据相关规定，国区已无法提供支持。详情请联系作者。\n According to related regulations, China has been removed from support. For more info, please contact the author.", preferredStyle: .alert)
             let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
 
             alertController.addAction(okAction)
 
             self.present(alertController, animated: true, completion: nil)
-            let userDefault = UserDefaults()
-            userDefault.set(hintVersion, forKey: kHintVersion)
+            
         }
     }
 

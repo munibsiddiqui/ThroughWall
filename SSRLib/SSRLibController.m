@@ -62,7 +62,7 @@ int sock_port (int fd) {
         profile.method = strdup([method UTF8String]);
         profile.local_addr = "127.0.0.1";
         profile.local_port = 0;
-        profile.timeout = 600;
+        profile.timeout = 60;
         
         if (protocol_ssr &&  ![protocol_ssr  isEqual: @""]) {
             profile.protocol = strdup([protocol_ssr UTF8String]);

@@ -14,34 +14,37 @@ let CustomizeOption = "Custom"
 
 class ProxyConfig: NSObject {
 
-    private let proxies = ["CUSTOM", "HTTP", "SOCKS5"]
+    private let proxies = ["Shadowsocks", "ShadowsocksR", "HTTP", "SOCKS5"]
 
     private let items = [
-        "CUSTOM": ["proxy", "description", "server", "port", "password", "method", "protocol", "proto_param", "obfs", "obfs_param"],
+        "Shadowsocks": ["proxy", "description", "server", "port", "password", "method", "obfs", "obfs_param"],
+        "ShadowsocksR": ["proxy", "description", "server", "port", "password", "method", "protocol", "proto_param", "obfs", "obfs_param"],
         "HTTP": ["proxy", "description", "server", "port", "user", "password"],
         "SOCKS5": ["proxy", "description", "server", "port", "user", "password"]
     ]
 
     private let hiddenItems = [
-        "CUSTOM": ["delay"],
+        "Shadowsocks": ["delay"],
+        "ShadowsocksR": ["delay"]
     ]
 
     private let defaults = [
-        "CUSTOM": ["proxy": "CUSTOM", "method": "aes-256-cfb", "dns": "System Default", "protocol": "", "obfs": ""],
+        "Shadowsocks": ["proxy": "Shadowsocks", "method": "aes-256-cfb", "dns": "System Default", "obfs": ""],
+        "ShadowsocksR": ["proxy": "ShadowsocksR", "method": "aes-256-cfb", "dns": "System Default", "protocol": "", "obfs": ""],
         "HTTP": ["proxy": "HTTP"],
         "SOCKS5": ["proxy": "SOCKS5"]
     ]
 
     private let availables = [
-        "CUSTOM": [
+        "Shadowsocks": [
             "proxy": [
                 "preset": [
-                    "CUSTOM"//, "HTTP", "SOCKS5"
+                    "Shadowsocks", "ShadowsocksR"//, "HTTP", "SOCKS5"
                 ]
             ],
             "method": [
                 "preset": [
-                    "table", "aes-128-ctr", "aes-192-ctr", "aes-256-ctr", "aes-128-cfb", "aes-192-cfb", "aes-256-cfb", "bf-cfb", "camellia-128-cfb", "camellia-192-cfb", "camellia-256-cfb", "cast5-cfb", "chacha20", "chacha20-ietf", "des-cfb", "idea-cfb", "rc2-cfb", "rc4", "rc4-md5", "salsa20", "seed-cfb"
+                    "table", "aes-128-ctr", "aes-192-ctr", "aes-256-ctr", "aes-128-cfb", "aes-192-cfb", "aes-256-cfb", "bf-cfb", "camellia-128-cfb", "camellia-192-cfb", "camellia-256-cfb", "cast5-cfb", "chacha20", "chacha20-ietf", "des-cfb", "idea-cfb", "rc2-cfb", "rc4", "rc4-md5", "salsa20", "seed-cfb", "aes-128-gcm", "aes-192-gcm", "aes-256-gcm", "chacha20-ietf-poly1305"
                 ]
             ],
             "dns": [
@@ -59,6 +62,31 @@ class ProxyConfig: NSObject {
             ],
             "obfs": [
                 "preset": [
+                    "", "http", "tls"
+                ]
+            ]
+        ],
+        "ShadowsocksR": [
+            "proxy": [
+                "preset": [
+                    "Shadowsocks", "ShadowsocksR"//, "HTTP", "SOCKS5"
+                ]
+            ],
+            "method": [
+                "preset": [
+                    "table", "aes-128-ctr", "aes-192-ctr", "aes-256-ctr", "aes-128-cfb", "aes-192-cfb", "aes-256-cfb", "bf-cfb", "camellia-128-cfb", "camellia-192-cfb", "camellia-256-cfb", "cast5-cfb", "chacha20", "chacha20-ietf", "des-cfb", "idea-cfb", "rc2-cfb", "rc4", "rc4-md5", "salsa20", "seed-cfb"
+                ]
+            ],
+            "dns": [
+                "preset": [
+                    "System Default"
+                ],
+                "customize": [
+                    CustomizeOption
+                ]
+            ],
+            "obfs": [
+                "preset": [
                     "", "plain", "http_simple", "http_post", "tls1.2_ticket_auth"
                 ]
             ]
@@ -66,21 +94,28 @@ class ProxyConfig: NSObject {
         "HTTP": [
             "proxy": [
                 "preset": [
-                    "CUSTOM", "HTTP", "SOCKS5"
+                    "Shadowsocks", "ShadowsocksR", "HTTP", "SOCKS5"
                 ]
             ]
         ],
         "SOCKS5": [
             "proxy": [
                 "preset": [
-                    "CUSTOM", "HTTP", "SOCKS5"
+                    "Shadowsocks", "ShadowsocksR", "HTTP", "SOCKS5"
                 ]
             ]
         ]
     ]
 
     private let keyboadType = [
-        "CUSTOM": [
+        "Shadowsocks": [
+            "description": ["default", "next"],
+            "server": ["url", "next"],
+            "port": ["number", "accessary", "next"],
+            "password": ["default", "secure", "next"],
+            "obfs_param": ["default", "done"]
+        ],
+        "ShadowsocksR": [
             "description": ["default", "next"],
             "server": ["url", "next"],
             "port": ["number", "accessary", "next"],
@@ -99,10 +134,10 @@ class ProxyConfig: NSObject {
         "password": "Password",
         "method": "Method",
         //        "dns": "DNS"
-        "protocol": "Protocol(SSR)",
-        "proto_param": "Protocol Param(SSR)",
-        "obfs": "Ofbs(SSR)",
-        "obfs_param": "Obfs Param(SSR)"
+        "protocol": "Protocol",
+        "proto_param": "Protocol Param",
+        "obfs": "Ofbs",
+        "obfs_param": "Obfs Param"
     ]
 
     private var _currentProxy = ""
@@ -185,7 +220,19 @@ class ProxyConfig: NSObject {
     func setSelection(_ item: String, selected value: String) {
         //        print("\(item) \(selected)")
         if item == "proxy" {
+            let oldValues = _values
             currentProxy = value
+            
+            for oldValue in oldValues {
+                if oldValue.key == "proxy" {
+                    continue
+                }
+                if containedItems.contains(oldValue.key) {
+                    setValue(byItem: oldValue.key, value: oldValue.value)
+                }else if containedHiddenItems.contains(oldValue.key) {
+                    setValue(byItem: oldValue.key, value: oldValue.value)
+                }
+            }
             return
         }
         _values[item] = value
@@ -467,6 +514,31 @@ class SiteConfigController {
         }
     }
 
+
+
+    func getRealProxyName(withConfigs configs: [String]) -> String {
+        for item in configs {
+            let temp = item.components(separatedBy: ":")
+            let name = temp[0]
+            // let option = temp.count > 2 ? temp.dropFirst().joined(separator: ":") : temp[1]
+            let option: String
+
+            if temp.count > 2 {
+                option = temp.dropFirst().joined(separator: ":")
+            } else {
+                option = temp[1]
+            }
+
+            if name == "protocol" {
+                if option != "" {
+                    return "ShadowsocksR"
+                }
+            }
+        }
+        return "Shadowsocks"
+    }
+
+
     func readSiteConfigsFromConfigFile() -> [ProxyConfig] {
         var proxyConfigs = [ProxyConfig]()
 
@@ -485,6 +557,7 @@ class SiteConfigController {
 
             let content = try String(contentsOf: url, encoding: String.Encoding.utf8)
             let sites = content.components(separatedBy: "#\n")
+            var modified = false
             for site in sites {
                 var items = site.components(separatedBy: "\n")
                 let config = ProxyConfig()
@@ -492,10 +565,18 @@ class SiteConfigController {
                 let firstItem = items[0]
 
                 if firstItem.hasPrefix("proxy:") {
-                    config.currentProxy = firstItem.substring(from: firstItem.index(firstItem.startIndex, offsetBy: 6))
+                    let proxy = firstItem.substring(from: firstItem.index(firstItem.startIndex, offsetBy: 6))
+
                     items.removeFirst()
                     items.removeLast()
 
+
+                    if proxy.lowercased() == "custom" {
+                        modified = true
+                        config.currentProxy = getRealProxyName(withConfigs: items)
+                    } else {
+                        config.currentProxy = proxy
+                    }
                     for item in items {
                         let temp = item.components(separatedBy: ":")
                         let name = temp[0]
@@ -514,6 +595,10 @@ class SiteConfigController {
                     }
                     proxyConfigs.append(config)
                 }
+            }
+
+            if modified {
+                writeIntoSiteConfigFile(withConfigs: proxyConfigs)
             }
         } catch {
             DDLogError("\(error)")
@@ -1015,7 +1100,7 @@ class RuleFileUpdateController: NSObject {
             DDLogError("\(error)")
             return
         }
-        
+
         //general
         let generalURL = url.appendingPathComponent(generalFileName)
         fileManager.createFile(atPath: generalURL.path, contents: nil, attributes: nil)
@@ -1031,7 +1116,7 @@ class RuleFileUpdateController: NSObject {
             DDLogError("\(error)")
             return
         }
-        
+
     }
 
 }

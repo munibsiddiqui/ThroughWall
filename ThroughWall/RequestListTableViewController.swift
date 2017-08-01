@@ -213,7 +213,7 @@ class RequestListTableViewController: UITableViewController {
         privateContext.performAndWait {
             cell.textLabel?.text = (self.hostTraffics[indexPath.row].hostConnectInfo?.name ?? "") + ":\(self.hostTraffics[indexPath.row].hostConnectInfo?.port ?? 0)"
             if self.hostTraffics[indexPath.row].hostConnectInfo?.requestTime != nil {
-                cell.detailTextLabel?.attributedText = makeAttributeDescription(fromHostTraffic: self.hostTraffics[indexPath.row])
+                cell.detailTextLabel?.attributedText = self.makeAttributeDescription(fromHostTraffic: self.hostTraffics[indexPath.row])
             } else {
                 cell.detailTextLabel?.text = "Error \(self.hostTraffics[indexPath.row].inProcessing) P"
             }
@@ -226,7 +226,7 @@ class RequestListTableViewController: UITableViewController {
     func makeAttributeDescription(fromHostTraffic hostTraffic: HostTraffic) -> NSAttributedString {
         let localFormatter = DateFormatter()
         localFormatter.locale = Locale.current
-        localFormatter.dateFormat = "HH:mm:ss:SSS"
+        localFormatter.dateFormat = "HH:mm:ss.SSS"
 
         let attributeDescription = NSMutableAttributedString(string: "")
 

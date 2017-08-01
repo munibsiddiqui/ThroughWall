@@ -429,7 +429,7 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
 
             do {
                 let bodyStamps = try privateContext.fetch(fetch)
-                transferBodyStampsIntoTraffic(withResponseBodies: bodyStamps)
+                self.transferBodyStampsIntoTraffic(withResponseBodies: bodyStamps)
                 for body in bodyStamps {
                     privateContext.refresh(body, mergeChanges: false)
                 }
@@ -443,7 +443,7 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
 
             do {
                 let headStamps = try privateContext.fetch(fetch)
-                transferResponseHeadIntoTraffic(withheads: headStamps)
+                self.transferResponseHeadIntoTraffic(withheads: headStamps)
                 for head in headStamps {
                     privateContext.refresh(head, mergeChanges: false)
                 }
@@ -457,7 +457,7 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
 
             do {
                 let bodyStamps = try privateContext.fetch(fetch)
-                transferBodyStampsIntoTraffic(withRequestBodies: bodyStamps)
+                self.transferBodyStampsIntoTraffic(withRequestBodies: bodyStamps)
                 for body in bodyStamps {
                     privateContext.refresh(body, mergeChanges: false)
                 }
@@ -467,7 +467,7 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
         }
 
         privateContext.performAndWait {
-            transferRequestHeadIntoTraffic()
+            self.transferRequestHeadIntoTraffic()
         }
 
         if let maxValue = responseTraffic.max() {

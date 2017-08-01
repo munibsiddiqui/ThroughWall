@@ -9,6 +9,8 @@
 import NetworkExtension
 import CocoaLumberjack
 import SSRLib
+import SSLib
+import SimpleObfs
 import TunnelLib
 import Fabric
 import Crashlytics
@@ -17,6 +19,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     var pendingStartCompletion: ((Error?) -> Void)?
     var pendingStopCompletion: (() -> Void)?
     let ssrControler = SSRLibController()
+    var ssController = SSLibController()
+    var simpleObfsController = SimpleobfsController()
     var lastPath: NWPath?
     var httpPort = 0
     var startTime = Date()
@@ -39,7 +43,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
 
         //Start shadowsocks_libev
 
-        startShodowsocksClient { (shadowLibSocksPort, error) in
+        startClient { (shadowLibSocksPort, error) in
             if error != nil {
                 self.pendingStartCompletion?(error)
                 return
@@ -145,15 +149,47 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         DDLogVerbose("\(fileLogger.currentLogFileInfo)")
     }
 
+    //for Lagecy Convertion
+    func isCustomProxySSR(_ conf: [String: AnyObject]) -> Bool {
+        if let _protocol = conf["protocol"] as? String {
+            if _protocol != "" {
+                return true
+            }
+        }
+        if let _obfs = conf["obfs"] as? String {
+            if _obfs != "" {
+                return true
+            }
+        }
+        return false
+    }
 
-
-    func startShodowsocksClient(callback: @escaping (Int, Error?) -> Void) {
+    func startClient(callback: @escaping (Int, Error?) -> Void) {
         let conf = (self.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration! as [String: AnyObject]
 
+        let proxy = (conf["proxy"] as! String).lowercased()
+
+        if proxy == "custom" {
+            if isCustomProxySSR(conf) {
+                startShadowsocksRClient(withConfig: conf, callback: callback)
+            } else {
+                startShadowsocksClient(withConfig: conf, callback: callback)
+            }
+        }
+
+        if proxy == "shadowsocks" {
+            startShadowsocksClient(withConfig: conf, callback: callback)
+        }else if proxy == "shadowsocksr" {
+            startShadowsocksRClient(withConfig: conf, callback: callback)
+        }
+    }
+
+    func startShadowsocksRClient(withConfig conf: [String: AnyObject], callback: @escaping (Int, Error?) -> Void) {
         let server = conf["server"] as! String
         let port = Int(conf["port"] as! String)
         let password = conf["password"] as! String
         let method = conf["method"] as! String
+
         let protocol_ssr: String
         if let _protocol = conf["protocol"] as? String {
             protocol_ssr = _protocol
@@ -178,11 +214,50 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         } else {
             obfs_param = ""
         }
-//        BOOL ota = [json[@"ota"] boolValue];
 
         ssrControler.startShodowsocksClientWithhostAddress(server, hostPort: NSNumber(value: port!), hostPassword: password, authscheme: method, protocol: protocol_ssr, pro_para: pro_param, obfs: obfs, obfs_para: obfs_param) { (port, error) in
             callback(Int(port), error)
         }
+    }
+
+    func startShadowsocksClient(withConfig conf: [String: AnyObject], callback: @escaping (Int, Error?) -> Void) {
+        let server = conf["server"] as! String
+        let port = Int(conf["port"] as! String)
+        let password = conf["password"] as! String
+        let method = conf["method"] as! String
+        let obfs: String
+        if let _obfs = conf["obfs"] as? String {
+            obfs = _obfs
+        } else {
+            obfs = ""
+        }
+        let obfs_param: String
+        if let _obfs_param = conf["obfs_param"] as? String {
+            obfs_param = _obfs_param
+        } else {
+            obfs_param = ""
+        }
+
+        let pluginOption: String
+        if obfs != "" {
+            pluginOption = "obfs=\(obfs),obfs-host=\(obfs_param)"
+
+        } else {
+            pluginOption = ""
+        }
+
+        if pluginOption == "" {
+            ssController.startSSClientWithhostAddress(server, hostPort: port as! NSNumber , hostPassword: password, authscheme: method) { (port, error) in
+                callback(Int(port), error)
+            }
+        }else{
+            simpleObfsController.startSimpleobfs(withHostAddr: server, hostPort: NSNumber(value: port!), pluginOpts: pluginOption) { (obfs_localPort, error) in
+                self.ssController.startSSClientWithhostAddress("127.0.0.1", hostPort: obfs_localPort as NSNumber, hostPassword: password, authscheme: method) { (port, error) in
+                    callback(Int(port), error)
+                }
+            }
+        }
+        
     }
 
     func setupTunnelWith(proxyPort port: Int, completionHandle: @escaping (Error?) -> Void) {

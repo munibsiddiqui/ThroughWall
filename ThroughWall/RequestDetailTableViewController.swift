@@ -103,7 +103,7 @@ class RequestDetailTableViewController: UITableViewController {
         case 1:
             let localFormatter = DateFormatter()
             localFormatter.locale = Locale.current
-            localFormatter.dateFormat = "HH:mm:ss:SSS"
+            localFormatter.dateFormat = "HH:mm:ss.SSS"
 
             let cell = tableView.dequeueReusableCell(withIdentifier: "timeDetail", for: indexPath)
             let privateContext = CoreDataController.sharedInstance.getPrivateContext()

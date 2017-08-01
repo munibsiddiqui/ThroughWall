@@ -40,6 +40,8 @@ typedef struct {
     int mtu;              // MTU of interface
     int mptcp;            // enable multipath TCP
     int verbose;          // verbose mode
+    char *plugin;
+    char *plugin_opts;
 } profile_t;
 
 /* An example profile
@@ -64,6 +66,7 @@ typedef struct {
 extern "C" {
 #endif
 
+        typedef void (*shadowsocks_cb) (int fd, void*);
 /*
  * Create and start a shadowsocks local server.
  *
@@ -75,8 +78,8 @@ extern "C" {
  *
  * If failed, -1 is returned. Errors will output to the log file.
  */
-int start_ss_local_server(profile_t profile);
-
+int start_ss_local_server(profile_t profile, shadowsocks_cb cb, void *data);
+    
 #ifdef __cplusplus
 }
 #endif

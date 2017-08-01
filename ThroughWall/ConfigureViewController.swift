@@ -25,9 +25,9 @@ class ConfigureViewController: UITableViewController {
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
 
-        if proxyConfig.currentProxy != "CUSTOM" {
+        if proxyConfig.currentProxy == "" {
             showDelete = false
-            proxyConfig.currentProxy = "CUSTOM"
+            proxyConfig.currentProxy = "Shadowsocks"
         } else {
             showDelete = true
         }

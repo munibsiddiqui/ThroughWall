@@ -53,7 +53,7 @@ class HomeViewController: UIViewController {
         convertToNewServerStyle()
         registerNotificationWhenLoaded()
 //        print(hardwareString())
-        print(PurchaseValidator().getReceipt())
+//        print(PurchaseValidator().getReceipt())
     }
 
 //    func hardwareString() -> String {
@@ -395,14 +395,14 @@ class HomeViewController: UIViewController {
         if on {
             do {
                 try manger.connection.startVPNTunnel()
-                let userDefault = UserDefaults()
-                if let _hintVersion = userDefault.value(forKey: kHintVersion) as? Int {
-                    if _hintVersion < hintVersion {
-                        tryShowWarning()
-                    }
-                } else {
-                    tryShowWarning()
-                }
+//                let userDefault = UserDefaults()
+//                if let _hintVersion = userDefault.value(forKey: kHintVersion) as? Int {
+//                    if _hintVersion < hintVersion {
+//                        tryShowWarning()
+//                    }
+//                } else {
+//                    tryShowWarning()
+//                }
 
             } catch {
                 showError(error, title: "start vpn")

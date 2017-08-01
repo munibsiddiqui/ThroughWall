@@ -1695,7 +1695,7 @@ main(int argc, char **argv)
 #else
 
 int
-start_ss_local_server(profile_t profile)
+start_ss_local_server(profile_t profile, shadowsocks_cb cb, void *data)
 {
     srand(time(NULL));
 
@@ -1707,6 +1707,13 @@ start_ss_local_server(profile_t profile)
     int remote_port   = profile.remote_port;
     int local_port    = profile.local_port;
     int timeout       = profile.timeout;
+    
+//    char *plugin      = profile.plugin;
+//    char *plugin_opts = profile.plugin_opts;
+//    char *plugin_host = NULL;
+//    char *plugin_port = NULL;
+//    char tmp_port[8];
+    
     int mtu           = 0;
     int mptcp         = 0;
 
@@ -1726,11 +1733,31 @@ start_ss_local_server(profile_t profile)
     if (profile.acl != NULL) {
         acl = !init_acl(profile.acl);
     }
+    
+//    if (plugin != NULL) {
+//        uint16_t port = get_local_port();
+//        if (port == 0) {
+//            FATAL("failed to find a free port");
+//        }
+//        snprintf(tmp_port, 8, "%d", port);
+//        plugin_host = "127.0.0.1";
+//        plugin_port = tmp_port;
+//
+//        LOGI("plugin \"%s\" enabled", plugin);
+//    }
+//
 
     if (local_addr == NULL) {
         local_addr = "127.0.0.1";
     }
-
+    
+//    if (plugin != NULL) {
+//        int err = start_plugin(plugin, plugin_opts, remote_host, remote_port_str, plugin_host, plugin_port, MODE_CLIENT);
+//        if (err) {
+//            FATAL("failed to start the plugin");
+//        }
+//    }
+    
     // ignore SIGPIPE
     signal(SIGPIPE, SIG_IGN);
     signal(SIGABRT, SIG_IGN);
@@ -1752,15 +1779,23 @@ start_ss_local_server(profile_t profile)
 
     struct sockaddr_storage storage;
     memset(&storage, 0, sizeof(struct sockaddr_storage));
-    if (get_sockaddr(remote_host, remote_port_str, &storage, 0, ipv6first) == -1) {
-        return -1;
-    }
+//    if (plugin != NULL) {
+//        if (get_sockaddr(plugin_host, plugin_port, &storage, 0, ipv6first) == -1) {
+//            return -1;
+//        }
+//    }else{
+        if (get_sockaddr(remote_host, remote_port_str, &storage, 0, ipv6first) == -1) {
+            return -1;
+        }
+//    }
 
     // Setup proxy context
     struct ev_loop *loop = EV_DEFAULT;
 
     struct sockaddr *remote_addr_tmp[MAX_REMOTE_NUM];
     listen_ctx_t listen_ctx;
+    memset(&listen_ctx, 0, sizeof(listen_ctx_t));
+    
     listen_ctx.remote_num     = 1;
     listen_ctx.remote_addr    = remote_addr_tmp;
     listen_ctx.remote_addr[0] = (struct sockaddr *)(&storage);
@@ -1804,6 +1839,8 @@ start_ss_local_server(profile_t profile)
     // Init connections
     cork_dllist_init(&connections);
 
+    cb(listen_ctx.fd, data);
+    
     // Enter the loop
     ev_run(loop, 0);
 

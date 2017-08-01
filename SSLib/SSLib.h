@@ -6,7 +6,8 @@
 //  Copyright © 2017 Wu Bin. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+//#import <UIKit/UIKit.h>
+#import "SSLibController.h"
 
 //! Project version number for SSLib.
 FOUNDATION_EXPORT double SSLibVersionNumber;

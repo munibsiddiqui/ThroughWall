@@ -278,7 +278,7 @@ class HomeViewController: UIViewController {
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kQRCodeExtracted), object: nil)
         if let code = notification.userInfo?["string"] as? String {
             let proxyConfig = ProxyConfig()
-            proxyConfig.currentProxy = "CUSTOM"
+//            proxyConfig.currentProxy = "CUSTOM"
             let (_proxyConfig, succeed) = QRCodeProcess().decode(QRCode: code, intoProxyConfig: proxyConfig)
             if succeed {
                 DispatchQueue.main.async {

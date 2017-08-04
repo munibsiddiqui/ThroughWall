@@ -292,15 +292,16 @@ class SiteConfigController {
 
         if var proxy = (mamager.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration!["proxy"] as? String {
             if proxy == "SHADOWSOCKS" {
-                proxy = "CUSTOM"
+                proxy = "Shadowsocks"
             }
             let proxyConfig = ProxyConfig()
             proxyConfig.currentProxy = proxy
 
             for item in proxyConfig.containedItems {
                 if var value = (mamager.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration![item] as? String {
-                    if value == "SHADOWSOCKS" {
-                        value = "CUSTOM"
+                    if item == "Proxy" {
+//                        value = "Shadowsocks"
+                        continue
                     }
                     proxyConfig.setValue(byItem: item, value: value)
                 }
@@ -637,9 +638,11 @@ class QRCodeProcess {
         var code = code
         let succeed: Bool
         if let preRange = code.range(of: "ssr://") {
+            proxyConfig.currentProxy = "ShadowsocksR"
             code.removeSubrange(preRange)
             succeed = SSRDecode(withCode: code)
         } else if let preRange = code.range(of: "ss://") {
+            proxyConfig.currentProxy = "Shadowsocks"
             code.removeSubrange(preRange)
             succeed = SSDecode(withCode: code)
         } else {

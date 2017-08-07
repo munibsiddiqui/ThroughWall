@@ -185,7 +185,6 @@
 		3436E04E1F29B333001186E6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3436E04D1F29B333001186E6 /* Assets.xcassets */; };
 		3439FA061DEEB7A000F8CE59 /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3439FA051DEEB7A000F8CE59 /* Rule.swift */; };
 		343B0EA91F2B011A00DF2F72 /* SSLib.h in Headers */ = {isa = PBXBuildFile; fileRef = 343B0EA71F2B011A00DF2F72 /* SSLib.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		343B0EAC1F2B011A00DF2F72 /* SSLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 343B0EA51F2B011A00DF2F72 /* SSLib.framework */; };
 		343B0EAD1F2B011A00DF2F72 /* SSLib.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 343B0EA51F2B011A00DF2F72 /* SSLib.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		343B0EB21F2B018B00DF2F72 /* libpcre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34F126391F00CD33004DEB50 /* libpcre.a */; };
 		343B0EB31F2B018B00DF2F72 /* libsodium.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34F1263A1F00CD33004DEB50 /* libsodium.a */; };
@@ -289,6 +288,9 @@
 		3464BF721EC4A88900D81663 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3464BF711EC4A88900D81663 /* AVFoundation.framework */; };
 		3469E9031EB9B9B20087DA38 /* VPNTableViewContTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3469E9021EB9B9B20087DA38 /* VPNTableViewContTableViewCell.swift */; };
 		346FBAF51EC2EEA2007E9B8D /* BackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 346FBAF41EC2EEA2007E9B8D /* BackgroundView.swift */; };
+		34701C591F38C188001FF4B9 /* SimpleObfs.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A8B4BE1F304BF300CFD9FA /* SimpleObfs.framework */; };
+		34701C5A1F38C188001FF4B9 /* SSLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 343B0EA51F2B011A00DF2F72 /* SSLib.framework */; };
+		34701C5B1F38C188001FF4B9 /* SSRLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34F124AD1F00BB9C004DEB50 /* SSRLib.framework */; };
 		3474EC7B1DDC926C00EBF3C5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3474EC7A1DDC926C00EBF3C5 /* AppDelegate.swift */; };
 		3474EC831DDC926C00EBF3C5 /* ThroughWall.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3474EC811DDC926C00EBF3C5 /* ThroughWall.xcdatamodeld */; };
 		3474EC851DDC926C00EBF3C5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3474EC841DDC926C00EBF3C5 /* Assets.xcassets */; };
@@ -300,7 +302,6 @@
 		3474ECAE1DDC92B900EBF3C5 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3474ECAC1DDC92B900EBF3C5 /* MainInterface.storyboard */; };
 		3474ECB21DDC92B900EBF3C5 /* TodayEx.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 3474ECA51DDC92B900EBF3C5 /* TodayEx.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3474ECD11DDC951100EBF3C5 /* TunnelLib.h in Headers */ = {isa = PBXBuildFile; fileRef = 3474ECCF1DDC951100EBF3C5 /* TunnelLib.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		3474ECD41DDC951100EBF3C5 /* TunnelLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3474ECCD1DDC951100EBF3C5 /* TunnelLib.framework */; };
 		3474ECD51DDC951100EBF3C5 /* TunnelLib.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3474ECCD1DDC951100EBF3C5 /* TunnelLib.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		3475A3561F29ABB50092A268 /* ThroughWall.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3474EC811DDC926C00EBF3C5 /* ThroughWall.xcdatamodeld */; };
 		3475A35C1F29ABF40092A268 /* CoreDataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3475A3571F29ABCA0092A268 /* CoreDataController.swift */; };
@@ -396,7 +397,6 @@
 		34A17DD51E8CF6F6005BC19B /* RuleListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A17DD41E8CF6F6005BC19B /* RuleListTableViewController.swift */; };
 		34A26A6B1E13447400A8CC93 /* HistoryOptionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A26A6A1E13447400A8CC93 /* HistoryOptionTableViewController.swift */; };
 		34A8B4C21F304BF300CFD9FA /* SimpleObfs.h in Headers */ = {isa = PBXBuildFile; fileRef = 34A8B4C01F304BF300CFD9FA /* SimpleObfs.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		34A8B4C51F304BF300CFD9FA /* SimpleObfs.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A8B4BE1F304BF300CFD9FA /* SimpleObfs.framework */; };
 		34A8B4C61F304BF300CFD9FA /* SimpleObfs.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34A8B4BE1F304BF300CFD9FA /* SimpleObfs.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		34A8B5611F304C1800CFD9FA /* crt_externs.h in Headers */ = {isa = PBXBuildFile; fileRef = 34A8B4CC1F304C1800CFD9FA /* crt_externs.h */; };
 		34A8B5621F304C1800CFD9FA /* commands.h in Headers */ = {isa = PBXBuildFile; fileRef = 34A8B4CF1F304C1800CFD9FA /* commands.h */; };
@@ -605,7 +605,6 @@
 		34F0B8F01EB2DFED007A286B /* CommonTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34F0B8EF1EB2DFED007A286B /* CommonTool.swift */; };
 		34F0B8F11EB2DFED007A286B /* CommonTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34F0B8EF1EB2DFED007A286B /* CommonTool.swift */; };
 		34F124B11F00BB9C004DEB50 /* SSRLib.h in Headers */ = {isa = PBXBuildFile; fileRef = 34F124AF1F00BB9C004DEB50 /* SSRLib.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		34F124B41F00BB9C004DEB50 /* SSRLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34F124AD1F00BB9C004DEB50 /* SSRLib.framework */; };
 		34F124B51F00BB9C004DEB50 /* SSRLib.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34F124AD1F00BB9C004DEB50 /* SSRLib.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		34F125871F00CCFB004DEB50 /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = 34F124BC1F00CCFB004DEB50 /* config.h */; };
 		34F125881F00CCFB004DEB50 /* commands.c in Sources */ = {isa = PBXBuildFile; fileRef = 34F124BF1F00CCFB004DEB50 /* commands.c */; };
@@ -2012,10 +2011,6 @@
 				3464BF721EC4A88900D81663 /* AVFoundation.framework in Frameworks */,
 				3464BF701EC4A86300D81663 /* CoreImage.framework in Frameworks */,
 				3464BF6A1EC49BDC00D81663 /* NetworkExtension.framework in Frameworks */,
-				3474ECD41DDC951100EBF3C5 /* TunnelLib.framework in Frameworks */,
-				34F124B41F00BB9C004DEB50 /* SSRLib.framework in Frameworks */,
-				34A8B4C51F304BF300CFD9FA /* SimpleObfs.framework in Frameworks */,
-				343B0EAC1F2B011A00DF2F72 /* SSLib.framework in Frameworks */,
 				914AEF6B56CAEE1284A50FD3 /* Pods_ThroughWall.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2024,6 +2019,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				34701C591F38C188001FF4B9 /* SimpleObfs.framework in Frameworks */,
+				34701C5A1F38C188001FF4B9 /* SSLib.framework in Frameworks */,
+				34701C5B1F38C188001FF4B9 /* SSRLib.framework in Frameworks */,
 				34BD966D1DDD3932002442BF /* TunnelLib.framework in Frameworks */,
 				34CC5FF61DDCA9200061AA44 /* libresolv.tbd in Frameworks */,
 				3464BF6B1EC49BFC00D81663 /* NetworkExtension.framework in Frameworks */,

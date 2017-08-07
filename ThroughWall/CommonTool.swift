@@ -222,14 +222,14 @@ class ProxyConfig: NSObject {
         if item == "proxy" {
             let oldValues = _values
             currentProxy = value
-            
+
             for oldValue in oldValues {
                 if oldValue.key == "proxy" {
                     continue
                 }
                 if containedItems.contains(oldValue.key) {
                     setValue(byItem: oldValue.key, value: oldValue.value)
-                }else if containedHiddenItems.contains(oldValue.key) {
+                } else if containedHiddenItems.contains(oldValue.key) {
                     setValue(byItem: oldValue.key, value: oldValue.value)
                 }
             }
@@ -439,6 +439,30 @@ class SiteConfigController {
             return
         }
     }
+    
+    func writeIntoSiteConfigFile(withContents content: String) {
+        let fileManager = FileManager.default
+        
+        guard var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName) else {
+            return
+        }
+        url.appendPathComponent(siteFileName)
+        
+        do {
+            if fileManager.fileExists(atPath: url.path) {
+                try fileManager.removeItem(at: url)
+            }
+            
+            fileManager.createFile(atPath: url.path, contents: nil, attributes: nil)
+            let filehandle = try FileHandle(forWritingTo: url)
+            filehandle.write(content.data(using: String.Encoding.utf8)!)
+            filehandle.synchronizeFile()
+            
+        } catch {
+            DDLogError("\(error)")
+            return
+        }
+    }
 
     func convertOldServer(withCompletionHandler completion: @escaping (NETunnelProviderManager?) -> Void) {
         checkServerStatus { (currentStatus, vpnManagers) in
@@ -539,71 +563,86 @@ class SiteConfigController {
         return "Shadowsocks"
     }
 
+    
+    func getSiteConfigsURL() -> URL? {
+        let fileManager = FileManager.default
+        
+        guard var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName) else {
+            return nil
+        }
+        
+        url.appendPathComponent(siteFileName)
+        if !fileManager.fileExists(atPath: url.path) {
+            return nil
+        }
+        
+        return  url
+    }
+    
+    func readSiteConfigsContent() -> String {
+        guard let url = getSiteConfigsURL() else {
+            return ""
+        }
+
+        do {
+            let content = try String(contentsOf: url, encoding: String.Encoding.utf8)
+            return content
+        } catch {
+            DDLogError("Read site config failed. \(error)")
+        }
+        return ""
+    }
+
 
     func readSiteConfigsFromConfigFile() -> [ProxyConfig] {
         var proxyConfigs = [ProxyConfig]()
 
-        let fileManager = FileManager.default
+        let content = readSiteConfigsContent()
+        let sites = content.components(separatedBy: "#\n")
+        var modified = false
+        for site in sites {
+            var items = site.components(separatedBy: "\n")
+            let config = ProxyConfig()
 
-        guard var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName) else {
-            return proxyConfigs
-        }
+            let firstItem = items[0]
 
-        url.appendPathComponent(siteFileName)
-        if !fileManager.fileExists(atPath: url.path) {
-            return proxyConfigs
-        }
+            if firstItem.hasPrefix("proxy:") {
+                let proxy = firstItem.substring(from: firstItem.index(firstItem.startIndex, offsetBy: 6))
 
-        do {
-
-            let content = try String(contentsOf: url, encoding: String.Encoding.utf8)
-            let sites = content.components(separatedBy: "#\n")
-            var modified = false
-            for site in sites {
-                var items = site.components(separatedBy: "\n")
-                let config = ProxyConfig()
-
-                let firstItem = items[0]
-
-                if firstItem.hasPrefix("proxy:") {
-                    let proxy = firstItem.substring(from: firstItem.index(firstItem.startIndex, offsetBy: 6))
-
-                    items.removeFirst()
-                    items.removeLast()
+                items.removeFirst()
+                items.removeLast()
 
 
-                    if proxy.lowercased() == "custom" {
-                        modified = true
-                        config.currentProxy = getRealProxyName(withConfigs: items)
-                    } else {
-                        config.currentProxy = proxy
-                    }
-                    for item in items {
-                        let temp = item.components(separatedBy: ":")
-                        let name = temp[0]
-                        // let option = temp.count > 2 ? temp.dropFirst().joined(separator: ":") : temp[1]
-                        let option: String
-
-                        if temp.count > 2 {
-                            option = temp.dropFirst().joined(separator: ":")
-                        } else {
-                            option = temp[1]
-                        }
-
-                        if config.containedItems.contains(name) || config.containedHiddenItems.contains(name) {
-                            config.setValue(byItem: name, value: option)
-                        }
-                    }
-                    proxyConfigs.append(config)
+                if proxy.lowercased() == "custom" {
+                    modified = true
+                    config.currentProxy = getRealProxyName(withConfigs: items)
+                } else {
+                    config.currentProxy = proxy
                 }
-            }
+                for item in items {
+                    let temp = item.components(separatedBy: ":")
+                    let name = temp[0]
+                    // let option = temp.count > 2 ? temp.dropFirst().joined(separator: ":") : temp[1]
+                    let option: String
 
-            if modified {
-                writeIntoSiteConfigFile(withConfigs: proxyConfigs)
+                    if temp.count > 2 {
+                        option = temp.dropFirst().joined(separator: ":")
+                    } else {
+                        option = temp[1]
+                    }
+
+                    if config.containedItems.contains(name) || config.containedHiddenItems.contains(name) {
+                        config.setValue(byItem: name, value: option)
+                    }
+                }
+                proxyConfigs.append(config)
             }
-        } catch {
-            DDLogError("\(error)")
         }
+
+        if modified {
+            writeIntoSiteConfigFile(withConfigs: proxyConfigs)
+        }
+
 
         return proxyConfigs
     }

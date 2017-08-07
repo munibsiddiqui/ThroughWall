@@ -18,6 +18,9 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
     var downloadIndicator = UIActivityIndicatorView()
 //    var hiddenHitTimes = 0
 
+    var isImportingRule = true
+
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -40,7 +43,7 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         backgroundView.backgroundColor = UIColor.darkGray
         backgroundView.layer.cornerRadius = 10
         backgroundView.clipsToBounds = true
-        
+
         downloadIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
         downloadIndicator.center = CGPoint(x: 50, y: 50)
         downloadIndicator.activityIndicatorViewStyle = .whiteLarge
@@ -111,7 +114,7 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 3
+        return 4
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -120,9 +123,11 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         case 0:
             return 2
         case 1:
-            return 4
-        case 2:
             return 3
+        case 2:
+            return 2
+        case 3:
+            return 2
         default:
             return 0
         }
@@ -133,9 +138,11 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         case 0:
             return " Actions"
         case 1:
-            return "Import Rule Files"
+            return " Import & Export Rule Files"
         case 2:
-            return " View rules"
+            return " View Rules"
+        case 3:
+            return " Import & Export Servers"
         default:
             return nil
         }
@@ -198,8 +205,10 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
             case 0:
                 cell.textLabel?.text = "Global mode"
                 cell.accessoryView = globalModeSwitch
+                cell.accessoryType = .none
             case 1:
                 cell.textLabel?.text = "Test Rule"
+                cell.accessoryView = nil
                 cell.accessoryType = .disclosureIndicator
             default:
                 break
@@ -209,31 +218,42 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
             let cell = tableView.dequeueReusableCell(withIdentifier: "actionCell", for: indexPath)
             switch indexPath.row {
             case 0:
-                cell.textLabel?.text = "From URL"
+                cell.textLabel?.text = "Import Rule"
             case 1:
-                cell.textLabel?.text = "From Local Document"
-            case 2:
-                cell.textLabel?.text = "From Cloud"
-            case 3:
                 cell.textLabel?.text = "Reset to Default"
+            case 2:
+                cell.textLabel?.text = "Export Rule"
             default:
                 break
             }
+            cell.accessoryView = nil
+            cell.accessoryType = .none
             return cell
         case 2:
             let cell = tableView.dequeueReusableCell(withIdentifier: "actionCell", for: indexPath)
             switch indexPath.row {
             case 0:
                 cell.textLabel?.text = "As List"
+                cell.accessoryView = nil
                 cell.accessoryType = .disclosureIndicator
             case 1:
                 cell.textLabel?.text = "As Raw TXT"
+                cell.accessoryView = nil
                 cell.accessoryType = .disclosureIndicator
-            case 2:
-                cell.textLabel?.text = "Export"
             default:
                 break
             }
+            return cell
+        case 3:
+            let cell = tableView.dequeueReusableCell(withIdentifier: "actionCell", for: indexPath)
+            if indexPath.row == 0 {
+                cell.textLabel?.text = "Import Servers (need RESTART app)"
+            } else {
+                cell.textLabel?.text = "Export Servers"
+            }
+
+            cell.accessoryView = nil
+            cell.accessoryType = .disclosureIndicator
             return cell
         default:
             break
@@ -257,16 +277,17 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         case 1:
             switch indexPath.row {
             case 0:
-                popTextFieldForURLInput()
+                //import
+                importRuleFile(withRect: rect)
             case 1:
-                popFileListInLocalFile(withSourceRect: rect)
-            case 2:
-                importFromCloud(withSourceRect: rect)
-            case 3:
                 useDefaultRule()
+            case 2:
+                //export
+                exportRuleToCloud(withSourceRect: rect)
             default:
                 break
             }
+
         case 2:
             switch indexPath.row {
             case 0:
@@ -276,20 +297,25 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
                 let vc = storyboard.instantiateViewController(withIdentifier: "rawRuleTXTView") as! RawRuleTXTViewController
 
                 self.navigationController?.pushViewController(vc, animated: true)
-//                performSegue(withIdentifier: "showRawTXT", sender: nil)
-            case 2:
-                exportToCloud(withSourceRect: rect)
             default:
                 break
             }
+        case 3:
+//            performSegue(withIdentifier: "icloudSync", sender: nil)
+            if indexPath.row == 0 {
+                importSetverFromCloud(withSourceRect: rect)
+            } else {
+                exportServersToCloud(withSourceRect: rect)
+            }
+
         default:
             break
         }
     }
 
-    // MARK: - Import Rule File
+    // MARK: - Import & Export Servers
 
-    func importFromCloud(withSourceRect sourceRect: CGRect) {
+    func importSetverFromCloud(withSourceRect sourceRect: CGRect) {
         let importMenu = UIDocumentMenuViewController(documentTypes: ["public.text", "public.data", "public.pdf", "public.doc"], in: .import)
         importMenu.delegate = self
         importMenu.modalPresentationStyle = .formSheet
@@ -297,13 +323,73 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
             popoverPresentationController.sourceView = view
             popoverPresentationController.sourceRect = sourceRect
         }
+        isImportingRule = false
         present(importMenu, animated: true, completion: nil)
     }
 
-    func exportToCloud(withSourceRect sourceRect: CGRect) {
+    func exportServersToCloud(withSourceRect sourceRect: CGRect) {
+        guard let url = SiteConfigController().getSiteConfigsURL() else {
+            return
+        }
+        let activityViewController = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+
+        if let popoverPresentationController = activityViewController.popoverPresentationController {
+            popoverPresentationController.sourceView = view
+            popoverPresentationController.sourceRect = sourceRect
+        }
+        present(activityViewController, animated: true, completion: nil)
+    }
+
+    // MARK: - Import & Export Rule File
+
+    func importRuleFile(withRect rect: CGRect) {
+
+        let listController = UIAlertController(title: "Import Rule Files From", message: nil, preferredStyle: .actionSheet)
+
+        let fromURLItem = UIAlertAction(title: "URL", style: .default, handler: { (_) in
+            self.popTextFieldForURLInput()
+        })
+        listController.addAction(fromURLItem)
+
+        let localDocumentItem = UIAlertAction(title: "Document", style: .default, handler: { (_) in
+            self.popFileListInLocalFile(withSourceRect: rect)
+        })
+        listController.addAction(localDocumentItem)
+
+        let cloudItem = UIAlertAction(title: "Cloud", style: .default, handler: { (_) in
+            self.importRuleFromCloud(withSourceRect: rect)
+        })
+        listController.addAction(cloudItem)
+
+
+        let cancelItem = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        listController.addAction(cancelItem)
+
+        if let popoverPresentationController = listController.popoverPresentationController {
+            popoverPresentationController.sourceView = view
+            popoverPresentationController.sourceRect = rect
+        }
+
+        present(listController, animated: true, completion: nil)
+
+    }
+
+    func importRuleFromCloud(withSourceRect sourceRect: CGRect) {
+        let importMenu = UIDocumentMenuViewController(documentTypes: ["public.text", "public.data", "public.pdf", "public.doc"], in: .import)
+        importMenu.delegate = self
+        importMenu.modalPresentationStyle = .formSheet
+        if let popoverPresentationController = importMenu.popoverPresentationController {
+            popoverPresentationController.sourceView = view
+            popoverPresentationController.sourceRect = sourceRect
+        }
+        isImportingRule = true
+        present(importMenu, animated: true, completion: nil)
+    }
+
+    func exportRuleToCloud(withSourceRect sourceRect: CGRect) {
         let url = URL(fileURLWithPath: RuleFileUpdateController().readCurrentRuleFileURL())
         let activityViewController = UIActivityViewController(activityItems: [url], applicationActivities: nil)
- 
+
         if let popoverPresentationController = activityViewController.popoverPresentationController {
             popoverPresentationController.sourceView = view
             popoverPresentationController.sourceRect = sourceRect
@@ -359,7 +445,6 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         }
         return []
     }
-
 
     func useDefaultRule() {
         let alertController = UIAlertController(title: "Using Default Rule?", message: "This will overwrite current rule", preferredStyle: .alert)
@@ -437,8 +522,13 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         if controller.documentPickerMode == .import {
             do {
                 let content = try String(contentsOf: url, encoding: String.Encoding.utf8)
-                saveToConfigFile(content)
-                RuleFileUpdateController().updateRuleFileFromImportedFile(downloadFilePath)
+                if isImportingRule {
+                    saveToConfigFile(content)
+                    RuleFileUpdateController().updateRuleFileFromImportedFile(downloadFilePath)
+                }else {
+                    let fixContent = content.replacingOccurrences(of: "\r\n", with: "\n")
+                    SiteConfigController().writeIntoSiteConfigFile(withContents: fixContent)
+                }
             } catch {
                 DDLogError("\(error)")
             }

@@ -275,6 +275,7 @@
 		344EF2C91EC345980055A049 /* LogViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 344EF2C81EC345980055A049 /* LogViewController.swift */; };
 		3450CA791EDC685E004E4A09 /* TimelineCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3450CA781EDC685E004E4A09 /* TimelineCellView.xib */; };
 		3450CA7B1EDC6871004E4A09 /* TimelineCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3450CA7A1EDC6871004E4A09 /* TimelineCellView.swift */; };
+		34520DF21F35A55300DA5E6D /* iCloudSyncViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34520DF11F35A55300DA5E6D /* iCloudSyncViewController.swift */; };
 		3452C3481E763D80008CCC4E /* Tool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3452C3471E763D80008CCC4E /* Tool.swift */; };
 		34585E4D1F0150FF001380C1 /* SSRLibController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34585E4C1F0150FF001380C1 /* SSRLibController.m */; };
 		345E6B791EC5A0D60064B25E /* QRShowViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 345E6B781EC5A0D60064B25E /* QRShowViewController.swift */; };
@@ -1187,6 +1188,7 @@
 		344EF2C81EC345980055A049 /* LogViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogViewController.swift; sourceTree = "<group>"; };
 		3450CA781EDC685E004E4A09 /* TimelineCellView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TimelineCellView.xib; sourceTree = "<group>"; };
 		3450CA7A1EDC6871004E4A09 /* TimelineCellView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimelineCellView.swift; sourceTree = "<group>"; };
+		34520DF11F35A55300DA5E6D /* iCloudSyncViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iCloudSyncViewController.swift; sourceTree = "<group>"; };
 		3452C3471E763D80008CCC4E /* Tool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tool.swift; sourceTree = "<group>"; };
 		34585E4C1F0150FF001380C1 /* SSRLibController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SSRLibController.m; sourceTree = "<group>"; };
 		34585E4E1F01510C001380C1 /* SSRLibController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SSRLibController.h; sourceTree = "<group>"; };
@@ -2907,6 +2909,7 @@
 				3482A2B01E9F0D9700A6B202 /* RuleProxySelectionTableViewController.swift */,
 				348F61961E8E4D0D00F6AF9A /* TestRuleViewController.swift */,
 				348F61981E8E540000F6AF9A /* RawRuleTXTViewController.swift */,
+				34520DF11F35A55300DA5E6D /* iCloudSyncViewController.swift */,
 			);
 			name = RuleConfig;
 			sourceTree = "<group>";
@@ -4825,6 +4828,9 @@
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 1;
 							};
+							com.apple.Push = {
+								enabled = 0;
+							};
 							com.apple.VPNLite = {
 								enabled = 0;
 							};
@@ -5346,6 +5352,7 @@
 				3433528D1DF943D100CF7281 /* CoreDataController.swift in Sources */,
 				3464BF6E1EC49F0400D81663 /* QRViewController.swift in Sources */,
 				341F7FA01F24C8DA00CDCEDD /* PAirSandbox.m in Sources */,
+				34520DF21F35A55300DA5E6D /* iCloudSyncViewController.swift in Sources */,
 				345ECB871DF8F5C100F70ACC /* Rule.swift in Sources */,
 				3474EC7B1DDC926C00EBF3C5 /* AppDelegate.swift in Sources */,
 				343B9E7A1EE8EC88003B7320 /* AboutViewController.swift in Sources */,

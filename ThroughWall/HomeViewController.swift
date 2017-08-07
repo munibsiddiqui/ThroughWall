@@ -344,8 +344,6 @@ class HomeViewController: UIViewController {
                 return
             }
 
-
-
             if let manager = self.currentVPNManager {
                 SiteConfigController().save(withConfig: proxyConfigs[selectedServerIndex], intoManager: manager, completionHander: {
                     manager.loadFromPreferences(completionHandler: { (_error) in

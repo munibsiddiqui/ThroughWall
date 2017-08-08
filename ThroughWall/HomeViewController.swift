@@ -606,6 +606,9 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
             currentVPNStatusLamp = cell.imageView!
             //            self.navigationItem.title = textLabel.text
         } else {
+            if currentVPNStatusLamp == cell.imageView {
+                currentVPNStatusLamp = UIImageView()
+            }
             cell.imageView?.image = UIImage(named: "TSDot")
         }
 

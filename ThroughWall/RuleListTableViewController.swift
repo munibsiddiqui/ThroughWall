@@ -208,10 +208,20 @@ class RuleListTableViewController: UITableViewController, UISearchResultsUpdatin
             } else {
                 let item = filteredRuleItems[indexPath.row - filteredRewriteItems.count]
 
-                cell.textLabel?.attributedText = usingFilterTextTohightlight(item[1])
-
-                //In fact, usingFilterTextTohightlight doesn't work now
-                cell.detailTextLabel?.attributedText = usingFilterTextTohightlight(attributedText: makeAttributeDescription(withMatchRule: item[0], andProxyRule: item[2]))
+//                cell.textLabel?.attributedText = usingFilterTextTohightlight(item[1])
+//
+//                //In fact, usingFilterTextTohightlight doesn't work now
+//                cell.detailTextLabel?.attributedText = usingFilterTextTohightlight(attributedText: makeAttributeDescription(withMatchRule: item[0], andProxyRule: item[2]))
+            
+                cell.textLabel?.attributedText = nil
+                cell.detailTextLabel?.attributedText = nil
+                if item.count >= 3 {
+                    cell.textLabel?.attributedText = usingFilterTextTohightlight(item[1])
+                    cell.detailTextLabel?.attributedText = usingFilterTextTohightlight(attributedText: makeAttributeDescription(withMatchRule: item[0], andProxyRule: item[2]))
+                } else {
+                    cell.textLabel?.text = ""
+                    cell.detailTextLabel?.attributedText = usingFilterTextTohightlight(attributedText: makeAttributeDescription(withMatchRule: item[0], andProxyRule: item[1]))
+                }
             }
         } else {
             if indexPath.row < rewriteItems.count {

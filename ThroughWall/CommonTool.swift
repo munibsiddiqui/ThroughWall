@@ -136,7 +136,7 @@ class ProxyConfig: NSObject {
         //        "dns": "DNS"
         "protocol": "Protocol",
         "proto_param": "Protocol Param",
-        "obfs": "Ofbs",
+        "obfs": "Obfs",
         "obfs_param": "Obfs Param"
     ]
 

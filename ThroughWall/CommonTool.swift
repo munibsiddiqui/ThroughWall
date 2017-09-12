@@ -55,11 +55,6 @@ class ProxyConfig: NSObject {
                     CustomizeOption
                 ]
             ],
-            "protocol": [
-                "preset": [
-                    "", "origin", "verify_simple", "auth_simple", "auth_sha1", "auth_sha1_v2", "auth_sha1_v4", "auth_aes128_md5", "auth_aes128_sha1", "auth_chain_a"
-                ]
-            ],
             "obfs": [
                 "preset": [
                     "", "http", "tls"
@@ -83,6 +78,11 @@ class ProxyConfig: NSObject {
                 ],
                 "customize": [
                     CustomizeOption
+                ]
+            ],
+            "protocol": [
+                "preset": [
+                    "", "origin", "verify_simple", "auth_simple", "auth_sha1", "auth_sha1_v2", "auth_sha1_v4", "auth_aes128_md5", "auth_aes128_sha1", "auth_chain_a"
                 ]
             ],
             "obfs": [
@@ -394,6 +394,60 @@ class SiteConfigController {
         }
     }
 
+    func getTimeStamp(fromContent content: String) -> Double? {
+        var splitContent = content.components(separatedBy: "\n")
+        splitContent.removeLast()
+        if var time = splitContent.last {
+            if time.starts(with: "#") {
+                time.removeFirst()
+                if let timestamp = Double(time) {
+                    return timestamp
+                }
+            }
+        }
+        return nil
+    }
+
+    func tryRestoreSiteConfigFile() {
+        let fileManager = FileManager.default
+
+        guard var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName) else {
+            return
+        }
+        url.appendPathComponent(siteFileName)
+
+        let backupURL = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)[0] + "/" + siteFileName
+        let usingTimestamp: Double
+        let backupTimestamp: Double
+
+        do {
+            if fileManager.fileExists(atPath: url.path) {
+                let content = try String.init(contentsOf: url)
+                usingTimestamp = getTimeStamp(fromContent: content) ?? -1
+            } else {
+                usingTimestamp = -1
+            }
+
+            if fileManager.fileExists(atPath: backupURL) {
+                let content = try String.init(contentsOfFile: backupURL)
+                backupTimestamp = getTimeStamp(fromContent: content) ?? -1
+            } else {
+                backupTimestamp = -1
+            }
+
+            if usingTimestamp > backupTimestamp {
+                if fileManager.fileExists(atPath: backupURL) {
+                    try fileManager.removeItem(atPath: backupURL)
+                }
+                try fileManager.copyItem(atPath: url.path, toPath: backupURL)
+            }
+
+        } catch {
+            DDLogError("\(error)")
+            return
+        }
+    }
+
     func writeIntoSiteConfigFile(withConfigs configs: [ProxyConfig]) {
         let fileManager = FileManager.default
 
@@ -431,33 +485,42 @@ class SiteConfigController {
 
                 filehandle.write("#\n".data(using: String.Encoding.utf8)!)
             }
-
+            filehandle.write("#\(Date().timeIntervalSince1970)\n".data(using: String.Encoding.utf8)!)
             filehandle.synchronizeFile()
+            filehandle.closeFile()
+
+            let backupURL = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)[0] + "/" + siteFileName
+
+            if fileManager.fileExists(atPath: backupURL) {
+                try fileManager.removeItem(atPath: backupURL)
+            }
+
+            try fileManager.copyItem(atPath: url.path, toPath: backupURL)
 
         } catch {
             DDLogError("\(error)")
             return
         }
     }
-    
+
     func writeIntoSiteConfigFile(withContents content: String) {
         let fileManager = FileManager.default
-        
+
         guard var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName) else {
             return
         }
         url.appendPathComponent(siteFileName)
-        
+
         do {
             if fileManager.fileExists(atPath: url.path) {
                 try fileManager.removeItem(at: url)
             }
-            
+
             fileManager.createFile(atPath: url.path, contents: nil, attributes: nil)
             let filehandle = try FileHandle(forWritingTo: url)
             filehandle.write(content.data(using: String.Encoding.utf8)!)
             filehandle.synchronizeFile()
-            
+            filehandle.closeFile()
         } catch {
             DDLogError("\(error)")
             return
@@ -475,6 +538,7 @@ class SiteConfigController {
                 completion(nil)
             case .CONVERTED:
                 DDLogDebug("converted")
+                self.tryRestoreSiteConfigFile()
                 let newVersionManager = self.deleteOldServer(fromVPNManagers: vpnManagers)
                 completion(newVersionManager)
             case .NOTCONVERTED:
@@ -563,22 +627,35 @@ class SiteConfigController {
         return "Shadowsocks"
     }
 
-    
+
     func getSiteConfigsURL() -> URL? {
         let fileManager = FileManager.default
-        
+
         guard var url = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupName) else {
             return nil
         }
-        
+
         url.appendPathComponent(siteFileName)
         if !fileManager.fileExists(atPath: url.path) {
             return nil
         }
-        
-        return  url
+
+        return url
     }
-    
+
+    func getBackupSiteConfigsURL() -> URL? {
+        let fileManager = FileManager.default
+        let path = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)[0] + "/" + siteFileName
+
+        if !fileManager.fileExists(atPath: path) {
+            return nil
+        }
+
+        let url = URL(fileURLWithPath: path)
+
+        return url
+    }
+
     func readSiteConfigsContent() -> String {
         guard let url = getSiteConfigsURL() else {
             return ""
@@ -697,7 +774,9 @@ class QRCodeProcess {
             DDLogDebug(decodestring)
             let parts = decodestring.components(separatedBy: "/?")
             if extractSSR(requiredPart: parts[0]) {
-                extractSSR(optionPart: parts[1])
+                if parts.count > 1 {
+                    extractSSR(optionPart: parts[1])
+                }
                 return true
             }
         }
@@ -716,6 +795,18 @@ class QRCodeProcess {
                 proxyConfig?.setValue(byItem: "obfs", value: parts[4])
                 proxyConfig?.setValue(byItem: "password", value: password)
                 proxyConfig?.setValue(byItem: "description", value: "\(parts[0]):\(parts[1])")
+                if let pro = proxyConfig?.getValue(byItem: "protocol") {
+                    if pro.hasSuffix("_compatible") {
+                        let endIndex = pro.index(pro.endIndex, offsetBy: -11)
+                        proxyConfig?.setValue(byItem: "protocol", value: pro.substring(to: endIndex))
+                    }
+                }
+                if let pro = proxyConfig?.getValue(byItem: "obfs") {
+                    if pro.hasSuffix("_compatible") {
+                        let endIndex = pro.index(pro.endIndex, offsetBy: -11)
+                        proxyConfig?.setValue(byItem: "obfs", value: pro.substring(to: endIndex))
+                    }
+                }
                 return true
             }
         }
@@ -752,11 +843,11 @@ class QRCodeProcess {
 
         if let poundsignIndex = code.range(of: "#")?.lowerBound {
             let removeRange = Range(uncheckedBounds: (lower: poundsignIndex, upper: code.endIndex))
-            description = code.substring(from: code.index(after: poundsignIndex))
+            description = code.substring(from: code.index(after: poundsignIndex)).removingPercentEncoding ?? ""
             code.removeSubrange(removeRange)
-        } else if let remarkRange = code.range(of: "?remark") {
+        } else if let remarkRange = code.range(of: "?remark=") {
             let removeRange = Range(uncheckedBounds: (lower: remarkRange.lowerBound, upper: code.endIndex))
-            description = code.substring(from: code.index(after: remarkRange.upperBound))
+            description = code.substring(from: code.index(after: remarkRange.upperBound)).removingPercentEncoding ?? ""
             code.removeSubrange(removeRange)
         } else {
             description = ""
@@ -896,7 +987,7 @@ class QRCodeProcess {
 
         DDLogDebug("\(result)")
         result = encodeUsingBase64(result)
-        if let value = proxyConfig?.getValue(byItem: "description") {
+        if let value = proxyConfig?.getValue(byItem: "description")?.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
             let tmp = result + "#" + value
             DDLogDebug(tmp)
             result = "ss://" + result + "#" + value

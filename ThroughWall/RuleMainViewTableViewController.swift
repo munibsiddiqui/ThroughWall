@@ -328,7 +328,7 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
     }
 
     func exportServersToCloud(withSourceRect sourceRect: CGRect) {
-        guard let url = SiteConfigController().getSiteConfigsURL() else {
+        guard let url = SiteConfigController().getBackupSiteConfigsURL() else {
             return
         }
         let activityViewController = UIActivityViewController(activityItems: [url], applicationActivities: nil)

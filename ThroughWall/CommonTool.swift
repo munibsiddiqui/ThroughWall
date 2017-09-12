@@ -298,7 +298,7 @@ class SiteConfigController {
             proxyConfig.currentProxy = proxy
 
             for item in proxyConfig.containedItems {
-                if var value = (mamager.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration![item] as? String {
+                if let value = (mamager.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration![item] as? String {
                     if item == "Proxy" {
 //                        value = "Shadowsocks"
                         continue
@@ -397,10 +397,10 @@ class SiteConfigController {
     func getTimeStamp(fromContent content: String) -> Double? {
         var splitContent = content.components(separatedBy: "\n")
         splitContent.removeLast()
-        if var time = splitContent.last {
-            if time.starts(with: "#") {
-                time.removeFirst()
-                if let timestamp = Double(time) {
+        if let time = splitContent.last {
+            if time.hasPrefix("#") {
+                let startInd = time.index(after: time.startIndex)
+                if let timestamp = Double(time.substring(from: startInd)) {
                     return timestamp
                 }
             }

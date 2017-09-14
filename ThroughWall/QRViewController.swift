@@ -29,17 +29,17 @@ class QRViewController: UIViewController, UINavigationControllerDelegate, UIImag
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-        imagePicker.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
+        imagePicker.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.white]
         imagePicker.navigationBar.tintColor = UIColor.white
         imagePicker.navigationBar.isTranslucent = false
         imagePicker.navigationBar.setBackgroundImage(image(fromColor: topUIColor), for: .any, barMetrics: .default)
         imagePicker.navigationBar.shadowImage = UIImage()
         imagePicker.delegate = self
 
-        let captureDevice = AVCaptureDevice.defaultDevice(withMediaType: AVMediaTypeVideo)
+        let captureDevice = AVCaptureDevice.default(for: AVMediaType.video)
 
         do {
-            let input = try AVCaptureDeviceInput.init(device: captureDevice)
+            let input = try AVCaptureDeviceInput.init(device: captureDevice!)
             // Initialize the captureSession object.
             captureSession = AVCaptureSession()
             // Set the input device on the capture session.
@@ -55,11 +55,11 @@ class QRViewController: UIViewController, UINavigationControllerDelegate, UIImag
 
         // Set delegate and use the default dispatch queue to execute the call back
         captureMetadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
-        captureMetadataOutput.metadataObjectTypes = [AVMetadataObjectTypeQRCode]
+        captureMetadataOutput.metadataObjectTypes = [AVMetadataObject.ObjectType.qr]
 
         // Initialize the video preview layer and add it as a sublayer to the viewPreview view's layer.
-        videoPreviewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-        videoPreviewLayer?.videoGravity = AVLayerVideoGravityResizeAspectFill
+        videoPreviewLayer = AVCaptureVideoPreviewLayer(session: captureSession!)
+        videoPreviewLayer?.videoGravity = AVLayerVideoGravity.resizeAspectFill
         videoPreviewLayer?.frame = view.layer.bounds
         view.layer.addSublayer(videoPreviewLayer!)
 
@@ -148,7 +148,7 @@ class QRViewController: UIViewController, UINavigationControllerDelegate, UIImag
 
     // MARK: - AVCaptureMetadataOutputObjectsDelegate
 
-    func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputMetadataObjects metadataObjects: [Any]!, from connection: AVCaptureConnection!) {
+    func metadataOutput(captureOutput: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
         // Check if the metadataObjects array is not nil and it contains at least one object.
 
         if metadataObjects == nil || metadataObjects.count == 0 {
@@ -160,7 +160,7 @@ class QRViewController: UIViewController, UINavigationControllerDelegate, UIImag
         // Get the metadata object.
         let metadataObj = metadataObjects[0] as! AVMetadataMachineReadableCodeObject
 
-        if metadataObj.type == AVMetadataObjectTypeQRCode {
+        if metadataObj.type == AVMetadataObject.ObjectType.qr {
             // If the found metadata is equal to the QR code metadata then update the status label's text and set the bounds
             let barCodeObject = videoPreviewLayer?.transformedMetadataObject(for: metadataObj) as! AVMetadataMachineReadableCodeObject
             qrCodeFrameView?.frame = barCodeObject.bounds;

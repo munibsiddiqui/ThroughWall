@@ -269,7 +269,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         ipv4Setting.includedRoutes = [NEIPv4Route.default()]
         ipv4Setting.excludedRoutes = generateExcludedRoutes()
 
-        settings.iPv4Settings = ipv4Setting
+        settings.ipv4Settings = ipv4Setting
         settings.mtu = 1600
 
         let proxySettings = NEProxySettings()
@@ -312,7 +312,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
 
-    func onShadowsocksClientClosed() {
+    @objc func onShadowsocksClientClosed() {
         DDLogDebug("onShadowsocksClientClosed")
         HTTPProxyManager.shardInstance.stopProxy()
         DDLogDebug("StopCompletion")

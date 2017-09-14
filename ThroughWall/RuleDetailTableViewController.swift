@@ -73,7 +73,7 @@ class RuleDetailTableViewController: UITableViewController, UITextFieldDelegate 
         let _ = navigationController?.popViewController(animated: true)
     }
     
-    func didSelectedNewValue(notification: Notification) {
+    @objc func didSelectedNewValue(notification: Notification) {
         if let newValue = notification.userInfo?["newValue"] as? String {
             switch selectedRow {
             case 0:

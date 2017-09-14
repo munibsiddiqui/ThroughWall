@@ -204,11 +204,11 @@ class RequestsInTimelineViewController: UIViewController, UIScrollViewDelegate {
             var inserted = false
             for (rowIndex, row) in classifiedTrafficsInRow.enumerated() {
                 if let lastInRow = row.last {
-                    let lastInRowDisTime: NSDate
+                    let lastInRowDisTime: Date
                     if let _lastInRowDisTime = lastInRow.disconnectTime {
                         lastInRowDisTime = _lastInRowDisTime
                     } else {
-                        lastInRowDisTime = NSDate()
+                        lastInRowDisTime = Date()
                     }
                     if let trafficReqTime = traffic.hostConnectInfo?.requestTime {
                         if trafficReqTime.timeIntervalSince(lastInRowDisTime as Date) >= 0 {

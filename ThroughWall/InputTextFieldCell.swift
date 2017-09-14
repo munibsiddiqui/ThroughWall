@@ -13,8 +13,8 @@ class InputTextFieldCell: UITableViewCell, UITextFieldDelegate {
     @IBOutlet weak var item: UILabel!
     @IBOutlet weak var itemDetail: UITextField!
     
-    var valueChanged: ((Void) -> Void)?
-    var returnPressed: ((Void) -> Void)?
+    var valueChanged: (() -> Void)?
+    var returnPressed: (() -> Void)?
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

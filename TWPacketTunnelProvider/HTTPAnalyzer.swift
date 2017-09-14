@@ -175,7 +175,7 @@ class HTTPAnalyzer: NSObject {
         DDLogVerbose("H\(intTag)H Init Read")
         timerForReadTimeout = DispatchSource.makeTimerSource(queue: DispatchQueue.global())
 
-        timerForReadTimeout?.scheduleOneshot(deadline: .now() + 120)
+        timerForReadTimeout?.schedule(deadline: .now() + 120)
         timerForReadTimeout?.setEventHandler(handler: {
             DDLogVerbose("H\(self.intTag)H Timeout TAG_READ_REQUEST_HEAD_FROM_CLIENT")
             self.clientDisconnectSchedule()
@@ -225,7 +225,7 @@ class HTTPAnalyzer: NSObject {
                     hostTraffic.inCount = Int64(inCount)
                     hostTraffic.outCount = Int64(outCount)
                     hostTraffic.inProcessing = false
-                    hostTraffic.disconnectTime = NSDate()
+                    hostTraffic.disconnectTime = Date()
                     hostTraffic.forceDisconnect = isForceDisconnect
                     CoreDataController.sharedInstance.addToRefreshList(withObj: hostTraffic, andContext: context)
                     if hasResponseBody {
@@ -633,11 +633,11 @@ extension HTTPAnalyzer {
         var requestComponents = request.components(separatedBy: "\r\n")
         for (index, requestComponent) in requestComponents.enumerated() {
             if requestComponent.hasPrefix("Host: ") {
-                var temp = requestComponent.substring(from: requestComponent.index(requestComponent.startIndex, offsetBy: 6))
+                var temp = String(requestComponent[requestComponent.index(requestComponent.startIndex, offsetBy: 6) ..< requestComponent.endIndex])
                 temp = "http://" + temp
                 temp = Rule.sharedInstance.tryRewriteURL(withURLString: temp)
                 if let slashIndex = temp.range(of: "//") {
-                    temp = temp.substring(from: slashIndex.upperBound)
+                    temp = String(temp[slashIndex.upperBound ..< temp.endIndex])
                     temp = "Host: " + temp
                     requestComponents[index] = temp
                 }
@@ -653,9 +653,9 @@ extension HTTPAnalyzer {
             return result
         }
 
-        let subRequest = request.substring(with: Range(uncheckedBounds: (lower: nameRange.upperBound, upper: request.endIndex)))
+        let subRequest = String(request[nameRange.upperBound ..< request.endIndex])
         let returnRange = subRequest.range(of: "\r\n")!
-        result = subRequest.substring(with: Range(uncheckedBounds: (lower: subRequest.startIndex, upper: returnRange.lowerBound)))
+        result = String(subRequest[..<returnRange.lowerBound])
 
         return result
     }
@@ -787,7 +787,7 @@ extension HTTPAnalyzer {
                 hostInfo.name = host
                 hostInfo.port = Int32(port)
                 hostInfo.rule = self.proxyType
-                hostInfo.requestTime = NSDate()
+                hostInfo.requestTime = Date()
                 hostInfo.tag = Int64(self.intTag)
                 hostInfo.belongToHost = self.hostTraffic
                 CoreDataController.sharedInstance.addToRefreshList(withObj: hostInfo, andContext: context)
@@ -924,7 +924,7 @@ extension HTTPAnalyzer: OutgoingTransmitDelegate {
 
     internal func outgoingSocket(didConnectToHost host: String, port: UInt16) {
         DDLogVerbose("H\(intTag)H didConnect \(host):\(port)")
-        let timeStamp = NSDate()
+        let timeStamp = Date()
         if isConnectRequest {
             DispatchQueue.main.async {
                 if self.shouldParseTraffic {
@@ -964,7 +964,7 @@ extension HTTPAnalyzer: OutgoingTransmitDelegate {
 
     private func retrievedOutgoingSocket(host: String, port: UInt16) {
         DDLogVerbose("H\(intTag)H retrievedOutgoingSocket \(host):\(port)")
-        let timeStamp = NSDate()
+        let timeStamp = Date()
         if isConnectRequest {
             DispatchQueue.main.async {
                 if self.shouldParseTraffic {
@@ -1103,7 +1103,7 @@ extension HTTPAnalyzer {
                 let context = CoreDataController.sharedInstance.getContext()
                 let responseHead = ResponseHead(context: context)
                 responseHead.head = serverResponseString
-                responseHead.time = NSDate()
+                responseHead.time = Date()
                 responseHead.size = Int64(serverResponseString.characters.count)
                 responseHead.belongToHost = self.hostTraffic
                 CoreDataController.sharedInstance.addToRefreshList(withObj: responseHead, andContext: context)

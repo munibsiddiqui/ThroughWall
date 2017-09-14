@@ -91,7 +91,7 @@ class HistoryOptionTableViewController: UITableViewController {
     }
 
     func setTopArear() {
-        navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
+        navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.white]
         navigationController?.navigationBar.tintColor = UIColor.white
         navigationController?.navigationBar.isTranslucent = false
         navigationController?.navigationBar.setBackgroundImage(image(fromColor: topUIColor), for: .any, barMetrics: .default)
@@ -145,7 +145,7 @@ class HistoryOptionTableViewController: UITableViewController {
         }
     }
 
-    func trigerLogFunction() {
+    @objc func trigerLogFunction() {
         if logRequestSwitch.isOn {
             let alertController = UIAlertController(title: "Caution", message: "Logs will NOT be deleted automatically. You should delete logs manually.", preferredStyle: .alert)
 

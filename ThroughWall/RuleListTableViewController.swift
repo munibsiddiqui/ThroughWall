@@ -80,7 +80,7 @@ class RuleListTableViewController: UITableViewController, UISearchResultsUpdatin
         // Dispose of any resources that can be recreated.
     }
 
-    func ruleSaved(notification: Notification) {
+    @objc func ruleSaved(notification: Notification) {
         if let value = notification.userInfo?["ruleItem"] as? [String] {
             if selectedIndex == -1 {
                 ruleItems.insert(value, at: 0)
@@ -101,7 +101,7 @@ class RuleListTableViewController: UITableViewController, UISearchResultsUpdatin
         reloadItemsFromDisk()
     }
 
-    func ruleDeleted(notification: Notification) {
+    @objc func ruleDeleted(notification: Notification) {
         ruleDeleted()
     }
 
@@ -251,19 +251,19 @@ class RuleListTableViewController: UITableViewController, UISearchResultsUpdatin
     func makeAttributeDescription(withMatchRule matchRule: String, andProxyRule proxyRule: String) -> NSAttributedString {
         let attributeDescription = NSMutableAttributedString(string: "")
 
-        let attributeRequestType = NSAttributedString(string: matchRule, attributes: [NSForegroundColorAttributeName: UIColor.lightGray])
+        let attributeRequestType = NSAttributedString(string: matchRule, attributes: [NSAttributedStringKey.foregroundColor: UIColor.lightGray])
         attributeDescription.append(attributeRequestType)
         attributeDescription.append(NSAttributedString(string: " "))
 
         switch proxyRule.lowercased() {
         case "direct":
-            let attributeRule = NSAttributedString(string: proxyRule, attributes: [NSForegroundColorAttributeName: UIColor.init(red: 0.24, green: 0.545, blue: 0.153, alpha: 1.0)])
+            let attributeRule = NSAttributedString(string: proxyRule, attributes: [NSAttributedStringKey.foregroundColor: UIColor.init(red: 0.24, green: 0.545, blue: 0.153, alpha: 1.0)])
             attributeDescription.append(attributeRule)
         case "proxy":
-            let attributeRule = NSAttributedString(string: proxyRule, attributes: [NSForegroundColorAttributeName: UIColor.orange])
+            let attributeRule = NSAttributedString(string: proxyRule, attributes: [NSAttributedStringKey.foregroundColor: UIColor.orange])
             attributeDescription.append(attributeRule)
         default:
-            let attributeRule = NSAttributedString(string: proxyRule, attributes: [NSForegroundColorAttributeName: UIColor.red])
+            let attributeRule = NSAttributedString(string: proxyRule, attributes: [NSAttributedStringKey.foregroundColor: UIColor.red])
             attributeDescription.append(attributeRule)
         }
         return attributeDescription
@@ -280,7 +280,7 @@ class RuleListTableViewController: UITableViewController, UISearchResultsUpdatin
 
         for range in searchRangesOfFilterText(inString: text) {
 
-            mutableAttText.addAttribute(NSBackgroundColorAttributeName, value: UIColor.yellow, range: text.toNSRange(from: range))
+            mutableAttText.addAttribute(.backgroundColor, value: UIColor.yellow, range: NSRange(range, in: text))
         }
         return mutableAttText
     }
@@ -289,7 +289,7 @@ class RuleListTableViewController: UITableViewController, UISearchResultsUpdatin
         var endRange = str.endIndex
         var ranges = [Range<String.Index>]()
         while true {
-            let subString = str.substring(to: endRange)
+            let subString = str[..<endRange]
             if let range = subString.range(of: filterText, options: [.literal, .backwards]) {
                 ranges.append(range)
                 endRange = range.lowerBound
@@ -389,14 +389,5 @@ class RuleListTableViewController: UITableViewController, UISearchResultsUpdatin
                 }
             }
         }
-    }
-}
-
-
-extension String {
-    func toNSRange(from range: Range<String.Index>) -> NSRange {
-        let from = range.lowerBound.samePosition(in: utf16)
-        let to = range.upperBound.samePosition(in: utf16)
-        return NSRange.init(location: utf16.distance(from: utf16.startIndex, to: from), length: utf16.distance(from: from, to: to))
     }
 }

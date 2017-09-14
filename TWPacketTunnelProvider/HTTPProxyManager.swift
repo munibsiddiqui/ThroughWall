@@ -118,7 +118,7 @@ class HTTPProxyManager: NSObject {
 
     func repeatlySaveTraffic(withInterval interval: Int) {
         saveTrafficTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue(label: "saveQueue"))
-        saveTrafficTimer?.scheduleRepeating(deadline: .now() + .seconds(interval), interval: .seconds(interval), leeway: .milliseconds(100))
+        saveTrafficTimer?.schedule(deadline: .now() + .seconds(interval), repeating: .seconds(interval), leeway: .milliseconds(100))
         saveTrafficTimer?.setEventHandler(handler: {
             let (download, proxyDownload, directDownload, upload, proxyUpload, directUpload) = self.readDownloadUploadCount()
             // DDLogVerbose("download:\(download) upload:\(upload)")
@@ -141,7 +141,7 @@ class HTTPProxyManager: NSObject {
                     let oldProxyDownload = defaults?.value(forKey: proxyDownloadCountKey) as! Int
                     let oldProxyUpload = defaults?.value(forKey: proxyUploadCountKey) as! Int
                     let oldDate = localFormatter.date(from: recordingDate)
-                    self.archiveOldMonthHistory(oldProxyDownload, oldProxyUpload: oldProxyUpload, oldDate: oldDate! as NSDate)
+                    self.archiveOldMonthHistory(oldProxyDownload, oldProxyUpload: oldProxyUpload, oldDate: oldDate!)
                     defaults?.set(proxyDownload, forKey: proxyDownloadCountKey)
                     defaults?.set(proxyUpload, forKey: proxyUploadCountKey)
                     defaults?.set(currentDate, forKey: recordingDateKey)
@@ -196,7 +196,7 @@ class HTTPProxyManager: NSObject {
         return (download, proxyDownload, directDownload, upload, proxyUpload, directUpload)
     }
 
-    func archiveOldMonthHistory(_ oldProxyDownload: Int, oldProxyUpload: Int, oldDate: NSDate) {
+    func archiveOldMonthHistory(_ oldProxyDownload: Int, oldProxyUpload: Int, oldDate: Date) {
         DispatchQueue.main.async {
             let context = CoreDataController.sharedInstance.getContext()
             let proxyHisTraffic = HistoryTraffic(context: context)
@@ -215,7 +215,7 @@ class HTTPProxyManager: NSObject {
         DispatchQueue.main.async {
             let context = CoreDataController.sharedInstance.getContext()
 
-            let timestamp = NSDate()
+            let timestamp = Date()
 
             if traffic.proxyDownload > 0 || traffic.proxyUpload > 0 {
                 let proxyHisTraffic = HistoryTraffic(context: context)
@@ -249,7 +249,7 @@ class HTTPProxyManager: NSObject {
 
     func repeatlyDeleteOldHistory(before beforeSeconds: Int, withRepeatPeriod repeatPeriod: Int) {
         repeatDeleteTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue(label: "deleteQueue"))
-        repeatDeleteTimer?.scheduleRepeating(deadline: .now() + .seconds(repeatPeriod), interval: .seconds(repeatPeriod), leeway: .milliseconds(100))
+        repeatDeleteTimer?.schedule(deadline: .now() + .seconds(repeatPeriod), repeating: .seconds(repeatPeriod), leeway: .milliseconds(100))
         repeatDeleteTimer?.setEventHandler(handler: {
             DispatchQueue.main.async {
                 let oldTime = NSDate.init(timeInterval: TimeInterval(-1 * beforeSeconds), since: Date())
@@ -274,7 +274,7 @@ class HTTPProxyManager: NSObject {
     // MARK: - repeatlyDisconnectOutgoing
     func repeatlyDisconnectOutgoing(withMaxKeepAliveTime maxAliveTime: Int, checkPeriod: Int) {
         repeatDisconnectTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue(label: "disconnectQueue"))
-        repeatDisconnectTimer?.scheduleRepeating(deadline: .now() + .seconds(checkPeriod), interval: .seconds(checkPeriod), leeway: .milliseconds(100))
+        repeatDisconnectTimer?.schedule(deadline: .now() + .seconds(checkPeriod), repeating: .seconds(checkPeriod), leeway: .milliseconds(100))
 
         repeatDisconnectTimer?.setEventHandler(handler: {
             let currentDate = Date()

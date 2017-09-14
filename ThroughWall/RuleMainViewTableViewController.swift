@@ -71,7 +71,7 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
     }
 
     func setTopArear() {
-        navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
+        navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.white]
         navigationController?.navigationBar.tintColor = UIColor.white
         navigationController?.navigationBar.isTranslucent = false
         navigationController?.navigationBar.setBackgroundImage(image(fromColor: topUIColor), for: .any, barMetrics: .default)
@@ -91,7 +91,7 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
     }
 
 
-    func globalModeSwitchDidChange(_ sender: UISwitch) {
+    @objc func globalModeSwitchDidChange(_ sender: UISwitch) {
         let defaults = UserDefaults.init(suiteName: groupName)
         defaults?.set(sender.isOn, forKey: globalModeSetting)
         defaults?.synchronize()
@@ -482,7 +482,7 @@ class RuleMainViewTableViewController: UITableViewController, URLSessionDownload
         self.present(alertController, animated: true, completion: nil)
     }
 
-    func alertTextFieldDidChange(notification: NSNotification) {
+    @objc func alertTextFieldDidChange(notification: NSNotification) {
         if let alertContorller = self.presentedViewController as? UIAlertController {
             guard let url = alertContorller.textFields?.first?.text else {
                 return

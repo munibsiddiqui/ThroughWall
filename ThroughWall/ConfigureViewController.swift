@@ -65,11 +65,11 @@ class ConfigureViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
 
-    func nextTextFieldAfterPortField() {
+    @objc func nextTextFieldAfterPortField() {
         inputFields[3].becomeFirstResponder()
     }
 
-    func didExtractedQRCode(notification: Notification) {
+    @objc func didExtractedQRCode(notification: Notification) {
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kQRCodeExtracted), object: nil)
         if let code = notification.userInfo?["string"] as? String {
            let (_proxyConfig, succeed)  = QRCodeProcess().decode(QRCode: code, intoProxyConfig: proxyConfig)
@@ -101,7 +101,7 @@ class ConfigureViewController: UITableViewController {
         if let outputImg = outputImage {
             let originalWidth = outputImg.extent.width
             let transform = CGAffineTransform(scaleX: 300.0 / originalWidth, y: 300.0 / originalWidth)
-            let transformedImage = outputImg.applying(transform)
+            let transformedImage = outputImg.transformed(by: transform)
 
             let context = CIContext(options: nil)
             let imageRef = context.createCGImage(transformedImage, from: transformedImage.extent)
@@ -200,7 +200,7 @@ class ConfigureViewController: UITableViewController {
 
                 cell.valueChanged = {
                     self.proxyConfig.setValue(byItem: item, value: cell.itemDetail.text!)
-                }
+                } as (() -> Void)
 
                 cell.returnPressed = {
                     if let index = self.inputFields.index(of: cell.itemDetail) {
@@ -210,7 +210,7 @@ class ConfigureViewController: UITableViewController {
                             cell.itemDetail.resignFirstResponder()
                         }
                     }
-                }
+                } as (() -> Void)
 
                 return cell
             }

@@ -235,15 +235,15 @@ class RequestListTableViewController: UITableViewController {
         if let rule = hostTraffic.hostConnectInfo?.rule {
             switch rule.lowercased() {
             case "direct":
-                let attributeRule = NSAttributedString(string: rule, attributes: [NSBackgroundColorAttributeName: UIColor.init(red: 0.24, green: 0.545, blue: 0.153, alpha: 1.0)])
+                let attributeRule = NSAttributedString(string: rule, attributes: [NSAttributedStringKey.backgroundColor: UIColor.init(red: 0.24, green: 0.545, blue: 0.153, alpha: 1.0)])
                 attributeDescription.append(attributeRule)
                 attributeDescription.append(NSAttributedString(string: " "))
             case "proxy":
-                let attributeRule = NSAttributedString(string: rule, attributes: [NSBackgroundColorAttributeName: UIColor.orange])
+                let attributeRule = NSAttributedString(string: rule, attributes: [NSAttributedStringKey.backgroundColor: UIColor.orange])
                 attributeDescription.append(attributeRule)
                 attributeDescription.append(NSAttributedString(string: " "))
             default:
-                let attributeRule = NSAttributedString(string: rule, attributes: [NSBackgroundColorAttributeName: UIColor.red])
+                let attributeRule = NSAttributedString(string: rule, attributes: [NSAttributedStringKey.backgroundColor: UIColor.red])
                 attributeDescription.append(attributeRule)
                 attributeDescription.append(NSAttributedString(string: " "))
             }
@@ -251,13 +251,13 @@ class RequestListTableViewController: UITableViewController {
 
         if let requestHead = hostTraffic.requestHead?.head {
             let requestType = requestHead.components(separatedBy: " ")[0]
-            let attributeRequestType = NSAttributedString(string: requestType, attributes: [NSForegroundColorAttributeName: UIColor.white, NSBackgroundColorAttributeName: UIColor.init(red: 0.24, green: 0.545, blue: 0.153, alpha: 1.0)])
+            let attributeRequestType = NSAttributedString(string: requestType, attributes: [NSAttributedStringKey.foregroundColor: UIColor.white, NSAttributedStringKey.backgroundColor: UIColor.init(red: 0.24, green: 0.545, blue: 0.153, alpha: 1.0)])
             attributeDescription.append(attributeRequestType)
             attributeDescription.append(NSAttributedString(string: " "))
         }
 
         if hostTraffic.inProcessing == true {
-            let attributeIsComplete = NSAttributedString(string: "Incomplete", attributes: [NSBackgroundColorAttributeName: UIColor.orange])
+            let attributeIsComplete = NSAttributedString(string: "Incomplete", attributes: [NSAttributedStringKey.backgroundColor: UIColor.orange])
             attributeDescription.append(attributeIsComplete)
             attributeDescription.append(NSAttributedString(string: " "))
         } else {
@@ -265,7 +265,7 @@ class RequestListTableViewController: UITableViewController {
             if hostTraffic.forceDisconnect == true {
                 backColor = UIColor.gray
             }
-            let attributeIsComplete = NSAttributedString(string: "Complete", attributes: [NSBackgroundColorAttributeName: backColor])
+            let attributeIsComplete = NSAttributedString(string: "Complete", attributes: [NSAttributedStringKey.backgroundColor: backColor])
             attributeDescription.append(attributeIsComplete)
             attributeDescription.append(NSAttributedString(string: " "))
         }

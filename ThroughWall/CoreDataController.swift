@@ -156,7 +156,7 @@ class CoreDataController: NSObject {
             let results = try context.fetch(fetch)
             for result in results {
                 if result.disconnectTime == nil {
-                    result.disconnectTime = disconnectTime as NSDate
+                    result.disconnectTime = disconnectTime
                     result.forceDisconnect = true
                     result.inProcessing = false
                 }

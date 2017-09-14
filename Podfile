@@ -4,7 +4,7 @@
 target 'ThroughWall' do
   # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
   use_frameworks!
-  pod 'CocoaLumberjack/Swift', '~> 3.1.0'
+  pod 'CocoaLumberjack/Swift'
   pod 'Charts'
   pod 'Fabric'
   pod 'Crashlytics'
@@ -16,7 +16,7 @@ end
 target 'TodayEx' do
   # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
   use_frameworks!
-  pod 'CocoaLumberjack/Swift', '~> 3.1.0'
+  pod 'CocoaLumberjack/Swift'
   pod 'Fabric'
   pod 'Crashlytics'
   # Pods for TodayEx
@@ -27,7 +27,7 @@ target 'TunnelLib' do
   # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
   use_frameworks!
   pod 'CocoaAsyncSocket'
-  pod 'CocoaLumberjack/Swift', '~> 3.1.0'
+  pod 'CocoaLumberjack/Swift'
   # Pods for TunnelLib
 
 end
@@ -36,7 +36,7 @@ target 'TWPacketTunnelProvider' do
   # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
   use_frameworks!
   pod 'CocoaAsyncSocket'
-  pod 'CocoaLumberjack/Swift', '~> 3.1.0'
+  pod 'CocoaLumberjack/Swift'
   pod 'Fabric'
   pod 'Crashlytics'
   pod 'MMDB-Swift'

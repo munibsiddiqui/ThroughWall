@@ -199,7 +199,7 @@ class TodayViewController: UIViewController, NCWidgetProviding, UITableViewDeleg
     }
 
 
-    func VPNStatusDidChange(_ notification: Notification?) {
+    @objc func VPNStatusDidChange(_ notification: Notification?) {
         if let currentVPNManager = self.currentVPNManager {
             currentVPNStatusIndicator = currentVPNManager.connection.status
         } else {
@@ -271,11 +271,11 @@ class TodayViewController: UIViewController, NCWidgetProviding, UITableViewDeleg
             if let intDelayValue = Int(delayValue) {
                 switch intDelayValue {
                 case -1:
-                    cell.VPNPingValueLabel.attributedText = NSAttributedString(string: "Timeout", attributes: [NSForegroundColorAttributeName: UIColor.red])
+                    cell.VPNPingValueLabel.attributedText = NSAttributedString(string: "Timeout", attributes: [NSAttributedStringKey.foregroundColor: UIColor.red])
                 case 0 ..< 100:
-                    cell.VPNPingValueLabel.attributedText = NSAttributedString(string: "\(delayValue) ms", attributes: [NSForegroundColorAttributeName: UIColor.init(red: 0.24, green: 0.545, blue: 0.153, alpha: 1.0)])
+                    cell.VPNPingValueLabel.attributedText = NSAttributedString(string: "\(delayValue) ms", attributes: [NSAttributedStringKey.foregroundColor: UIColor.init(red: 0.24, green: 0.545, blue: 0.153, alpha: 1.0)])
                 default:
-                    cell.VPNPingValueLabel.attributedText = NSAttributedString(string: "\(delayValue) ms", attributes: [NSForegroundColorAttributeName: UIColor.black])
+                    cell.VPNPingValueLabel.attributedText = NSAttributedString(string: "\(delayValue) ms", attributes: [NSAttributedStringKey.foregroundColor: UIColor.black])
                 }
             } else {
                 cell.VPNPingValueLabel.text = ""

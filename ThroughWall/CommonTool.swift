@@ -569,7 +569,7 @@ class SiteConfigController {
         }
     }
 
-    func save(withConfig config: ProxyConfig, intoManager manager: NETunnelProviderManager, completionHander completion: @escaping (Void) -> Void) {
+    func save(withConfig config: ProxyConfig, intoManager manager: NETunnelProviderManager, completionHander completion: @escaping () -> Void) {
         self.setConfig(fromProxyConfig: config, toManager: manager)
 
         manager.isEnabled = true

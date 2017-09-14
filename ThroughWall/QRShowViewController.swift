@@ -34,7 +34,7 @@ class QRShowViewController: UIViewController {
         dismiss(animated: true, completion: nil)
     }
     
-    func image(image:UIImage,didFinishSavingWithError error:NSError?,contextInfo:AnyObject) {
+    @objc func image(image:UIImage,didFinishSavingWithError error:NSError?,contextInfo:AnyObject) {
         
         if error != nil {
             let alertController = UIAlertController(title: "Failed", message: "Failed to save QRCode", preferredStyle: .alert)

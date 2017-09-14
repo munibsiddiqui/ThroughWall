@@ -46,7 +46,7 @@ class RawRuleTXTViewController: UIViewController, UITextViewDelegate {
     }
     
     
-    func keyboardWillChangeFrame(notification: Notification) {
+    @objc func keyboardWillChangeFrame(notification: Notification) {
         if let userInfo = notification.userInfo {
             let endFrame = (userInfo[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue
             let duration:TimeInterval = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0
@@ -76,7 +76,7 @@ class RawRuleTXTViewController: UIViewController, UITextViewDelegate {
         
         for range in searchRanges(ofKeytext: keyText, inString: text){
             
-            mutableAttText.addAttribute(NSForegroundColorAttributeName, value: fColor, range: text.toNSRange(from: range))
+            mutableAttText.addAttribute(.foregroundColor, value: fColor, range: NSRange(range, in: text))
         }
         return mutableAttText
     }

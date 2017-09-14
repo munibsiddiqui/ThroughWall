@@ -130,7 +130,7 @@ class HomeViewController: UIViewController {
 
 
     func setTopArea() {
-        navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
+        navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.white]
         navigationController?.navigationBar.tintColor = UIColor.white
         navigationController?.navigationBar.isTranslucent = false
         navigationController?.navigationBar.setBackgroundImage(image(fromColor: topUIColor), for: .any, barMetrics: .default)
@@ -274,7 +274,7 @@ class HomeViewController: UIViewController {
     }
 
     // MARK: - kQRCodeExtracted notification
-    func didExtractedQRCode(notification: Notification) {
+    @objc func didExtractedQRCode(notification: Notification) {
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kQRCodeExtracted), object: nil)
         if let code = notification.userInfo?["string"] as? String {
             let proxyConfig = ProxyConfig()
@@ -301,7 +301,7 @@ class HomeViewController: UIViewController {
     }
 
     // MARK: - NEVPNStatusDidChange notification
-    func VPNStatusDidChange(_ notification: Notification?) {
+    @objc func VPNStatusDidChange(_ notification: Notification?) {
         if let currentVPNManager = self.currentVPNManager {
             currentVPNStatusIndicator = currentVPNManager.connection.status
         } else {
@@ -310,7 +310,7 @@ class HomeViewController: UIViewController {
     }
 
     // MARK: - UIApplicationWillEnterForeground notification
-    func animationResume() {
+    @objc func animationResume() {
         setOperationArea()
     }
 
@@ -435,7 +435,7 @@ class HomeViewController: UIViewController {
     }
 
     // MARK: - Test Server Dalay
-    func testServerDelay(sender: AnyObject) {
+    @objc func testServerDelay(sender: AnyObject) {
         if let manager = currentVPNManager {
             if manager.connection.status != .disconnected {
 
@@ -488,7 +488,7 @@ class HomeViewController: UIViewController {
         self.performSegue(withIdentifier: "configure", sender: nil)
     }
 
-    func saveVPN(_ notification: NSNotification) {
+    @objc func saveVPN(_ notification: NSNotification) {
         if willEditServerIndex == -1 {
             //add
             if let newConfig = notification.userInfo?["proxyConfig"] as? ProxyConfig {
@@ -508,7 +508,7 @@ class HomeViewController: UIViewController {
         reloadTable()
     }
 
-    func deleteEditingVPN() {
+    @objc func deleteEditingVPN() {
         let selectedServer = proxyConfigs[selectedServerIndex]
         proxyConfigs.remove(at: willEditServerIndex)
         if let newSelectedServerIndex = proxyConfigs.index(of: selectedServer) {
@@ -574,18 +574,18 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
             if let intDelayValue = Int(delayValue) {
                 switch intDelayValue {
                 case -1:
-                    delayLabel.attributedText = NSAttributedString(string: "Timeout", attributes: [NSForegroundColorAttributeName: UIColor.red])
+                    delayLabel.attributedText = NSAttributedString(string: "Timeout", attributes: [NSAttributedStringKey.foregroundColor: UIColor.red])
                 case 0 ..< 100:
-                    delayLabel.attributedText = NSAttributedString(string: "\(delayValue) ms", attributes: [NSForegroundColorAttributeName: darkGreenUIColor])
+                    delayLabel.attributedText = NSAttributedString(string: "\(delayValue) ms", attributes: [NSAttributedStringKey.foregroundColor: darkGreenUIColor])
                 default:
-                    delayLabel.attributedText = NSAttributedString(string: "\(delayValue) ms", attributes: [NSForegroundColorAttributeName: UIColor.black])
+                    delayLabel.attributedText = NSAttributedString(string: "\(delayValue) ms", attributes: [NSAttributedStringKey.foregroundColor: UIColor.black])
                 }
             } else {
                 delayLabel.text = ""
             }
 
         } else {
-            delayLabel.attributedText = NSAttributedString(string: "? ms", attributes: [NSForegroundColorAttributeName: UIColor.orange])
+            delayLabel.attributedText = NSAttributedString(string: "? ms", attributes: [NSAttributedStringKey.foregroundColor: UIColor.orange])
         }
 
         if indexPath.row == selectedServerIndex {

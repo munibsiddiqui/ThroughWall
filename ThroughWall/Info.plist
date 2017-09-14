@@ -19,7 +19,7 @@
 	<key>CFBundleShortVersionString</key>
 	<string>1.2.8</string>
 	<key>CFBundleVersion</key>
-	<string>25</string>
+	<string>26</string>
 	<key>Fabric</key>
 	<dict>
 		<key>APIKey</key>
@@ -57,6 +57,8 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Using Camera to capture QR Code</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Save QRCode</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Read or Write QR Code requiring Photo Library permission</string>
 	<key>UIFileSharingEnabled</key>
@@ -84,7 +86,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Save QRCode</string>
 </dict>
 </plist>

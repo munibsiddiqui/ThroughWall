@@ -440,6 +440,11 @@ class SiteConfigController {
                     try fileManager.removeItem(atPath: backupURL)
                 }
                 try fileManager.copyItem(atPath: url.path, toPath: backupURL)
+            }else if usingTimestamp < backupTimestamp {
+                if fileManager.fileExists(atPath: url.path) {
+                    try fileManager.removeItem(atPath: url.path)
+                }
+                try fileManager.copyItem(atPath: backupURL, toPath: url.path)
             }
 
         } catch {

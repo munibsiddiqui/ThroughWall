@@ -633,14 +633,16 @@ extension HTTPAnalyzer {
         var requestComponents = request.components(separatedBy: "\r\n")
         for (index, requestComponent) in requestComponents.enumerated() {
             if requestComponent.hasPrefix("Host: ") {
-                var temp = String(requestComponent[requestComponent.index(requestComponent.startIndex, offsetBy: 6) ..< requestComponent.endIndex])
-                temp = "http://" + temp
-                temp = Rule.sharedInstance.tryRewriteURL(withURLString: temp)
-                if let slashIndex = temp.range(of: "//") {
-                    temp = String(temp[slashIndex.upperBound ..< temp.endIndex])
-                    temp = "Host: " + temp
-                    requestComponents[index] = temp
-                }
+                autoreleasepool(invoking: { () -> Void in
+                    var temp = String(requestComponent[requestComponent.index(requestComponent.startIndex, offsetBy: 6) ..< requestComponent.endIndex])
+                    temp = "http://" + temp
+                    temp = Rule.sharedInstance.tryRewriteURL(withURLString: temp)
+                    if let slashIndex = temp.range(of: "//") {
+                        temp = String(temp[slashIndex.upperBound ..< temp.endIndex])
+                        temp = "Host: " + temp
+                        requestComponents[index] = temp
+                    }
+                })
             }
         }
         return requestComponents.joined(separator: "\r\n")

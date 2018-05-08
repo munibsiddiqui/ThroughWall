@@ -69,7 +69,7 @@ class ProxyConfig: NSObject {
             ],
             "method": [
                 "preset": [
-                    "table", "aes-128-ctr", "aes-192-ctr", "aes-256-ctr", "aes-128-cfb", "aes-192-cfb", "aes-256-cfb", "bf-cfb", "camellia-128-cfb", "camellia-192-cfb", "camellia-256-cfb", "cast5-cfb", "chacha20", "chacha20-ietf", "des-cfb", "idea-cfb", "rc2-cfb", "rc4", "rc4-md5", "salsa20", "seed-cfb"
+                    "none", "table", "aes-128-ctr", "aes-192-ctr", "aes-256-ctr", "aes-128-cfb", "aes-192-cfb", "aes-256-cfb", "bf-cfb", "camellia-128-cfb", "camellia-192-cfb", "camellia-256-cfb", "cast5-cfb", "chacha20", "chacha20-ietf", "des-cfb", "idea-cfb", "rc2-cfb", "rc4", "rc4-md5", "salsa20", "seed-cfb"
                 ]
             ],
             "dns": [
@@ -851,6 +851,10 @@ class QRCodeProcess {
             description = code.substring(from: code.index(after: poundsignIndex)).removingPercentEncoding ?? ""
             code.removeSubrange(removeRange)
         } else if let remarkRange = code.range(of: "?remark=") {
+            let removeRange = Range(uncheckedBounds: (lower: remarkRange.lowerBound, upper: code.endIndex))
+            description = code.substring(from: code.index(after: remarkRange.upperBound)).removingPercentEncoding ?? ""
+            code.removeSubrange(removeRange)
+        }else if let remarkRange = code.range(of: "?remarks=") {
             let removeRange = Range(uncheckedBounds: (lower: remarkRange.lowerBound, upper: code.endIndex))
             description = code.substring(from: code.index(after: remarkRange.upperBound)).removingPercentEncoding ?? ""
             code.removeSubrange(removeRange)

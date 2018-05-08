@@ -26,8 +26,8 @@ class ViewController: NSViewController {
         localFormatter.locale = Locale.current
         localFormatter.dateFormat = "HH:mm:ss:SSS"
 
-        let securityTest = SecurityTest()
-        securityTest.start()
+//        let securityTest = SecurityTest()
+//        securityTest.start()
     }
 
     override var representedObject: Any? {
